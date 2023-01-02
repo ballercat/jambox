@@ -1,0 +1,25 @@
+.vscode
+node_modules
+coverage
+.DS_Store
+*.log
+dist
+build
+public
+.idea
+test-report.xml
+
+# ???
+http:/*
+server.log
+
+# yarn
+
+.pnp.*
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

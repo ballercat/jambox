@@ -1,0 +1,8 @@
+{
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "arrowParens": "always",
+  "singleQuote": true,
+  "plugins": ["prettier-plugin-svelte"]
+}
+

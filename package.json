@@ -1,0 +1,75 @@
+{
+  "name": "jambox",
+  "version": "0.0.7",
+  "description": "Tool for recording and playing back HTTP requests.",
+  "bin": {
+    "jam": "./jam.mjs",
+    "jam-server": "./jam-server.mjs"
+  },
+  "packageManager": "yarn@3.2.4",
+  "author": "Arthur Buldauskas <arthurbuldauskas@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+github.com:ballercat/jambox.git"
+  },
+  "scripts": {
+    "build": "webpack",
+    "dev": "nodemon --watch ext --watch src --exec ./jam-server.mjs",
+    "test": "c8 -r=text -r=lcov ava",
+    "lint": "eslint src/**/*.mjs",
+    "format": "prettier --write ./src",
+    "shutdown": "curl localhost:9000/shutdown",
+    "health": "curl localhost:9000/info"
+  },
+  "dependencies": {
+    "@httptoolkit/browser-launcher": "^2.0.2",
+    "arg": "^5.0.2",
+    "body-parser": "^1.20.1",
+    "debug": "^4.3.4",
+    "deepmerge": "^4.2.2",
+    "express": "^4.18.2",
+    "express-ws": "^5.0.2",
+    "global-agent": "^3.0.0",
+    "http-encoding": "^1.5.1",
+    "minimatch": "^5.1.0",
+    "mockttp": "^3.4.0",
+    "nock": "^13.2.9",
+    "node-fetch": "^2",
+    "osenv": "^0.1.5",
+    "wait-on": "^6.0.1",
+    "zen-observable": "^0.9.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.2",
+    "@babel/preset-env": "^7.20.2",
+    "ava": "^5.0.1",
+    "babel-loader": "^9.1.0",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "c8": "^7.12.0",
+    "css-loader": "^6.7.1",
+    "eslint": "^7.32.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "find-open-port": "^2.0.3",
+    "html-webpack-plugin": "^5.5.0",
+    "https-proxy-agent": "^5.0.1",
+    "mock-fs": "^5.1.4",
+    "nodemon": "^2.0.20",
+    "prettier": "^2.7.1",
+    "prettier-plugin-svelte": "^2.9.0",
+    "prop-types": "^15.8.1",
+    "proxy-agent": "^5.0.0",
+    "supertest": "^6.3.1",
+    "superwstest": "^2.0.3",
+    "svelte": "^3.55.0",
+    "svelte-loader": "^3.1.4",
+    "webextension-polyfill": "^0.10.0",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  },
+  "nodemonConfig": {
+    "env": {
+      "DEBUG": "jambox*"
+    }
+  }
+}
