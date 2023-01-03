@@ -14,9 +14,6 @@ const initialize = ({ ws }, timestamp) => {
 
     ws.addEventListener('message', listen);
 
-    // TODO: Remove. No longer necessary. Use the REST API
-    ws.send(JSON.stringify({ type: '__sub' }));
-
     return () => {
       ws.removeEventListener('message', listen);
     };

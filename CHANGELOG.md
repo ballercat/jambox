@@ -1,3 +1,9 @@
+## 0.0.8 Bugfixes, config watchmode
+
+- Bugfix: `trust` list
+- Bugfix: cache handling. Remove unnecessary options
+- Feature: config file is watched for changes, server resets with changes.
+
 ## 0.0.7 Publish
 
 - License

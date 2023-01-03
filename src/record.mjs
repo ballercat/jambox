@@ -25,12 +25,7 @@ export default async function record(options) {
 
   debug('Checking if a server instance is running.');
 
-  const cacheDir = path.join(cwd, CACHE_DIR_NAME);
   const config = getConfig();
-  if (fs.existsSync(cacheDir)) {
-    config.cache = deepmerge(config.cache || {}, { dir: cacheDir });
-    config.logLocation = path.join(cacheDir, 'server.log');
-  }
 
   try {
     await launchServer({ log, port, constants, config });
@@ -45,7 +40,7 @@ export default async function record(options) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(config),
+      body: JSON.stringify({ cwd }),
     })
   ).json();
 

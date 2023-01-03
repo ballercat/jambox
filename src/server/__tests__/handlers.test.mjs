@@ -68,10 +68,13 @@ test('localhost: glob matching', async (t) => {
 });
 
 test('cache', async (t) => {
-  await record({ proxy: t.context.proxy, cache: {} }, {});
+  await record(
+    { proxy: t.context.proxy },
+    { value: { cache: { stage: ['**'] } } }
+  );
 
   t.deepEqual(t.context.explainRules(), [
-    'CacheMatcher {"paths":["**"],"host":"*"}',
+    'CacheMatcher {"stage":["**"]}',
     'CacheHandler return a response from cache',
   ]);
 });

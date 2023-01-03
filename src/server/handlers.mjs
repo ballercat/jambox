@@ -27,21 +27,21 @@ const pathGlobMatcher = (target, options) => (request) => {
 class CacheMatcher extends mockttp.matchers.CallbackMatcher {
   #options = null;
 
-  constructor(svc, options) {
-    const matchPaths = pathGlobMatcher(options.host, options);
+  constructor(svc, options = {}) {
     super(async (request) => {
       if (svc.cache.bypass()) {
         return false;
       }
 
-      const matches = matchPaths(request);
+      const { ignore = [], stage = [] } = options;
+      const url = new URL(request.url);
+      const testGlob = (glob) => minimatch(url.pathname, glob);
+      const ignored = ignore.some(testGlob);
+      const matched = stage.some(testGlob);
+
       const hash = await Cache.hash(request);
 
-      if (!matches || !svc.cache.has(hash)) {
-        return false;
-      }
-
-      return true;
+      return !ignored && matched && svc.cache.has(hash);
     });
     this.#options = options;
   }
@@ -110,25 +110,12 @@ class CacheHandler extends mockttp.requestHandlers.CallbackHandler {
   }
 }
 
-export const record = async (svc, config) => {
-  const all = {
-    '*': {
-      paths: ['**'],
-    },
-    ...config.value?.cache,
-  };
-  await Promise.all(
-    Object.entries(all).map(([original, ...rest]) => {
-      const options = typeof rest[0] === 'object' ? rest[0] : {};
-
-      options.host = original;
-      return svc.proxy.addRequestRule({
-        priority: 100,
-        matchers: [new CacheMatcher(svc, options)],
-        handler: new CacheHandler(svc),
-      });
-    })
-  );
+export const record = (svc, config) => {
+  return svc.proxy.addRequestRule({
+    priority: 100,
+    matchers: [new CacheMatcher(svc, config.value.cache)],
+    handler: new CacheHandler(svc),
+  });
 };
 
 export const forward = (svc, config) => {
@@ -306,6 +293,7 @@ export default async function handlers(svc, config) {
       .forAnyRequest()
       .asPriority(98)
       .thenPassThrough({
+        // Trust any hosts specified.
         ignoreHostHttpsErrors: [...(config.value.trust || [])],
       });
   }

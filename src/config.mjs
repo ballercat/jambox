@@ -1,14 +1,23 @@
+import fs from 'fs';
 import path from 'path';
 import deepmerge from 'deepmerge';
 import getUserConfigFile from './read-user-config.js';
-import { PROJECT_ROOT } from './constants.mjs';
+import {
+  PROJECT_ROOT,
+  CONFIG_FILE_NAME,
+  CACHE_DIR_NAME,
+} from './constants.mjs';
 
-export default function config(overrides = {}) {
+export default function config(overrides = {}, cwd = process.cwd()) {
+  const filepath = path.join(cwd, CONFIG_FILE_NAME);
   // Works with .json & .js
-  const userConfig = getUserConfigFile();
+  const userConfig = getUserConfigFile(filepath);
+  const cacheDir = path.join(cwd, CACHE_DIR_NAME);
 
-  return deepmerge(
+  const config = deepmerge(
     {
+      cwd,
+      filepath,
       logLocation: path.join(PROJECT_ROOT, 'server.log'),
       forward: {},
       noProxy: ['<-loopback->'],
@@ -16,4 +25,11 @@ export default function config(overrides = {}) {
     },
     overrides
   );
+
+  if (fs.existsSync(cacheDir)) {
+    config.cache = deepmerge(config.cache || {}, { dir: cacheDir });
+    config.logLocation = path.join(cacheDir, 'server.log');
+  }
+
+  return config;
 }
