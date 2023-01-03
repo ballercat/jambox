@@ -40,7 +40,6 @@ export default async function record(options) {
       headers: {
         'Content-Type': 'application/json',
       },
-      // body: JSON.stringify(config),
       body: JSON.stringify({ cwd }),
     })
   ).json();

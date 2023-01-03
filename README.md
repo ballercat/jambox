@@ -52,6 +52,10 @@ or create a re-usable script if you don't want to type this out every time
 
 Currently `jambox.config.js` is the default config path.
 
+Changing the config file resets the jambox server in order to use the changed
+options. Any cache values not persisted to file(s) are abanadoned when a jam server
+is reset.
+
 Here is a kitchen sink example of a config that:
 
 - blocks any non mocked request

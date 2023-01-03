@@ -289,7 +289,6 @@ export default async function handlers(svc, config) {
   await record(svc, config);
 
   if (!config.value.blockNetworkRequests) {
-    debug('Allow requests');
     await svc.proxy
       .forAnyRequest()
       .asPriority(98)

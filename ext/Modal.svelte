@@ -58,13 +58,13 @@
   }
 
   .modal {
-    position: absolute;
-    left: 50%;
+    position: fixed;
+    top: 10%;
+    left: 5%;
     width: calc(100vw - 2em);
     max-width: 62em;
     max-height: calc(100vh - 4em);
     overflow: auto;
-    transform: translate(-50%, -50%);
     padding: 1em;
     border-radius: 0.2em;
     background: white;

@@ -77,7 +77,7 @@ const backend = async (svc, config) => {
 
         configWatcher = fs.watchFile(
           config.value.filepath,
-          { persistent: false, interval: 1000 },
+          { persistent: false, interval: 500 },
           () => {
             config.value = getConfig({}, config.value.cwd);
             reset();

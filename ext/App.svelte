@@ -30,7 +30,11 @@
 <main class="Container">
   <h1>Jambox</h1>
   <div class="Box">
-    <button>Clear</button>
+    <button
+      on:click={() =>
+        store.update((state) => reducer(state, { type: 'clear' }))}
+      >Clear</button
+    >
     <button
       on:click={() => {
         chrome.tabs.query(
