@@ -19,12 +19,12 @@ module.exports = {
     'react/react-in-jsx-scope': 0,
   },
   env: {
-    es6: true,
     browser: true,
     node: true,
     webextensions: true,
+    es2022: true,
   },
-  parserOptions: { ecmaVersion: 11, sourceType: 'module' },
+  parserOptions: { /*ecmaVersion: 12,*/ sourceType: 'module' },
   overrides: [
     {
       files: ['*.svelte'],

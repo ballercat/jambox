@@ -1,11 +1,12 @@
 const path = require('path');
 const debug = require('debug')('jambox.config');
 
-module.exports = (cwd = process.cwd()) => {
+module.exports = (filepath) => {
   try {
-    return require(path.join(cwd, 'jambox.config'));
+    delete require.cache[require.resolve(filepath)];
+    return require(filepath);
   } catch (error) {
-    debug('No config file found.');
+    debug(`No config file found: ${filepath}.`);
     return {};
   }
 };

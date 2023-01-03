@@ -7,11 +7,18 @@
   const chrome = window.chrome;
   let cleanup;
 
+  fetch('http://localhost:9000/api/config')
+    .then((res) => res.json())
+    .then((payload) => {
+      store.update((state) => reducer(state, { type: 'config', payload }));
+    });
+
   $: {
     cleanup?.();
 
     const sub = server.subscribe((action) => {
       store.update((state) => {
+        console.log(action);
         return reducer(state, action);
       });
     });
@@ -26,7 +33,6 @@
     <button>Clear</button>
     <button
       on:click={() => {
-        // refresh?
         chrome.tabs.query(
           { active: true, currentWindow: true },
           (arrayOfTabs) => {
@@ -36,9 +42,12 @@
         );
       }}>Refresh</button
     >
-    <div>
-      <input type="checkbox" id="block-network" name="block-network" />
-      <label for="block-network">Block Network Requests</label>
+    <div class="Align-Bottom">
+      <div>
+        Network Requests Are Blocked: {$store.config.blockNetworkRequests
+          ? 'yes'
+          : 'no'}
+      </div>
     </div>
   </div>
   <Waterfall data={$store} />
@@ -52,5 +61,10 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    gap: 10px;
+  }
+  .Align-Bottom {
+    display: flex;
+    align-items: flex-end;
   }
 </style>

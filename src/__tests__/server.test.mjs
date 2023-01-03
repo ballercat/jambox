@@ -30,6 +30,7 @@ test.after.always(async (t) => {
 
 test.serial('server config - get, post', async (t) => {
   let config = (await supertest(t.context.server).get('/api/config')).body;
+
   t.like(config, {
     serverURL: `http://localhost:${SERVER_PORT}`,
   });

@@ -54,9 +54,8 @@ module.exports = {
           loader: 'svelte-loader',
           options: {
             compilerOptions: {
-              dev: false,
+              dev: !process.env.CI,
             },
-            hotReload: false,
           },
         },
       },
