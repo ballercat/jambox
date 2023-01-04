@@ -8,8 +8,8 @@ import server from '../server/index.mjs';
 import tiny from '../utils/tiny-server.mjs';
 import { PROJECT_ROOT } from '../constants.mjs';
 
-const SERVER_PORT = 777;
-const APP_PORT = 555;
+const SERVER_PORT = 7777;
+const APP_PORT = 5555;
 
 test.before(async (t) => {
   t.context.server = await server({
