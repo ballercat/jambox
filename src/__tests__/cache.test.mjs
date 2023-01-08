@@ -87,8 +87,8 @@ test('observing cache changes', async (t) => {
   t.snapshot(events);
 });
 
-test.skip('reading cache', async (t) => {
-  const hash = '1e61b76c3b0bf1328568bcdeea3746b1';
+test('reading cache', async (t) => {
+  const hash = '16068043c24805b3a5ab193fa4a23b8c';
   const cache = new Cache();
   const results = cache.read(
     path.join(PROJECT_ROOT, 'src', '__mocks__', 'cache-dir')
