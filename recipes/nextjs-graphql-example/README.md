@@ -44,7 +44,7 @@ Note that this URL is simply proxied to your local NextJS app at `localhost:3000
 
 Search for a couple of Pokemon, like "Picachu"
 
-![](./picachu.png)
+![](./pikachu.png)
 
 And "Slowpoke"
 
