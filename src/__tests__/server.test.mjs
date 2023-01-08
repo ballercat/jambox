@@ -8,8 +8,8 @@ import server from '../server/index.mjs';
 import tiny from '../utils/tiny-server.mjs';
 import { PROJECT_ROOT } from '../constants.mjs';
 
-const SERVER_PORT = 777;
-const APP_PORT = 555;
+const SERVER_PORT = 7777;
+const APP_PORT = 5555;
 
 test.before(async (t) => {
   t.context.server = await server({
@@ -138,10 +138,10 @@ test.serial('ws - request inspect', async (t) => {
 });
 
 // NOTE: This does work but needs a better cache mock
-test.skip('server - reset', async (t) => {
+test('server - reset', async (t) => {
   t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
 
-  const hash = '1e61b76c3b0bf1328568bcdeea3746b1';
+  const hash = '16068043c24805b3a5ab193fa4a23b8c';
   const cacheDir = path.join(PROJECT_ROOT, 'src', '__mocks__', 'cache-dir');
 
   await supertest(t.context.server)

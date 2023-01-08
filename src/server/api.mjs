@@ -3,6 +3,7 @@ import fs from 'fs';
 import deepmerge from 'deepmerge';
 import getConfig from '../config.mjs';
 import setupHandlers from './handlers.mjs';
+import debounce from '../utils/debounce.mjs';
 
 const debug = _debug('jambox.backend');
 
@@ -75,13 +76,12 @@ const backend = async (svc, config) => {
         configWatcher?.removeAllListeners();
         configWatcher = null;
 
-        configWatcher = fs.watchFile(
+        configWatcher = fs.watch(
           config.value.filepath,
-          { persistent: false, interval: 500 },
-          () => {
+          debounce(() => {
             config.value = getConfig({}, config.value.cwd);
             reset();
-          }
+          })
         );
       }
 

@@ -67,8 +67,9 @@ const mac = ({ chrome, uri, info }) => {
 };
 
 async function launchProxiedChrome(uri, info) {
+  const browserName = info.browser || 'chrome';
   const browsers = await detect();
-  const chrome = browsers.find(({ name }) => name === 'chrome');
+  const chrome = browsers.find(({ name }) => name === browserName);
   const launch = await getLauncher();
 
   if (os.platform() === 'darwin') {
@@ -79,9 +80,9 @@ async function launchProxiedChrome(uri, info) {
     launch(
       uri,
       {
-        browser: 'chrome',
+        browser: browserName,
         proxy: info.proxy.http,
-        noProxy: info.config.noProxy,
+        noProxy: info.noProxy,
         detached: true,
         profile: null,
         options: [
@@ -103,7 +104,7 @@ async function launchProxiedChrome(uri, info) {
           reject(err);
         }
 
-        console.log(`Chrome launched with ${instance.pid}`);
+        console.log(`${browserName} launched with ${instance.pid}`);
         instance.process.unref();
         instance.process.stdin.unref();
         instance.process.stdout.unref();

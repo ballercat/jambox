@@ -35,7 +35,7 @@ class CacheMatcher extends mockttp.matchers.CallbackMatcher {
 
       const { ignore = [], stage = [] } = options;
       const url = new URL(request.url);
-      const testGlob = (glob) => minimatch(url.pathname, glob);
+      const testGlob = (glob) => minimatch(url.hostname + url.pathname, glob);
       const ignored = ignore.some(testGlob);
       const matched = stage.some(testGlob);
 
@@ -209,11 +209,13 @@ const events = (svc, config) => {
     const ignoreList = config.value.cache?.ignore || [];
     const stageList = config.value.cache?.stage || [];
 
-    if (ignoreList.some((glob) => minimatch(url.pathname, glob))) {
+    const matchValue = url.hostname + url.pathname;
+
+    if (ignoreList.some((glob) => minimatch(matchValue, glob))) {
       return false;
     }
 
-    return stageList.some((glob) => minimatch(url.pathname, glob));
+    return stageList.some((glob) => minimatch(matchValue, glob));
   };
 
   const onRequest = async (request) => {

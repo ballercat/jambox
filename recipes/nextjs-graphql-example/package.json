@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "dependencies": {
+    "next": "^12",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "scripts": {
+    "dev": "../../jam.mjs next",
+    "build": "next build",
+    "start": "next start",
+    "visit": "../../jam.mjs http://jambox-demo-graphql.vercel.app",
+    "clear-cache": "rm -rf .jambox/*.json"
+  }
+}
