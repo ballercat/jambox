@@ -1,3 +1,10 @@
+## 0.0.9 NextJS demo, better watch mode
+
+- A tidy GraphQL example
+- A fix for watching config file on linux systems
+- New `browser` option in the config file to indicate which browser should be launched.
+- Cache globs now match hostname + pathname, not just pathname
+
 ## 0.0.8 Bugfixes, config watchmode
 
 - Bugfix: `trust` list

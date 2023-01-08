@@ -92,6 +92,7 @@ module.exports = {
   },
   cache: {
     write: 'auto',
+    // Match a hostname + pathname string
     stage: ['**/graphql'],
     ignore: ['**/log'],
   },

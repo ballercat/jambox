@@ -14,11 +14,13 @@ export default function config(overrides = {}, cwd = process.cwd()) {
   const userConfig = getUserConfigFile(filepath);
   const cacheDir = path.join(cwd, CACHE_DIR_NAME);
 
+  const logName = `sever.${new Date().toISOString().split('T')[0]}.log`;
+
   const config = deepmerge(
     {
       cwd,
       filepath,
-      logLocation: path.join(PROJECT_ROOT, 'server.log'),
+      logLocation: path.join(PROJECT_ROOT, logName),
       forward: {},
       noProxy: ['<-loopback->'],
       ...userConfig,
@@ -28,7 +30,7 @@ export default function config(overrides = {}, cwd = process.cwd()) {
 
   if (fs.existsSync(cacheDir)) {
     config.cache = deepmerge(config.cache || {}, { dir: cacheDir });
-    config.logLocation = path.join(cacheDir, 'server.log');
+    config.logLocation = path.join(cacheDir, logName);
   }
 
   return config;
