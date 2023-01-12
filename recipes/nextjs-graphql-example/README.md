@@ -55,7 +55,7 @@ you can search for more images. Now we can turn off network requests in `jambox.
 
 ```
 {
-  blockNetworkRequests: false
+  blockNetworkRequests: true
 }
 ```
 
