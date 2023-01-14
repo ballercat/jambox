@@ -1,5 +1,5 @@
 module.exports = {
-  browser: 'chromium',
+  browser: 'chrome',
   blockNetworkRequests: false,
   forward: {
     'http://jambox-demo-graphql.vercel.app': {

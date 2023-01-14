@@ -55,7 +55,7 @@ const mac = ({ chrome, uri, info }) => {
       '--enable-fixed-layout',
       '--no-first-run',
       '--noerrdialogs',
-      '--ignore-certificate-errors-spki-list=eqkW7XlzpdM4UC0xkQzKX6t415TM398j5H16Dwjr/Jk=',
+      `--ignore-certificate-errors-spki-list=${SPKI_FINGERPRINT}`,
       '--test-type',
       '--auto-open-devtools-for-tabs',
       `--load-extension=${EXTENSION_PATH}`,
