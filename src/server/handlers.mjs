@@ -203,10 +203,6 @@ const events = (svc, config) => {
       return false;
     }
 
-    if (config.value.cacheEverything) {
-      return true;
-    }
-
     const ignoreList = config.value.cache?.ignore || [];
     const stageList = config.value.cache?.stage || [];
 
