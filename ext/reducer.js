@@ -63,4 +63,4 @@ export const reducer = (state, action) => {
   }
 };
 
-export store = writeable(initialState);
+export const store = writeable(initialState);

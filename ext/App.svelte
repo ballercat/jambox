@@ -17,8 +17,15 @@
     cleanup?.();
 
     const sub = server.subscribe((action) => {
+      if (action.type === 'config') {
+        chrome.notifications.create('', {
+          title: 'Jambox Config Updated!',
+          message: 'Jambox Config Updated!',
+          iconUrl: 'icons/icon-json-64x64.png',
+          type: 'basic',
+        });
+      }
       store.update((state) => {
-        console.log(action);
         return reducer(state, action);
       });
     });

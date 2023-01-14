@@ -4,6 +4,7 @@ import deepmerge from 'deepmerge';
 import getConfig from '../config.mjs';
 import setupHandlers from './handlers.mjs';
 import debounce from '../utils/debounce.mjs';
+import notifier from 'node-notifier';
 
 const debug = _debug('jambox.backend');
 
@@ -81,6 +82,14 @@ const backend = async (svc, config) => {
           debounce(() => {
             config.value = getConfig({}, config.value.cwd);
             reset();
+            try {
+              notifier.notify({
+                title: 'Jambox',
+                message: 'Config Updated!',
+              });
+            } catch (e) {
+              debug(e);
+            }
           })
         );
       }

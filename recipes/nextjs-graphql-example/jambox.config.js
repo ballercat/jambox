@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  blockNetworkRequests: false,
+  blockNetworkRequests: true,
   forward: {
     'http://jambox-demo-graphql.vercel.app': {
       target: 'http://localhost:3000',
