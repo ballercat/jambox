@@ -68,7 +68,23 @@ they should be replaced by a `200x200` placeholder `.jpeg`.
 ![](./200x200.jpg);
 _Note: If images continue to load ensure that Chrome network cache is disabled._
 
-You may clear the `.jambox` folder to start fresh.
+Alternatively you may utilize the caching to persist the seen images of Pokemon to
+disk an not show any placeholders. Add a `**/*.jpeg` to see for yourself.
+
+```js
+{
+  cache: {
+    stage: ['**/*.jpeg'];
+  }
+}
+```
+
+Enable network requests once again, and search the Pokemon images again to see the
+difference.
+
+## Notes
+
+- You may clear the `.jambox` folder to start fresh.
 
 ## Cleanup
 
