@@ -62,6 +62,12 @@ you can search for more images. Now we can turn off network requests in `jambox.
 Now try searching for additional Pokemon and notice how the requests fail. However the initial
 requests should still work as they are cached in the `.jambox/` folder.
 
+Because network requests are disabled you should no longer see images of Pokemon load. Instead
+they should be replaced by a `200x200` placeholder `.jpeg`.
+
+![](./200x200.jpg);
+_Note: If images continue to load ensure that Chrome network cache is disabled._
+
 You may clear the `.jambox` folder to start fresh.
 
 ## Cleanup

@@ -86,7 +86,10 @@ module.exports = {
     },
   },
   auto: {
-    '**/*.jpg': 204,
+    '**/*.png': 204,
+    // It's possible to respond with placeholder images instead of blank/broken 204s
+    // Note that you must spcify a filepath, not file contents
+    '**/*.jpg': { status: 200, file: 'placeholder.jpg' },
     '**/*.ico': 204,
     '**/log': { status: 200, statusMessage: 'auto mock log' },
   },

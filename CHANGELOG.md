@@ -1,3 +1,9 @@
+## 0.0.10 Better image handling, auto mocking
+
+- Let users specify a filepath during an auto-mock. This filepath will be read
+  from disk when an auto-mock is used.
+- Improve `nextjs-graphql-example`. Add a demo of an image placeholder.
+
 ## 0.0.9 NextJS demo, better watch mode
 
 - A tidy GraphQL example
