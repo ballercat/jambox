@@ -25,7 +25,7 @@ export default async function record(options) {
 
   debug('Checking if a server instance is running.');
 
-  const config = getConfig();
+  const config = getConfig({}, cwd);
 
   try {
     await launchServer({ log, port, constants, config });
