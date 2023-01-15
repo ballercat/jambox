@@ -85,9 +85,5 @@ difference.
 ## Notes
 
 - You may clear the `.jambox` folder to start fresh.
-
-## Cleanup
-
-To shutdown the server:
-
-`curl localhost:9000/shutdown`
+- Check if jambox is running with `yarn jam ping`
+- Shutdown the server with `yarn jam shutdown`
