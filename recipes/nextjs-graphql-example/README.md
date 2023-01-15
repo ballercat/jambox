@@ -62,10 +62,29 @@ you can search for more images. Now we can turn off network requests in `jambox.
 Now try searching for additional Pokemon and notice how the requests fail. However the initial
 requests should still work as they are cached in the `.jambox/` folder.
 
-You may clear the `.jambox` folder to start fresh.
+Because network requests are disabled you should no longer see images of Pokemon load. Instead
+they should be replaced by a `200x200` placeholder `.jpeg`.
 
-## Cleanup
+![](./200x200.jpg);
+_Note: If images continue to load ensure that Chrome network cache is disabled._
 
-To shutdown the server:
+Alternatively you may utilize the caching to persist the seen images of Pokemon to
+disk an not show any placeholders. Add a `**/*.jpeg` to see for yourself.
 
-`curl localhost:9000/shutdown`
+```js
+{
+  cache: {
+    stage: ['**/*.jpeg'];
+  }
+}
+```
+
+Enable network requests once again, and search the Pokemon images again to see the
+difference.
+
+## Notes
+
+- You may clear the `.jambox` folder to start fresh.
+- Check if jambox is running with `yarn jam-server ping`
+- Shutdown the server with `yarn jam-server shutdown`
+- Tail the logs with `yarn jam-server tail`

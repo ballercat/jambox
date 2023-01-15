@@ -1,14 +1,11 @@
 import _debug from 'debug';
 import fetch from 'node-fetch';
 import path from 'path';
-import fs from 'fs';
 import { spawn } from 'child_process';
-import deepmerge from 'deepmerge';
 import launchProxiedChrome from './browser.mjs';
 import isURI from './is-uri.mjs';
 import launchServer from './server-launcher.mjs';
 import getConfig from './config.mjs';
-import { CACHE_DIR_NAME } from './constants.mjs';
 
 const debug = _debug('jambox');
 
@@ -25,7 +22,7 @@ export default async function record(options) {
 
   debug('Checking if a server instance is running.');
 
-  const config = getConfig();
+  const config = getConfig({}, cwd);
 
   try {
     await launchServer({ log, port, constants, config });

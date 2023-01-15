@@ -1,5 +1,6 @@
+const path = require('path');
+
 module.exports = {
-  browser: 'chromium',
   blockNetworkRequests: false,
   forward: {
     'http://jambox-demo-graphql.vercel.app': {
@@ -8,6 +9,9 @@ module.exports = {
       // websocket: true will ensure NextJS can make a WS connection + HMR
       websocket: true,
     },
+  },
+  auto: {
+    '**/*.jpg': { status: 200, file: path.join(__dirname, '200x200.jpg') },
   },
   cache: {
     write: 'auto',

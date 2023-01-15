@@ -2,6 +2,7 @@ import _debug from 'debug';
 import minimatch from 'minimatch';
 import mockttp from 'mockttp';
 import Cache from '../cache.mjs';
+import fs from 'fs';
 
 const debug = _debug('jambox.handlers');
 
@@ -186,8 +187,8 @@ export const auto = (svc, config) => {
         matchers: [new GlobMatcher('*', { paths: [path] })],
         handler: new mockttp.requestHandlers.SimpleHandler(
           options.status,
-          options.statusMessage || 'jambox auto-mock',
-          options.data || null
+          options.statusMessage || (options.file ? 'OK' : 'jambox auto-mock'),
+          options.file ? fs.readFileSync(options.file) : null
         ),
       });
     })
@@ -200,10 +201,6 @@ const events = (svc, config) => {
   const shouldStage = (url) => {
     if (svc.cache.bypass() || config.value.blockNetworkRequests) {
       return false;
-    }
-
-    if (config.value.cacheEverything) {
-      return true;
     }
 
     const ignoreList = config.value.cache?.ignore || [];

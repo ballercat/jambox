@@ -1,6 +1,7 @@
 const path = require('path');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('./manifest-plugin.js');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { EnvironmentPlugin } = require('webpack');
 
 module.exports = {
@@ -36,6 +37,16 @@ module.exports = {
     }),
     new EnvironmentPlugin({
       BROWSER: 'chrome',
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'ext/*.png',
+          to() {
+            return 'icons/[name][ext]';
+          },
+        },
+      ],
     }),
   ],
   module: {

@@ -2,7 +2,7 @@
 import record from './src/record.mjs';
 import * as constants from './src/constants.mjs';
 
-const run = (argv, cwd) => {
+const run = async (argv, cwd) => {
   console.log('📻 Jambox 📻');
 
   const script = process.argv.slice(2);

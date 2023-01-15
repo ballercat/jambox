@@ -1,6 +1,6 @@
 {
   "name": "jambox",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Tool for recording and playing back HTTP requests.",
   "bin": {
     "jam": "./jam.mjs",
@@ -37,6 +37,7 @@
     "nock": "^13.2.9",
     "node-fetch": "^2",
     "osenv": "^0.1.5",
+    "tail-file": "^1.4.15",
     "wait-on": "^6.0.1",
     "zen-observable": "^0.9.0"
   },
@@ -47,6 +48,7 @@
     "babel-loader": "^9.1.0",
     "babel-plugin-module-resolver": "^4.1.0",
     "c8": "^7.12.0",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
     "eslint": "^8.31.0",
     "eslint-plugin-svelte3": "^4.0.0",

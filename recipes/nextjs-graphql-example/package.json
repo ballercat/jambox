@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "visit": "../../jam.mjs http://jambox-demo-graphql.vercel.app",
-    "clear-cache": "rm -rf .jambox/*.json"
+    "clear-cache": "rm -rf .jambox/*.json",
+    "jam-server": "../../jam-server.mjs"
   }
 }

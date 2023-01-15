@@ -10,7 +10,7 @@ yarn add -D jambox
 
 ## Usage
 
-### Scripts
+### `jam`
 
 Prepend `jam` to whatever command you are using to run `next` for example
 
@@ -28,7 +28,7 @@ Or without changing an existing command
 $(yarn bin jam) yarn dev
 ```
 
-### Browser
+#### Browser
 
 Each command auto starts a proxy server.
 
@@ -47,6 +47,31 @@ or create a re-usable script if you don't want to type this out every time
   }
 }
 ```
+
+### `jam-server [sub-command] [--port]`
+
+Launches a jambox server, you shoulnd't have to start one manually. These are
+launched by the `jam` command if one isn't already running.
+
+See sub-commands below.
+
+#### `ping`
+
+`yarn jam-server ping`
+
+Attempt to ping a currently running jambox server
+
+#### `shutdown`
+
+`yanr jam-server shutdown`
+
+Attempt to shutdown a currently running jambox server
+
+#### `tail`
+
+`yarn jam-server tail`
+
+Tail the current logfile
 
 ## Config (in-progress)
 
@@ -86,7 +111,10 @@ module.exports = {
     },
   },
   auto: {
-    '**/*.jpg': 204,
+    '**/*.png': 204,
+    // It's possible to respond with placeholder images instead of blank/broken 204s
+    // Note that you must spcify a filepath, not file contents
+    '**/*.jpg': { status: 200, file: 'placeholder.jpg' },
     '**/*.ico': 204,
     '**/log': { status: 200, statusMessage: 'auto mock log' },
   },
