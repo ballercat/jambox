@@ -4,6 +4,7 @@
   from disk when an auto-mock is used.
 - Improve `nextjs-graphql-example`. Add a demo of an image placeholder.
 - Add Chrome Extension notifications. Config updates fire notifications.
+- Add `ping` & `shutdown` sub-commmands to `jam`
 
 ## 0.0.9 NextJS demo, better watch mode
 
