@@ -10,6 +10,7 @@ module.exports = {
   rules: {
     'no-console': 0,
     'no-undefined': 1,
+    'no-unused-vars': ['error', { ignoreRestSiblings: true }],
     camelcase: 0,
     'import/no-namespace': 0,
     'import/no-extraneous-dependencies': 0,

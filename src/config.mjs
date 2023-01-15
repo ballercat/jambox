@@ -2,11 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import deepmerge from 'deepmerge';
 import getUserConfigFile from './read-user-config.js';
-import {
-  PROJECT_ROOT,
-  CONFIG_FILE_NAME,
-  CACHE_DIR_NAME,
-} from './constants.mjs';
+import { CONFIG_FILE_NAME, CACHE_DIR_NAME } from './constants.mjs';
 
 const prepCacheDir = (cwd) => {
   const cacheDir = path.join(cwd, CACHE_DIR_NAME);

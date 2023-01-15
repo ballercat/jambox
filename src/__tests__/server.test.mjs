@@ -141,7 +141,6 @@ test.serial('ws - request inspect', async (t) => {
 test('server - reset', async (t) => {
   t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
 
-  const hash = '16068043c24805b3a5ab193fa4a23b8c';
   const cacheDir = path.join(PROJECT_ROOT, 'src', '__mocks__', 'cache-dir');
 
   await supertest(t.context.server)

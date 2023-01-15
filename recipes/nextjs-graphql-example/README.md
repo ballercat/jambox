@@ -85,5 +85,6 @@ difference.
 ## Notes
 
 - You may clear the `.jambox` folder to start fresh.
-- Check if jambox is running with `yarn jam ping`
-- Shutdown the server with `yarn jam shutdown`
+- Check if jambox is running with `yarn jam-server ping`
+- Shutdown the server with `yarn jam-server shutdown`
+- Tail the logs with `yarn jam-server tail`

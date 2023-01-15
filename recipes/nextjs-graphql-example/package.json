@@ -11,6 +11,6 @@
     "start": "next start",
     "visit": "../../jam.mjs http://jambox-demo-graphql.vercel.app",
     "clear-cache": "rm -rf .jambox/*.json",
-    "jam": "../../jam.mjs"
+    "jam-server": "../../jam-server.mjs"
   }
 }
