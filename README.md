@@ -1,3 +1,5 @@
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ballercat_jambox&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ballercat_jambox)
+
 # :radio: Jambox :radio:
 
 Record & Playback requests.
