@@ -283,7 +283,7 @@ const events = (svc, config) => {
 };
 
 export default async function handlers(svc, config) {
-  await events(svc, config);
+  events(svc, config);
 
   await record(svc, config);
 
