@@ -10,7 +10,6 @@ jobs:
       - name: Unit tests
         uses: actions/setup-node@v3
         with:
-          fetch-depth: 0
           node-version: 16.x.x
       - run: yarn
       - run: yarn test
