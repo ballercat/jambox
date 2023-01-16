@@ -15,7 +15,7 @@ jobs:
           node-version: 16.x.x
       - uses: Klemensas/action-autotag@stable
         with:
-          GITHUB_TOKEN "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - run: yarn
       - run: yarn build
       - uses: JS-DevTools/npm-publish@v1
