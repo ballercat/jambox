@@ -13,4 +13,24 @@ jobs:
           node-version: 16.x.x
       - run: yarn
       - run: yarn test
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Lints
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x.x
+      - run: yarn
+      - run: yarn lint
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Lints
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x.x
+      - run: yarn
+      - run: yarn build
 
