@@ -146,6 +146,7 @@ test.serial('auto mocks', async (t) => {
     .send({
       auto: {
         '**/path.html': { status: 204 },
+        '**/*.jpg': { status: 204, preferNetwork: true },
       },
     })
     .expect(200);

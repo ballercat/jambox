@@ -183,10 +183,7 @@ export const auto = (svc, config) => {
   return Promise.all(
     Object.entries(config.value.auto).map(([path, value]) => {
       const options = typeof value === 'object' ? value : { status: value };
-      if (
-        options.preferNetwork &&
-        config.value.blockNetworkRequests === false
-      ) {
+      if (options.preferNetwork && !config.value.blockNetworkRequests) {
         return;
       }
       return svc.proxy.addRequestRule({
