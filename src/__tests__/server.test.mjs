@@ -137,6 +137,39 @@ test.serial('ws - request inspect', async (t) => {
   await plan;
 });
 
+test.serial('auto mocks', async (t) => {
+  t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
+  const { body: config } = await supertest(t.context.server).get('/api/config');
+
+  await supertest(t.context.server)
+    .post('/api/config')
+    .send({
+      auto: {
+        '**/path.html': { status: 204 },
+        '**/*.jpg': { status: 204, preferNetwork: true },
+      },
+    })
+    .expect(200);
+
+  const plan = superwstest(config.serverURL)
+    .ws('/')
+    .expectJson((json) => {
+      t.like(json, {
+        type: 'request',
+        payload: { url: 'http://random-domain.com/path.html' },
+      });
+    })
+    .expectJson((json) => {
+      t.like(json, { type: 'response', payload: { statusCode: 204 } });
+    });
+
+  const opts = { agent: new HttpsProxyAgent(config.proxy.http) };
+
+  await fetch('http://random-domain.com/path.html', opts).catch(console.log);
+
+  await plan;
+});
+
 // NOTE: This does work but needs a better cache mock
 test('server - reset', async (t) => {
   t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
