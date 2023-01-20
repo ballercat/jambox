@@ -181,9 +181,16 @@ export const forward = (svc, config) => {
 
 export const auto = (svc, config) => {
   return Promise.all(
-    Object.entries(config.value.auto).map(async ([path, value]) => {
+    Object.entries(config.value.auto).map(([path, value]) => {
       const options = typeof value === 'object' ? value : { status: value };
-      await svc.proxy.addRequestRule({
+      if (
+        options.preferNetwork &&
+        config.value.blockNetworkRequests === false
+      ) {
+        return;
+      }
+      return svc.proxy.addRequestRule({
+        priority: 99,
         matchers: [new GlobMatcher('*', { paths: [path] })],
         handler: new mockttp.requestHandlers.SimpleHandler(
           options.status,

@@ -1,3 +1,9 @@
+## 0.0.11 Auto mock tweaks
+
+- `auto` mocks patch requests even if network mode is enabled.
+- `preferNetwork` boolean is added to allow network first responses even if
+  an auto-mock is available.
+
 ## 0.0.10 Better image handling, auto mocking
 
 - Let users specify a filepath during an auto-mock. This filepath will be read
