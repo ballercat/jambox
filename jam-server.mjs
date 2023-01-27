@@ -2,11 +2,9 @@
 // Entrypoint
 import arg from 'arg';
 import server from './src/server/index.mjs';
-import path from 'path';
 import fs from 'fs';
 import fetch from 'node-fetch';
 import Tail from 'tail-file';
-import * as constants from './src/constants.mjs';
 
 const tail = async (port = 9000) => {
   const config = await (

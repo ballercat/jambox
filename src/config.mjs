@@ -20,7 +20,7 @@ export default function config(overrides = {}, cwd = process.cwd()) {
   const userConfig = getUserConfigFile(filepath);
   const cacheDir = path.join(cwd, CACHE_DIR_NAME);
 
-  const logName = `sever.${new Date().toISOString().split('T')[0]}.log`;
+  const logName = `jam-server.${new Date().toISOString().split('T')[0]}.log`;
 
   prepCacheDir(cwd);
 
