@@ -23,6 +23,11 @@ export default async function tiny(port) {
   app.get('/*', (req, res) => {
     res.status(200).json({ path: req.path });
   });
+  app.post('/delay', (req, res) => {
+    setTimeout(() => {
+      res.status(200).json({ delayed: 50 });
+    }, 50);
+  });
   const server = http.createServer(app);
   await promise(server.listen.bind(server), port);
 

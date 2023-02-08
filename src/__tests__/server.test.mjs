@@ -170,6 +170,57 @@ test.serial('auto mocks', async (t) => {
   await plan;
 });
 
+test.serial('abort signal', async (t) => {
+  t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
+  const { body: config } = await supertest(t.context.server).get('/api/config');
+
+  await supertest(t.context.server)
+    .post('/api/config')
+    .send({
+      forward: {
+        'http://random-domain.com': `http://localhost:${APP_PORT}`,
+      },
+    })
+    .expect(200);
+
+  const plan = superwstest(config.serverURL)
+    .ws('/')
+    .expectJson((json) => {
+      t.like(json, {
+        type: 'request',
+        payload: { url: 'http://random-domain.com/delay' },
+      });
+    })
+    .expectJson((json) => {
+      t.like(json, {
+        type: 'abort',
+        payload: { url: 'http://random-domain.com/delay' },
+      });
+    });
+
+  const controller = new AbortController();
+  const signal = controller.signal;
+  const opts = {
+    method: 'POST',
+    agent: new HttpsProxyAgent(config.proxy.http),
+    signal,
+  };
+
+  const fetchPromise = fetch('http://random-domain.com/delay', opts).catch(
+    (e) => e
+  );
+
+  // A bit tricky, we need to delay the abort somewhat to ensure a connection of
+  // some kind is established before abort.
+  setTimeout(() => controller.abort(), 10);
+
+  const error = await fetchPromise;
+
+  t.is(error.name, 'AbortError');
+
+  await plan;
+});
+
 // NOTE: This does work but needs a better cache mock
 test('server - reset', async (t) => {
   t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
