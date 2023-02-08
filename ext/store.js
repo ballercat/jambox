@@ -4,6 +4,7 @@ export const initialState = {
   config: {},
   requestById: {},
   responseById: {},
+  abortedRequestById: {},
   blockNetwork: false,
   cache: {},
 };
@@ -29,6 +30,15 @@ export const reducer = (state, action) => {
         ...state,
         requestById: {},
         responseById: {},
+      };
+    }
+    case 'abort': {
+      return {
+        ...state,
+        abortedRequestById: {
+          ...state.abortedRequestById,
+          [payload.id]: payload,
+        },
       };
     }
     case 'request': {

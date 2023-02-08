@@ -282,6 +282,25 @@ const events = (svc, config) => {
     }
   };
 
+  const onAbort = async (abortedRequest) => {
+    if (svc.cache.hasStaged(abortedRequest)) {
+      svc.cache.reset(abortedRequest);
+    }
+
+    const message = JSON.stringify({
+      type: 'abort',
+      payload: {
+        id: abortedRequest.id,
+        url: abortedRequest.url,
+        headers: abortedRequest.headers,
+        ...abortedRequest.timingEvents,
+      },
+    });
+
+    svc.ws.getWss('/').clients.forEach((client) => client.send(message));
+  };
+
+  svc.proxy.on('abort', onAbort);
   svc.proxy.on('request', onRequest);
   svc.proxy.on('response', onResponse);
 };

@@ -17,6 +17,7 @@
   export let barOffset;
   export let minTime;
   export let onClick;
+  export let aborted;
 
   let hover = false;
 
@@ -31,6 +32,7 @@
   $: {
     font = `${statusCode ? '' : 'italic '}10px sans-serif`;
     fill = statusCode && statusCode >= 400 ? '#a35' : 'black';
+
     sizeText = (() => {
       const size = response?.sizeInBytes || 0;
       if (size <= 124) {
@@ -55,6 +57,13 @@
 
       return '#aaa';
     })();
+
+    if (aborted) {
+      statusCode = 'Aborted';
+      sizeText = '';
+      contentType = '';
+      fill = '#a35';
+    }
   }
 
   const handleSelect = (e) => {
