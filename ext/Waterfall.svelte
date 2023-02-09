@@ -42,13 +42,10 @@
         const response = data.responseById[request.id];
         const contentTypeHeader = response?.headers['content-type'] ?? null;
         const contentType = contentTypeHeader
-          ? CONTENT_MAP[contentTypeHeader.split(';')[0]] ?? 'other'
-          : null;
+          ? CONTENT_MAP[contentTypeHeader.split(';')[0]]
+          : 'other';
 
-        if (
-          (response && !contentTypeHeader) ||
-          (contentTypeHeader && !checked.includes(contentType))
-        ) {
+        if (!checked.includes(contentType)) {
           return acc;
         }
 
@@ -75,6 +72,7 @@
           duration,
           statusCode: response?.statusCode || null,
           contentType,
+          aborted: Boolean(data.abortedRequestById[request.id]),
         });
 
         return acc;

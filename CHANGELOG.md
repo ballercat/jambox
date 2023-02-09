@@ -1,3 +1,10 @@
+## 0.0.12 Abort event tracking, UI fixes
+
+- add: `abort` event
+- fix: aborted requests are evacuated from cache
+- fix: content type responses are no longer hidden
+- fix: spelling for log files `sever -> server`
+
 ## 0.0.11 Auto mock tweaks
 
 - `auto` mocks patch requests even if network mode is enabled.
