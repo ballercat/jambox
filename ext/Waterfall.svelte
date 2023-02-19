@@ -28,7 +28,7 @@
 
   const rowHeight = 15;
   const rowPadding = 5;
-  const barOffset = 285;
+  const barOffset = 0;
 
   const width = '100%';
 
@@ -84,7 +84,7 @@
       }
     ));
     height = (rows.length + 1) * (rowHeight + rowPadding); // +1 for axis
-    scaleFactor = Math.ceil((maxTime - minTime) / (width - 5 - barOffset));
+    scaleFactor = Math.ceil((maxTime - minTime) / (1000 - 5 - barOffset));
   }
 </script>
 
@@ -128,7 +128,7 @@
 </div>
 
 <div class="Content">
-  <svg {width} {height}  viewBox="0 0 100% 100%"  preserveAspectRatio="none">
+  <svg {width} {height}  viewBox="0 0 100% 100%"  preserveAspectRatio="none" style="overflow: auto;">
     {#each rows as row, index}
       <Row
         {...row}

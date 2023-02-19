@@ -98,7 +98,7 @@
     {title}
   </text>
   <text
-    x="50%"
+    x="250"
     y={0}
     dy={rowHeight}
     style={`padding: 5px; font: ${font}; fill: ${statusCode && statusCode >= 400 || aborted ? 'var(--aborted)' : 'var(--textColor)'}`}
@@ -107,7 +107,7 @@
     {statusCode ?? 'pending'}
   </text>
   <text
-    x="65%"
+    x="315"
     y={0}
     dy={rowHeight}
     style={`padding: 5px; font: ${font}; fill: ${statusCode && statusCode >= 400 || aborted ? 'var(--aborted)' : 'var(--textColor)'}`}
@@ -116,7 +116,7 @@
     {contentType ?? ''}
   </text>
   <text
-    x="80%"
+    x="370"
     y={0}
     dy={rowHeight}
     style={`padding: 5px; font: ${font}; fill: ${statusCode && statusCode >= 400 || aborted ? 'var(--aborted)' : 'var(--textColor)'}`}
@@ -134,7 +134,7 @@
       })}
     </title>
     <rect
-      x={(start - minTime) / scaleFactor}
+      x={`${((start - minTime) / scaleFactor) + 435}`}
       y={6}
       width={received}
       height={rowHeight - 12}
@@ -142,7 +142,7 @@
     />
     {#if duration}
       <rect
-        x={(start - minTime) / scaleFactor + received}
+        x={`${((start - minTime) / scaleFactor + received) + 435}`}
         y={2}
         rx={1}
         width={duration / scaleFactor}
