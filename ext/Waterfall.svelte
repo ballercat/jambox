@@ -27,10 +27,10 @@
   let checked = possibleChecks;
 
   const rowHeight = 15;
-  const rowPadding = 2;
+  const rowPadding = 5;
   const barOffset = 285;
 
-  const width = 700;
+  const width = '100%';
 
   let rows, minTime, maxTime;
   let height, scaleFactor;
@@ -88,44 +88,47 @@
   }
 </script>
 
-<div class="Wrapper">
-  <div class="Box">
-    <div>
+<div class="Box">
+  <div class="Checkbox-wrapper">
+    <input
+      on:click={() => {
+        if (checked.length === possibleChecks.length) {
+          checked = [];
+        } else {
+          checked = [...possibleChecks];
+        }
+      }}
+      checked={checked.length === possibleChecks.length}
+      type="checkbox"
+      id="all-check"
+      name="all-check"
+      class="AllCheckbox Checkbox"
+    />
+    <label class="Label" for="all-check">All</label>
+  </div>
+  {#each possibleChecks as type}
+    <div class="Checkbox-wrapper">
       <input
         on:click={() => {
-          if (checked.length === possibleChecks.length) {
-            checked = [];
+          if (checked.includes(type)) {
+            checked = checked.filter((check) => check !== type);
           } else {
-            checked = [...possibleChecks];
+            checked = [...checked, type];
           }
         }}
-        checked={checked.length === possibleChecks.length}
+        checked={checked.includes(type)}
         type="checkbox"
-        id="all-check"
-        name="all-check"
+        id="{type}-check"
+        name="{type}-check"
+        class="IndvidualCheckbox Checkbox"
       />
-      <label for="all-check">All</label>
+      <label class="Label" for="{type}-check">{type}</label>
     </div>
-    {#each possibleChecks as type}
-      <div>
-        <input
-          on:click={() => {
-            if (checked.includes(type)) {
-              checked = checked.filter((check) => check !== type);
-            } else {
-              checked = [...checked, type];
-            }
-          }}
-          checked={checked.includes(type)}
-          type="checkbox"
-          id="{type}-check"
-          name="{type}-check"
-        />
-        <label for="{type}-check">{type}</label>
-      </div>
-    {/each}
-  </div>
-  <svg {width} {height}>
+  {/each}
+</div>
+
+<div class="Content">
+  <svg {width} {height}  viewBox="0 0 100% 100%"  preserveAspectRatio="none">
     {#each rows as row, index}
       <Row
         {...row}
@@ -146,21 +149,46 @@
       />
     {/each}
   </svg>
-  {#if selection}
-    <Modal on:close={() => (selection = null)}>
-      <h4>{selection.request.url}</h4>
-      <RequestInfo {...selection} />
-    </Modal>
-  {/if}
 </div>
+{#if selection}
+  <Modal on:close={() => (selection = null)}>
+    <h4>{selection.request.url}</h4>
+    <RequestInfo {...selection} />
+  </Modal>
+{/if}
 
 <style>
-  .Wrapper {
-    margin-top: 20px;
-  }
   .Box {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    margin: 20px;
   }
+  .Checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .Checkbox-wrapper:not(:first-child) {
+    margin-top: 5px;
+  }
+  .Checkbox {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+  .Checkbox:checked ~ .Label {
+    font-weight: bold;
+  }
+  .IndvidualCheckbox {
+    accent-color: MediumSlateBlue;
+  }
+  .AllCheckbox {
+    accent-color: fuchsia;
+  }
+  .Label {
+    cursor: pointer;
+    width: 100%;
+  }
+  .Content {
+    grid-column: 1 / 3;
+  }
+
 </style>

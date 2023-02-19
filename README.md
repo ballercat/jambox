@@ -65,7 +65,7 @@ Attempt to ping a currently running jambox server
 
 #### `shutdown`
 
-`yanr jam-server shutdown`
+`yarn jam-server shutdown`
 
 Attempt to shutdown a currently running jambox server
 

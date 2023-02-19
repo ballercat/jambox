@@ -30,7 +30,7 @@
   let font, fill, sizeText, cacheColor;
 
   $: {
-    font = `${statusCode ? '' : 'italic '}10px sans-serif`;
+    font = `${statusCode ? '' : 'italic '} 1rem sans-serif`;
     fill = statusCode && statusCode >= 400 ? '#a35' : 'black';
 
     sizeText = (() => {
@@ -82,46 +82,44 @@
   opacity={statusCode ? 1 : 0.5}
 >
   <rect
-    width={rowWidth}
-    height={rowHeight + rowPadding - 1}
-    fill={index % 2 ? '#efefef' : '#fff'}
+    width="100%"
     strokeWidth={1}
-    stroke={hover ? '#000' : '#fff'}
+    style={`height: calc(100% + ${rowPadding - 1}px); fill: ${index % 2 ?  'var(--stripeA)' : 'var(--stripeB)'}; stroke: ${hover ? 'var(---backgroundColor)' : 'var(---textColor)'};`}
   />
-  <rect width={2} height={rowHeight} fill={cacheColor} />
+  <rect width={2} height="100%" fill={cacheColor} />
   <text
-    x={5}
+    x="5"
     y={0}
     dx={0}
     dy={rowHeight}
-    style="font: {font}; fill: {fill};"
+    style={`padding: 5px; font: ${font}; fill: ${statusCode && statusCode >= 400 || aborted ? 'var(--aborted)' : 'var(--textColor)'}`}
     textAnchor="start"
   >
     {title}
   </text>
   <text
-    x={198}
+    x="50%"
     y={0}
     dy={rowHeight}
-    style="font: {font}; fill: {fill};"
+    style={`padding: 5px; font: ${font}; fill: ${statusCode && statusCode >= 400 || aborted ? 'var(--aborted)' : 'var(--textColor)'}`}
     textAnchor="start"
   >
     {statusCode ?? 'pending'}
   </text>
   <text
-    x={220}
+    x="65%"
     y={0}
     dy={rowHeight}
-    style="font: {font}; fill: {fill};"
+    style={`padding: 5px; font: ${font}; fill: ${statusCode && statusCode >= 400 || aborted ? 'var(--aborted)' : 'var(--textColor)'}`}
     textAnchor="start"
   >
     {contentType ?? ''}
   </text>
   <text
-    x={250}
+    x="80%"
     y={0}
     dy={rowHeight}
-    style="font: {font}; fill: {fill};"
+    style={`padding: 5px; font: ${font}; fill: ${statusCode && statusCode >= 400 || aborted ? 'var(--aborted)' : 'var(--textColor)'}`}
     textAnchor="start"
   >
     {sizeText}
