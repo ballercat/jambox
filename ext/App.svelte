@@ -36,7 +36,7 @@
 
 <main class="Container">
   <div class="Box">
-    <h1 class="Title">Jambox</h1>
+    <h1>📻 Jambox 📻</h1>
     <div>
       <button
       type='button'
