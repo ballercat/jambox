@@ -59,14 +59,10 @@
 
   .modal {
     position: fixed;
-    top: 10%;
-    left: 5%;
-    width: calc(100vw - 2em);
-    max-width: 62em;
-    max-height: calc(100vh - 4em);
+    inset: 10%;
     overflow: auto;
     padding: 1em;
     border-radius: 0.2em;
-    background: white;
+    background: var(--backgroundColor);
   }
 </style>
