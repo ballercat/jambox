@@ -1,3 +1,8 @@
+## 0.0.13 Improve Extension Styles
+
+- add: styling based on system preferences to extension
+- fix: typo in README.md
+
 ## 0.0.12 Abort event tracking, UI fixes
 
 - add: `abort` event
