@@ -58,11 +58,28 @@
           );
         }}>Refresh</button
       >
+      <button
+        class="Button"
+        type="button"
+        on:click={() =>
+          fetch('http://localhost:9000/api/pause', {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify({ paused: !$store.config.paused }),
+          })}>{$store.config.paused ? 'Unpause' : 'Pause'}</button
+      >
     </div>
     <div>
       Network Requests Are Blocked: <span class="Highlight Text"
         >{$store.config.blockNetworkRequests ? 'yes' : 'no'}
       </span>
+    </div>
+    <div>
+      Proxy is paused: <span class="Highlight Text"
+        >{$store.config.paused ? 'yes' : 'no'}</span
+      >
     </div>
   </div>
   <Waterfall data={$store} />
