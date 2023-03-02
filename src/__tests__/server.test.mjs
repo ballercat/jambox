@@ -221,6 +221,48 @@ test.serial('abort signal', async (t) => {
   await plan;
 });
 
+test.serial('pause', async (t) => {
+  t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
+  const { body: config } = await supertest(t.context.server).get('/api/config');
+
+  await supertest(t.context.server)
+    .post('/api/config')
+    .send({
+      auto: {
+        '**/**/*.jpg': { status: 204 },
+      },
+    })
+    .expect(200);
+
+  const opts = { agent: new HttpsProxyAgent(config.proxy.http) };
+  const doRequest = () => fetch('http://jamboxtest.com/test.jpg', opts);
+
+  // Baseline, get's a 204 auto-mock response
+  let res = await doRequest();
+  t.is(res.status, 204);
+  t.is(res.statusText, 'jambox auto-mock');
+
+  await supertest(t.context.server)
+    .post('/api/pause')
+    .send({ paused: true })
+    .expect(200);
+
+  // Paused, no more mocking
+  res = await doRequest();
+  t.is(res.status, 502);
+  t.is(res.statusText, 'Error communicating with upstream server');
+
+  await supertest(t.context.server)
+    .post('/api/pause')
+    .send({ paused: false })
+    .expect(200);
+
+  // Unpaused, back to baseline
+  res = await doRequest();
+  t.is(res.status, 204);
+  t.is(res.statusText, 'jambox auto-mock');
+});
+
 // NOTE: This does work but needs a better cache mock
 test('server - reset', async (t) => {
   t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
