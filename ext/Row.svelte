@@ -12,7 +12,6 @@
   export let scaleFactor;
   export let statusCode;
   export let rowHeight;
-  export let rowWidth;
   export let rowPadding;
   export let barOffset;
   export let minTime;
@@ -84,7 +83,9 @@
   <rect
     width="100%"
     strokeWidth={1}
-    style={`height: calc(100% + ${rowPadding - 1}px); fill: ${index % 2 ?  'var(--stripeA)' : 'var(--stripeB)'}; stroke: ${hover ? 'var(---backgroundColor)' : 'var(---textColor)'};`}
+    style={`height: calc(100% + ${rowPadding - 1}px); fill: ${
+      index % 2 ? 'var(--stripeA)' : 'var(--stripeB)'
+    }; stroke: ${hover ? 'var(---backgroundColor)' : 'var(---textColor)'};`}
   />
   <rect width={2} height="100%" fill={cacheColor} />
   <text
@@ -92,7 +93,11 @@
     y={0}
     dx={0}
     dy={rowHeight}
-    style={`padding: 5px; font: ${font}; fill: ${statusCode && statusCode >= 400 || aborted ? 'var(--aborted)' : 'var(--textColor)'}`}
+    style={`padding: 5px; font: ${font}; fill: ${
+      (statusCode && statusCode >= 400) || aborted
+        ? 'var(--aborted)'
+        : 'var(--textColor)'
+    }`}
     textAnchor="start"
   >
     {title}
@@ -101,7 +106,11 @@
     x="250"
     y={0}
     dy={rowHeight}
-    style={`padding: 5px; font: ${font}; fill: ${statusCode && statusCode >= 400 || aborted ? 'var(--aborted)' : 'var(--textColor)'}`}
+    style={`padding: 5px; font: ${font}; fill: ${
+      (statusCode && statusCode >= 400) || aborted
+        ? 'var(--aborted)'
+        : 'var(--textColor)'
+    }`}
     textAnchor="start"
   >
     {statusCode ?? 'pending'}
@@ -110,7 +119,11 @@
     x="315"
     y={0}
     dy={rowHeight}
-    style={`padding: 5px; font: ${font}; fill: ${statusCode && statusCode >= 400 || aborted ? 'var(--aborted)' : 'var(--textColor)'}`}
+    style={`padding: 5px; font: ${font}; fill: ${
+      (statusCode && statusCode >= 400) || aborted
+        ? 'var(--aborted)'
+        : 'var(--textColor)'
+    }`}
     textAnchor="start"
   >
     {contentType ?? ''}
@@ -119,7 +132,11 @@
     x="370"
     y={0}
     dy={rowHeight}
-    style={`padding: 5px; font: ${font}; fill: ${statusCode && statusCode >= 400 || aborted ? 'var(--aborted)' : 'var(--textColor)'}`}
+    style={`padding: 5px; font: ${font}; fill: ${
+      (statusCode && statusCode >= 400) || aborted
+        ? 'var(--aborted)'
+        : 'var(--textColor)'
+    }`}
     textAnchor="start"
   >
     {sizeText}
@@ -134,7 +151,7 @@
       })}
     </title>
     <rect
-      x={`${((start - minTime) / scaleFactor) + 435}`}
+      x={`${(start - minTime) / scaleFactor + 435}`}
       y={6}
       width={received}
       height={rowHeight - 12}
@@ -142,7 +159,7 @@
     />
     {#if duration}
       <rect
-        x={`${((start - minTime) / scaleFactor + received) + 435}`}
+        x={`${(start - minTime) / scaleFactor + received + 435}`}
         y={2}
         rx={1}
         width={duration / scaleFactor}
