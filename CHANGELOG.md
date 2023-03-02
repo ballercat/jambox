@@ -1,3 +1,10 @@
+## 0.0.14 Add pause api
+
+- add: #10, add `/api/pause`
+- fix: extension formatting
+- fix: waterfall svg viewBox responds to resize events
+- fix: resolve Svelte warnings
+
 ## 0.0.13 Improve Extension Styles
 
 - add: styling based on system preferences to extension
