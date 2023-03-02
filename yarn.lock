@@ -2408,6 +2408,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"batch-processor@npm:1.0.0":
+  version: 1.0.0
+  resolution: "batch-processor@npm:1.0.0"
+  checksum: 5519b024f6cd0e95a543bb3edf0ae19e5badae0c32b30b41839b4469bbb1f91e14fc04bff3759cd9c2621aa9e16def48c938783e9027e7ec977fba62d537a468
+  languageName: node
+  linkType: hard
+
 "big-integer@npm:1.6.x":
   version: 1.6.51
   resolution: "big-integer@npm:1.6.51"
@@ -3494,6 +3501,15 @@ __metadata:
   version: 1.4.284
   resolution: "electron-to-chromium@npm:1.4.284"
   checksum: be496e9dca6509dbdbb54dc32146fc99f8eb716d28a7ee8ccd3eba0066561df36fc51418d8bd7cf5a5891810bf56c0def3418e74248f51ea4a843d423603d10a
+  languageName: node
+  linkType: hard
+
+"element-resize-detector@npm:^1.1":
+  version: 1.2.4
+  resolution: "element-resize-detector@npm:1.2.4"
+  dependencies:
+    batch-processor: 1.0.0
+  checksum: 81c47b7e229c303889d3a9d78ec3f3232e88a6682f1e2424fb0632d9b4f503b2ca011e6954321060604da07749a5a972b6a175fdf6c6806093a3b80a304cde7b
   languageName: node
   linkType: hard
 
@@ -5143,6 +5159,7 @@ __metadata:
     superwstest: ^2.0.3
     svelte: ^3.55.0
     svelte-loader: ^3.1.4
+    svelte-watch-resize: ^1.0.3
     tail-file: ^1.4.15
     wait-on: ^6.0.1
     webextension-polyfill: ^0.10.0
@@ -7885,6 +7902,15 @@ __metadata:
   peerDependencies:
     svelte: ">3.0.0"
   checksum: 34fe4862f8c076a015b9f59195f3f39504fbdb17b9cc9c5a3366ec6fa51aa0b0621881339e5aedfdc1c89df77b90eb76f7cc08087d4bc30f805267d6a8c266eb
+  languageName: node
+  linkType: hard
+
+"svelte-watch-resize@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "svelte-watch-resize@npm:1.0.3"
+  dependencies:
+    element-resize-detector: ^1.1
+  checksum: 4c3f163f33d85ab891cb19c9f435978d3bcb22a4c88908537ce69a6de19b90ebfcc6dcf1e7c6dd3cda3f2b7883b40f440fc2b85aeea1e4b487e1b1199ce1ef8a
   languageName: node
   linkType: hard
 

@@ -39,32 +39,48 @@
     <h1>📻 Jambox 📻</h1>
     <div>
       <button
-      type='button'
-      class="Button"
-      on:click={() =>
-        store.update((state) => reducer(state, { type: 'clear' }))}
-      >Clear</button
-    >
-    <button
-      class="Button"
-      type='button'
-      on:click={() => {
-        chrome.tabs.query(
-          { active: true, currentWindow: true },
-          (arrayOfTabs) => {
-            store.update((state) => reducer(state, { type: 'refresh' }));
-            chrome.tabs.reload(arrayOfTabs[0].id);
-          }
-        );
-      }}>Refresh</button
-    >
-  </div>
-  <div>
-    Network Requests Are Blocked: <span class="Highlight Text">{$store.config.blockNetworkRequests
-      ? 'yes'
-      : 'no'}
-    </span>
-  </div>
+        type="button"
+        class="Button"
+        on:click={() =>
+          store.update((state) => reducer(state, { type: 'clear' }))}
+        >Clear</button
+      >
+      <button
+        class="Button"
+        type="button"
+        on:click={() => {
+          chrome.tabs.query(
+            { active: true, currentWindow: true },
+            (arrayOfTabs) => {
+              store.update((state) => reducer(state, { type: 'refresh' }));
+              chrome.tabs.reload(arrayOfTabs[0].id);
+            }
+          );
+        }}>Refresh</button
+      >
+      <button
+        class="Button"
+        type="button"
+        on:click={() =>
+          fetch('http://localhost:9000/api/pause', {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify({ paused: !$store.config.paused }),
+          })}>{$store.config.paused ? 'Unpause' : 'Pause'}</button
+      >
+    </div>
+    <div>
+      Network Requests Are Blocked: <span class="Highlight Text"
+        >{$store.config.blockNetworkRequests ? 'yes' : 'no'}
+      </span>
+    </div>
+    <div>
+      Proxy is paused: <span class="Highlight Text"
+        >{$store.config.paused ? 'yes' : 'no'}</span
+      >
+    </div>
   </div>
   <Waterfall data={$store} />
 </main>
@@ -115,5 +131,4 @@
     border-color: MediumSlateBlue;
     color: MediumSlateBlue;
   }
-
 </style>

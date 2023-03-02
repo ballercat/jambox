@@ -306,10 +306,6 @@ const events = (svc, config) => {
 };
 
 export default async function handlers(svc, config) {
-  events(svc, config);
-
-  await record(svc, config);
-
   if (!config.value.blockNetworkRequests) {
     await svc.proxy
       .forAnyRequest()
@@ -319,6 +315,14 @@ export default async function handlers(svc, config) {
         ignoreHostHttpsErrors: [...(config.value.trust || [])],
       });
   }
+
+  if (config.value.paused) {
+    return;
+  }
+
+  events(svc, config);
+
+  await record(svc, config);
 
   if (config.value.forward) {
     await forward(svc, config);

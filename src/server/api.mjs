@@ -60,6 +60,23 @@ const backend = async (svc, config) => {
     }
   });
 
+  // Maybe a tad bit unnecessary if /api/config can do the same thing, but it's
+  // nice to have a specific endpoint for a specific action also :shrug:
+  svc.app.post('/api/pause', async (req, res) => {
+    try {
+      const { paused } = req.body;
+      config.value = {
+        ...config.value,
+        paused,
+      };
+      await reset();
+
+      res.sendStatus(200);
+    } catch (e) {
+      res.status(500).send(e.stack);
+    }
+  });
+
   svc.app.get('/api/cache', (_, res) => {
     res.send(svc.cache.all());
   });

@@ -1,5 +1,5 @@
 <script>
-  import { store } from './store.js';
+  import { watchResize } from 'svelte-watch-resize';
   import Row from './Row.svelte';
   import RequestInfo from './RequestInfo.svelte';
   import Modal from './Modal.svelte';
@@ -34,6 +34,11 @@
 
   let rows, minTime, maxTime;
   let height, scaleFactor;
+  let contentWidth = 100;
+
+  function handleContentResize(node) {
+    contentWidth = node.clientWidth;
+  }
 
   $: {
     ({ rows, minTime, maxTime } = Object.values(data.requestById).reduce(
@@ -127,8 +132,14 @@
   {/each}
 </div>
 
-<div class="Content">
-  <svg {width} {height}  viewBox="0 0 100% 100%"  preserveAspectRatio="none" style="overflow: auto;">
+<div class="Content" use:watchResize={handleContentResize}>
+  <svg
+    {width}
+    {height}
+    viewBox="0 0 {contentWidth} {height}"
+    preserveAspectRatio="none"
+    style="overflow: auto;"
+  >
     {#each rows as row, index}
       <Row
         {...row}
@@ -136,7 +147,6 @@
         response={data.responseById[row.id]}
         {minTime}
         {rowHeight}
-        rowWidth={width}
         {rowPadding}
         {index}
         {barOffset}
@@ -190,5 +200,4 @@
   .Content {
     grid-column: 1 / 3;
   }
-
 </style>
