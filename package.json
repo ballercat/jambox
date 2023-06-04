@@ -1,6 +1,6 @@
 {
   "name": "jambox",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Tool for recording and playing back HTTP requests.",
   "bin": {
     "jam": "./jam.mjs",
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@httptoolkit/browser-launcher": "^2.0.2",
+    "@zerodevx/svelte-json-view": "^1.0.5",
     "arg": "^5.0.2",
     "body-parser": "^1.20.1",
     "debug": "^4.3.4",

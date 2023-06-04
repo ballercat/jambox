@@ -22,6 +22,7 @@ module.exports = {
       svelte: path.resolve('node_modules', 'svelte'),
     },
     mainFields: ['svelte', 'browser', 'module', 'main'],
+    conditionNames: ['svelte'],
   },
   plugins: [
     new ManifestPlugin(),

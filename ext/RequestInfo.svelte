@@ -1,4 +1,6 @@
 <script>
+  import { JsonView } from '@zerodevx/svelte-json-view';
+
   export let request;
   export let response;
 
@@ -33,8 +35,11 @@
     </li>
   </ul>
 </div>
-<div>
-  <span>Request Headers</span>
+<div class="Section">
+  <h4>Request</h4>
+  <h5>Raw</h5>
+  <JsonView json={request} depth={-1} />
+  <h5>Headers</h5>
   <ul>
     {#each Object.entries(reqHeaders) as [key, value]}
       <li>
@@ -45,15 +50,20 @@
   </ul>
 </div>
 {#if response}
-  <span>Response Headers</span>
-  <ul>
-    {#each Object.entries(resHeaders) as [key, value]}
-      <li>
-        <div class="Columns">{key}</div>
-        <div class="Columns">{value}</div>
-      </li>
-    {/each}
-  </ul>
+  <div class="Section">
+    <h4>Response</h4>
+    <h5>Raw</h5>
+    <JsonView json={response} depth={-1} />
+    <h5>Headers</h5>
+    <ul>
+      {#each Object.entries(resHeaders) as [key, value]}
+        <li>
+          <div class="Columns">{key}</div>
+          <div class="Columns">{value}</div>
+        </li>
+      {/each}
+    </ul>
+  </div>
 {/if}
 
 <style>
@@ -61,7 +71,6 @@
     list-style-type: none;
     padding: 5px;
     border: 1px solid var(--borderColor);
-
   }
   li {
     display: grid;
@@ -80,5 +89,9 @@
   }
   .Columns:nth-child(even) {
     grid-column: 2 / 4;
+  }
+  .Section {
+    padding: 2px;
+    margin-bottom: 5px;
   }
 </style>
