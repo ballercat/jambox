@@ -242,6 +242,7 @@ const events = (svc, config) => {
           status: request.status,
           statusCode: request.statusCode,
           statusMessage: request.statusMessage,
+          body: await request.body.getJson(),
           ...request.timingEvents,
         },
       });
@@ -273,6 +274,7 @@ const events = (svc, config) => {
           statusCode: response.statusCode,
           statusMessage: response.statusMessage,
           headers: response.headers,
+          body: await response.body.getJson(),
           ...response.timingEvents,
         },
       });
