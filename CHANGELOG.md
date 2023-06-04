@@ -1,3 +1,7 @@
+## 0.0.15 Display raw request & responses
+
+- Show the raw json of request/response in the info modal
+
 ## 0.0.14 Add pause api
 
 - add: #10, add `/api/pause`
