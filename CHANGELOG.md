@@ -1,3 +1,7 @@
+## 0.0.17 - Housekeeping, cypress tests
+
+- chore: add cypress tests to the project
+
 ## 0.0.16 - Port configs, Request info tabs, auto-reconnect
 
 - feature: jambox can be configured with a port now

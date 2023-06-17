@@ -11,11 +11,23 @@ example kitched sink example in the README.md for a good config starting point.
 - Push branch
 - Get Pull Request merged
 
-`yarn dev` to watch and rebuild server
+## Manual testing
 
-`yarn dev-ext` to watch and rebuild webextension
+`yarn dev` to watch and rebuild server
+`yarn webpack --watch` to rebuild the extension UI
 
 Once Chrome is launched with via jambox, for example `jam record <url>` you
 no longer need to re-launch chrome to connect to the jambox. Just restart the
 server, chrome will be able to proxy to it just fine. One day it'll be possible
 to reset/change settings from withing the Chrome extension.
+
+## Cypress
+
+_NOTE: At the moment Cypress test don't integrate with the backend_
+
+You may run cypress tests to easily test changes to the web extension.
+
+`yarn cy`
+
+The API is fully mocked in the cypress tests so this isn't a full integration
+test _yet_.
