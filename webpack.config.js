@@ -1,7 +1,6 @@
 const path = require('path');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('./manifest-plugin.js');
-const MiniCssExtractPlugn = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { EnvironmentPlugin } = require('webpack');
 
@@ -27,7 +26,6 @@ module.exports = {
     conditionNames: ['svelte', 'import'],
   },
   plugins: [
-    new MiniCssExtractPlugn({ filename: 'styles.css' }),
     new ManifestPlugin(),
     new HTMLWebpackPlugin({
       filename: 'panel.html',
@@ -67,7 +65,6 @@ module.exports = {
             compilerOptions: {
               dev: !process.env.CI,
             },
-            emitCss: true,
           },
         },
       },
@@ -77,21 +74,9 @@ module.exports = {
           fullySpecified: false,
         },
       },
-      // {
-      //   test: /\.css$/i,
-      //   use: ['style-loader', 'css-loader'],
-      // },
       {
-        test: /\.css$/,
-        use: [
-          MiniCssExtractPlugn.loader,
-          {
-            loader: 'css-loader',
-            options: {
-              url: false,
-            },
-          },
-        ],
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },

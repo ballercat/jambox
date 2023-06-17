@@ -60,7 +60,6 @@
     "find-open-port": "^2.0.3",
     "html-webpack-plugin": "^5.5.0",
     "https-proxy-agent": "^5.0.1",
-    "mini-css-extract-plugin": "^2.7.6",
     "mock-fs": "^5.1.4",
     "nodemon": "^2.0.20",
     "prettier": "^2.8.1",
