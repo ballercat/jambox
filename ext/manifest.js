@@ -8,7 +8,7 @@ module.exports = {
   host_permissions: ['<all_urls>'],
   web_accessible_resources: [
     {
-      resources: ['index.js'],
+      resources: ['index.js', 'runtime.json'],
       matches: ['<all_urls>'],
     },
   ],

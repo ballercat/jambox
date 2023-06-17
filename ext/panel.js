@@ -1,7 +1,7 @@
 import App from './App.svelte';
 import Observable from 'zen-observable';
 
-const initialize = ({ ws }, timestamp) => {
+const initialize = ({ ws, runtimeConfig }, timestamp) => {
   const server = new Observable((observer) => {
     const listen = (event) => {
       try {
@@ -29,14 +29,23 @@ const initialize = ({ ws }, timestamp) => {
   return new App({
     target: document.body,
     props: {
+      ...runtimeConfig,
       server,
     },
   });
 };
 
 const boot = async () => {
-  const ws = new WebSocket('ws://localhost:9000/');
-  ws.onopen = () => initialize({ ws }, Date.now());
+  const runtimeConfigURL = chrome.runtime.getURL('runtime.json');
+  const runtimeConfig = await fetch(runtimeConfigURL)
+    .then((response) => {
+      return response.json();
+    })
+    .catch(() => {
+      return { port: 9000 };
+    });
+  const ws = new WebSocket(`ws://localhost:${runtimeConfig.port}/`);
+  ws.onopen = () => initialize({ ws, runtimeConfig }, Date.now());
   ws.addEventListener('error', boot);
 };
 

@@ -1,7 +1,9 @@
 import _debug from 'debug';
+import fs from 'fs';
 import fetch from 'node-fetch';
 import path from 'path';
 import { spawn } from 'child_process';
+import { EXTENSION_PATH } from './constants.mjs';
 import launchProxiedChrome from './browser.mjs';
 import isURI from './is-uri.mjs';
 import launchServer from './server-launcher.mjs';
@@ -10,19 +12,13 @@ import getConfig from './config.mjs';
 const debug = _debug('jambox');
 
 export default async function record(options) {
-  const {
-    script,
-    cwd = process.cwd(),
-    port = 9000,
-    log,
-    env,
-    constants,
-  } = options;
+  const { script, cwd = process.cwd(), log, env, constants } = options;
   const [entrypoint, ...args] = script;
 
   debug('Checking if a server instance is running.');
 
   const config = getConfig({}, cwd);
+  const port = config.port || 9000;
 
   try {
     await launchServer({ log, port, constants, config });
@@ -46,6 +42,11 @@ export default async function record(options) {
   if (isURI(entrypoint)) {
     log(`${entrypoint} parsed as a URI. Launching a browser instance`);
     debug('launch proxied chrome');
+    const runtimeConfig = { port };
+    fs.writeFileSync(
+      path.join(EXTENSION_PATH, 'runtime.json'),
+      JSON.stringify(runtimeConfig, null, 2)
+    );
     const browser = await launchProxiedChrome(entrypoint, info);
 
     return {

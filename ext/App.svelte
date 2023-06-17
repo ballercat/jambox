@@ -3,11 +3,12 @@
   import Waterfall from './Waterfall.svelte';
 
   export let server;
+  export let port;
 
   const chrome = window.chrome;
   let cleanup;
 
-  fetch('http://localhost:9000/api/config')
+  fetch(`http://localhost:${port}/api/config`)
     .then((res) => res.json())
     .then((payload) => {
       store.update((state) => reducer(state, { type: 'config', payload }));
@@ -62,7 +63,7 @@
         class="Button"
         type="button"
         on:click={() =>
-          fetch('http://localhost:9000/api/pause', {
+          fetch(`http://localhost:${port}/api/pause`, {
             headers: {
               'Content-Type': 'application/json',
             },
