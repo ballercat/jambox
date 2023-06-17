@@ -5,7 +5,7 @@ import Observable from 'zen-observable';
  * @typedef {import('./types').Subscribtion} Subscribtion
  */
 
-const WEBSOCKET_RETRY_TIMER = 1000;
+const WEBSOCKET_RETRY_TIMER = 3000;
 
 export default class API {
   /**
@@ -48,8 +48,13 @@ export default class API {
       this.#sub.unsubscribe();
     }
 
+    const boundListen = this._listen.bind(this);
+
     try {
       this.#ws = new WebSocket(this.socketURL.toString());
+      this.#ws.onerror = () => {
+        setTimeout(boundListen, WEBSOCKET_RETRY_TIMER);
+      };
       this.#ws.onopen = () => {
         this.observable = new Observable((observer) => {
           const listener = (event) => {
@@ -73,11 +78,11 @@ export default class API {
         );
       };
       this.#ws.addEventListener('close', () => {
-        setTimeout(this._listen, WEBSOCKET_RETRY_TIMER);
+        setTimeout(boundListen, WEBSOCKET_RETRY_TIMER);
       });
     } catch (e) {
       console.error(e.name, e);
-      setTimeout(this._listen, WEBSOCKET_RETRY_TIMER);
+      setTimeout(boundListen, WEBSOCKET_RETRY_TIMER);
     }
   }
 

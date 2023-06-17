@@ -3,7 +3,7 @@ import _debug from 'debug';
 import fetch from 'node-fetch';
 import path from 'path';
 import { spawn } from 'child_process';
-import persistRuntimeConfig from './persist-runtime-config';
+import persistRuntimeConfig from './persist-runtime-config.mjs';
 import launchProxiedChrome from './browser.mjs';
 import isURI from './is-uri.mjs';
 import launchServer from './server-launcher.mjs';
