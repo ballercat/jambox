@@ -1,3 +1,10 @@
+## 0.0.16 - Port configs, Request info tabs, auto-reconnect
+
+- feature: jambox can be configured with a port now
+- feature: request Info has "tabs" for headers, request & response info
+- fix: extension will attempt to re-connect to the WebSocket server so a panel refresh is no longer necessary to reconnect.
+- chore: added support for typescript JSDoc comments and typechecks.
+
 ## 0.0.15 Display raw request & responses
 
 - Show the raw json of request/response in the info modal
