@@ -29,6 +29,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: cypress
         uses: cypress-io/github-action@v5
+        with:
+          component: true
   lint:
     runs-on: ubuntu-latest
     steps:
