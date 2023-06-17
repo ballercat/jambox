@@ -1,6 +1,6 @@
 {
   "name": "jambox",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Tool for recording and playing back HTTP requests.",
   "bin": {
     "jam": "./jam.mjs",
@@ -17,6 +17,7 @@
     "build": "webpack",
     "dev": "nodemon --watch ext --watch src --exec ./jam-server.mjs",
     "test": "c8 -r=text -r=lcov ava",
+    "cy": "cypress open --component",
     "lint": "eslint src/**/*.mjs",
     "format": "prettier --write ./src",
     "shutdown": "curl localhost:9000/shutdown",
@@ -53,6 +54,7 @@
     "c8": "^7.12.0",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
+    "cypress": "^12.14.0",
     "eslint": "^8.31.0",
     "eslint-plugin-svelte3": "^4.0.0",
     "eslint-plugin-typescript": "^0.14.0",

@@ -79,6 +79,7 @@
   transform={`translate(0,${(index + 1) * (rowHeight + rowPadding)})`}
   style="cursor: pointer;"
   opacity={statusCode ? 1 : 0.5}
+  data-cy-id="request-{id}"
 >
   <rect
     width="100%"
