@@ -1,6 +1,7 @@
 const path = require('path');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('./manifest-plugin.js');
+const MiniCssExtractPlugn = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { EnvironmentPlugin } = require('webpack');
 
@@ -19,12 +20,14 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.mjs', '.svelte'],
     alias: {
-      svelte: path.resolve('node_modules', 'svelte'),
+      //  svelte: path.resolve('node_modules', 'svelte'),
+      svelte: path.dirname(require.resolve('svelte/package.json')),
     },
     mainFields: ['svelte', 'browser', 'module', 'main'],
-    conditionNames: ['svelte'],
+    conditionNames: ['svelte', 'import'],
   },
   plugins: [
+    new MiniCssExtractPlugn({ filename: 'styles.css' }),
     new ManifestPlugin(),
     new HTMLWebpackPlugin({
       filename: 'panel.html',
@@ -57,10 +60,6 @@ module.exports = {
         loader: 'babel-loader',
       },
       {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
-      },
-      {
         test: /\.(svelte)$/,
         use: {
           loader: 'svelte-loader',
@@ -68,6 +67,7 @@ module.exports = {
             compilerOptions: {
               dev: !process.env.CI,
             },
+            emitCss: true,
           },
         },
       },
@@ -76,6 +76,22 @@ module.exports = {
         resolve: {
           fullySpecified: false,
         },
+      },
+      // {
+      //   test: /\.css$/i,
+      //   use: ['style-loader', 'css-loader'],
+      // },
+      {
+        test: /\.css$/,
+        use: [
+          MiniCssExtractPlugn.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              url: false,
+            },
+          },
+        ],
       },
     ],
   },

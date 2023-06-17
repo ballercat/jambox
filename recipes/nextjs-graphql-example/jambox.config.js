@@ -1,6 +1,7 @@
 const path = require('path');
 
 module.exports = {
+  browser: 'chromium',
   blockNetworkRequests: false,
   forward: {
     'http://jambox-demo-graphql.vercel.app': {

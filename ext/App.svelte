@@ -76,6 +76,33 @@
 </main>
 
 <style>
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --backgroundColor: #000;
+      --textColor: #fff;
+      --stripeA: #333;
+      --stripeB: #000;
+      --aborted: DeepPink;
+      --borderColor: #666;
+    }
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --backgroundColor: #fff;
+      --textColor: #000;
+      --stripeA: #efefef;
+      --stripeB: #fff;
+      --aborted: #a35;
+      --borderColor: #aaa;
+    }
+  }
+
+  :global(html, body) {
+    font-size: 1rem;
+    background-color: var(--backgroundColor);
+    color: var(--textColor);
+  }
   .Container {
     padding: 0 20px;
     display: grid;

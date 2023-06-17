@@ -8,19 +8,22 @@
   let currentTab = 'headers';
 </script>
 
-<div class="Wrapper">
+<div class="Wrapper" data-cy-id="request-info">
   <div>
     <button
+      data-cy-id="select-headers-tab"
       on:click={() => {
         currentTab = 'headers';
       }}>Headers</button
     >
     <button
+      data-cy-id="select-request-tab"
       on:click={() => {
         currentTab = 'request';
       }}>Request</button
     >
     <button
+      data-cy-id="select-response-tab"
       on:click={() => {
         currentTab = 'response';
       }}>Response</button

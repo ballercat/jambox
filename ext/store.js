@@ -11,6 +11,7 @@ export const initialState = {
 
 export const reducer = (state, action) => {
   const { type, payload } = action;
+  console.log(action);
   switch (type) {
     case 'clear': {
       return {
