@@ -31,6 +31,11 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           component: true
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          if-no-files-found: ignore
   lint:
     runs-on: ubuntu-latest
     steps:
