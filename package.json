@@ -1,6 +1,6 @@
 {
   "name": "jambox",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Tool for recording and playing back HTTP requests.",
   "bin": {
     "jam": "./jam.mjs",
@@ -47,7 +47,6 @@
     "@babel/preset-env": "^7.20.2",
     "@types/chrome": "^0.0.237",
     "@types/zen-observable": "^0.8.3",
-    "@typescript-eslint/parser": "^5.59.11",
     "ava": "^5.0.1",
     "babel-loader": "^9.1.0",
     "babel-plugin-module-resolver": "^4.1.0",
@@ -56,6 +55,7 @@
     "css-loader": "^6.7.1",
     "eslint": "^8.31.0",
     "eslint-plugin-svelte3": "^4.0.0",
+    "eslint-plugin-typescript": "^0.14.0",
     "find-open-port": "^2.0.3",
     "html-webpack-plugin": "^5.5.0",
     "https-proxy-agent": "^5.0.1",
