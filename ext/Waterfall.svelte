@@ -1,7 +1,7 @@
 <script>
   import { watchResize } from 'svelte-watch-resize';
   import Row from './Row.svelte';
-  import RequestInfo from './RequestInfo.svelte';
+  import RequestInfo from './RequestInfo';
   import Modal from './Modal.svelte';
 
   export let data;
@@ -162,7 +162,6 @@
 </div>
 {#if selection}
   <Modal on:close={() => (selection = null)}>
-    <h4>{selection.request.url}</h4>
     <RequestInfo {...selection} />
   </Modal>
 {/if}

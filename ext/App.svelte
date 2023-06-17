@@ -2,22 +2,19 @@
   import { store, reducer } from './store.js';
   import Waterfall from './Waterfall.svelte';
 
-  export let server;
-  export let port;
+  export let api;
 
   const chrome = window.chrome;
   let cleanup;
 
-  fetch(`http://localhost:${port}/api/config`)
-    .then((res) => res.json())
-    .then((payload) => {
-      store.update((state) => reducer(state, { type: 'config', payload }));
-    });
+  api.getConfig().then((payload) => {
+    store.update((state) => reducer(state, { type: 'config', payload }));
+  });
 
   $: {
     cleanup?.();
 
-    const sub = server.subscribe((action) => {
+    cleanup = api.subscribe((action) => {
       if (action.type === 'config') {
         chrome.notifications.create('', {
           title: 'Jambox Config Updated!',
@@ -30,8 +27,6 @@
         return reducer(state, action);
       });
     });
-
-    cleanup = () => sub.unsubscribe();
   }
 </script>
 
@@ -62,14 +57,8 @@
       <button
         class="Button"
         type="button"
-        on:click={() =>
-          fetch(`http://localhost:${port}/api/pause`, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            method: 'POST',
-            body: JSON.stringify({ paused: !$store.config.paused }),
-          })}>{$store.config.paused ? 'Unpause' : 'Pause'}</button
+        on:click={() => api.pause(!$store.config.paused)}
+        >{$store.config.paused ? 'Unpause' : 'Pause'}</button
       >
     </div>
     <div>

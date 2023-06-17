@@ -1,3 +1,4 @@
+// @ts-check
 import fs from 'fs';
 import path from 'path';
 import Observable from 'zen-observable';
@@ -191,7 +192,9 @@ class Cache {
       }
 
       debug(`read ${filename}`);
-      const json = JSON.parse(fs.readFileSync(path.join(dir, filename)));
+      const json = JSON.parse(
+        fs.readFileSync(path.join(dir, filename), 'utf-8')
+      );
       const obj = deserialize(json);
       results[name] = obj;
     };

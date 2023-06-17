@@ -212,7 +212,6 @@ const events = (svc, config) => {
 
     const matchValue = url.hostname + url.pathname;
 
-    debug(`${config.value.cache}`);
     if (ignoreList.some((glob) => minimatch(matchValue, glob))) {
       return false;
     }

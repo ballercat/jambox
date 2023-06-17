@@ -1,9 +1,9 @@
+// @ts-check
 import _debug from 'debug';
-import fs from 'fs';
 import fetch from 'node-fetch';
 import path from 'path';
 import { spawn } from 'child_process';
-import { EXTENSION_PATH } from './constants.mjs';
+import persistRuntimeConfig from './persist-runtime-config';
 import launchProxiedChrome from './browser.mjs';
 import isURI from './is-uri.mjs';
 import launchServer from './server-launcher.mjs';
@@ -42,13 +42,11 @@ export default async function record(options) {
   if (isURI(entrypoint)) {
     log(`${entrypoint} parsed as a URI. Launching a browser instance`);
     debug('launch proxied chrome');
-    const runtimeConfig = { port };
-    fs.writeFileSync(
-      path.join(EXTENSION_PATH, 'runtime.json'),
-      JSON.stringify(runtimeConfig, null, 2)
-    );
     const browser = await launchProxiedChrome(entrypoint, info);
-
+    persistRuntimeConfig({
+      host: 'localhost',
+      port,
+    });
     return {
       browser,
     };
