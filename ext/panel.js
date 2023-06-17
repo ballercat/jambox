@@ -1,43 +1,14 @@
 import App from './App.svelte';
-import Observable from 'zen-observable';
+import API from './Api';
 
-const initialize = ({ ws }, timestamp) => {
-  const server = new Observable((observer) => {
-    const listen = (event) => {
-      try {
-        const action = JSON.parse(event.data);
-        observer.next(action);
-      } catch (e) {
-        observer.error(e);
-      }
-    };
-
-    ws.addEventListener('message', listen);
-
-    return () => {
-      ws.removeEventListener('message', listen);
-    };
-  });
-
-  server.send = (data) => {
-    if (ws.readyState > 1) {
-      boot();
-      return;
-    }
-    ws.send(JSON.stringify(data));
-  };
+const boot = async () => {
+  const api = await API.create();
   return new App({
     target: document.body,
     props: {
-      server,
+      api,
     },
   });
-};
-
-const boot = async () => {
-  const ws = new WebSocket('ws://localhost:9000/');
-  ws.onopen = () => initialize({ ws }, Date.now());
-  ws.addEventListener('error', boot);
 };
 
 boot();

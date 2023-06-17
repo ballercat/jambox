@@ -1,3 +1,4 @@
+// @ts-check
 import fs from 'fs';
 import path from 'path';
 import _debug from 'debug';
@@ -12,7 +13,7 @@ import { PROJECT_ROOT } from '../constants.mjs';
 
 const debug = _debug('jambox');
 
-const getServices = () => {
+const getServices = (filesystem) => {
   const app = express();
   const ews = expessWS(app);
   const cache = new Cache();
@@ -21,8 +22,12 @@ const getServices = () => {
     recordTraffic: false,
     suggestChanges: false,
     https: {
-      key: fs.readFileSync(path.join(PROJECT_ROOT, 'testCA.key')).toString(),
-      cert: fs.readFileSync(path.join(PROJECT_ROOT, 'testCA.pem')).toString(),
+      key: filesystem
+        .readFileSync(path.join(PROJECT_ROOT, 'testCA.key'))
+        .toString(),
+      cert: filesystem
+        .readFileSync(path.join(PROJECT_ROOT, 'testCA.pem'))
+        .toString(),
     },
   });
 
@@ -40,8 +45,8 @@ const shutdown = (nodeProcess, svc) => async (req, res) => {
   nodeProcess.exit(0);
 };
 
-async function start({ port, nodeProcess = process }) {
-  const svc = getServices();
+async function start({ port, nodeProcess = process, filesystem = fs }) {
+  const svc = getServices(filesystem);
   const config = {
     value: { serverURL: `http://localhost:${port}` },
   };

@@ -1,12 +1,5 @@
-/**
- * Eslint config
- *
- * @author    Joe Boyle <joboyle@wayfair.com>
- * @copyright 2020 Wayfair LLC - All rights reserved
- */
-
 module.exports = {
-  plugins: ['svelte3'],
+  plugins: ['svelte3', 'typescript'],
   rules: {
     'no-console': 0,
     'no-undefined': 1,
