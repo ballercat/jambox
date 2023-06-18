@@ -31,7 +31,6 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           start: npm run e2e-dev
-          wait-on: http://localhost:8000
           component: true
           command-prefix: HTTP_PROXY=http://localhost:8000
       - uses: actions/upload-artifact@v3
