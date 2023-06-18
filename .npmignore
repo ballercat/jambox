@@ -7,11 +7,18 @@ public
 recipes
 .idea
 test-report.xml
+.github
+cypress
+*.cy.js
+*.test.mjs
+ext
+.git
 
 # ???
 http:/*
 server.log
 jambox.config.js
+.jambox
 
 # yarn
 .pnp.*
