@@ -30,6 +30,7 @@ jobs:
       - name: cypress
         uses: cypress-io/github-action@v5
         with:
+          env: HTTP_PROXY=http://localhost:8000
           server: ./e2e-backend.mjs
           component: true
       - uses: actions/upload-artifact@v3
