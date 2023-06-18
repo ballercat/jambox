@@ -31,7 +31,7 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           env: HTTP_PROXY=http://localhost:8000
-          start: ./e2e-backend.mjs
+          start: npm run e2e-dev
           component: true
       - uses: actions/upload-artifact@v3
         with:
