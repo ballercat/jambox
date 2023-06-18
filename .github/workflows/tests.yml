@@ -29,12 +29,11 @@ jobs:
       - uses: actions/checkout@v3
       - name: cypress
         uses: cypress-io/github-action@v5
-        env:
-          HTTP_PROXY: http://localhost:8000
         with:
           start: npm run e2e-dev
           wait-on: http://localhost:8000
           component: true
+          command-prefix: HTTP_PROXY=http://localhost:8000
       - uses: actions/upload-artifact@v3
         with:
           name: cypress-videos
