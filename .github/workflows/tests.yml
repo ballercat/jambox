@@ -31,8 +31,7 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           start: npm run e2e-dev
-          component: true
-          command-prefix: HTTP_PROXY=http://localhost:8000
+          command: npm run cy-ci
       - uses: actions/upload-artifact@v3
         with:
           name: cypress-videos
