@@ -23,11 +23,16 @@ to reset/change settings from withing the Chrome extension.
 
 ## Cypress
 
-_NOTE: At the moment Cypress test don't integrate with the backend_
+You may run cypress tests to easily integration test changes to both web-extension
+and the server.
 
-You may run cypress tests to easily test changes to the web extension.
+Start the end-to-end backend, this will stand up a simple HTTP server to test against and
+a jambox server to act as a proxy.
+
+`yarn e2e-dev`
+
+Launch cypress
 
 `yarn cy`
 
-The API is fully mocked in the cypress tests so this isn't a full integration
-test _yet_.
+Note that if yuu did not launch the server first, the tests will fail.

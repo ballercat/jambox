@@ -16,7 +16,7 @@
 
     cleanup = api.subscribe((action) => {
       if (action.type === 'config') {
-        chrome.notifications.create('', {
+        chrome.notifications?.create('', {
           title: 'Jambox Config Updated!',
           message: `Loaded ${action.payload.filepath}`,
           iconUrl: 'icons/icon-json-64x64.png',
