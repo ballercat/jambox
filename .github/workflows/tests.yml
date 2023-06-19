@@ -30,7 +30,8 @@ jobs:
       - name: cypress
         uses: cypress-io/github-action@v5
         with:
-          component: true
+          start: npm run e2e-dev
+          command: npm run cy-ci
       - uses: actions/upload-artifact@v3
         with:
           name: cypress-videos
