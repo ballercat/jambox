@@ -1,18 +1,21 @@
 <script>
   import { store, reducer } from './store.js';
+  import Checkbox from './Checkbox.svelte';
   import Waterfall from './Waterfall.svelte';
 
   export let api;
 
   const chrome = window.chrome;
+  let pauseChecked = false;
   let cleanup;
-
   api.getConfig().then((payload) => {
     store.update((state) => reducer(state, { type: 'config', payload }));
   });
 
   $: {
     cleanup?.();
+    pauseChecked = $store.config.pause;
+    console.log($store.config);
 
     cleanup = api.subscribe((action) => {
       if (action.type === 'config') {
@@ -32,44 +35,22 @@
 
 <main class="Container">
   <div class="Box">
-    <h1>📻 Jambox 📻</h1>
-    <div>
-      <button
-        type="button"
-        class="Button"
-        on:click={() =>
-          store.update((state) => reducer(state, { type: 'clear' }))}
-        >Clear</button
-      >
-      <button
-        class="Button"
-        type="button"
-        on:click={() => {
-          chrome.tabs.query(
-            { active: true, currentWindow: true },
-            (arrayOfTabs) => {
-              store.update((state) => reducer(state, { type: 'refresh' }));
-              chrome.tabs.reload(arrayOfTabs[0].id);
-            }
-          );
-        }}>Refresh</button
-      >
-      <button
-        class="Button"
-        type="button"
-        on:click={() => api.pause(!$store.config.paused)}
-        >{$store.config.paused ? 'Unpause' : 'Pause'}</button
-      >
-    </div>
-    <div>
-      Network Requests Are Blocked: <span class="Highlight Text"
-        >{$store.config.blockNetworkRequests ? 'yes' : 'no'}
-      </span>
-    </div>
-    <div>
-      Proxy is paused: <span class="Highlight Text"
-        >{$store.config.paused ? 'yes' : 'no'}</span
-      >
+    <div class="TopBar">
+      <div class="Text">📻 Jambox 📻</div>
+      <Checkbox
+        checked={$store.config.paused}
+        inline
+        label="Pause Proxy"
+        onClick={() => {
+          api.pause(!$store.config.paused);
+        }}
+      />
+      <Checkbox
+        inline
+        checked={$store.config.blockNetworkRequests}
+        label="Block Network"
+        onClick={() => {}}
+      />
     </div>
   </div>
   <Waterfall data={$store} />
@@ -99,14 +80,13 @@
   }
 
   :global(html, body) {
+    font-family: menlo, monospace;
     font-size: 1rem;
     background-color: var(--backgroundColor);
     color: var(--textColor);
   }
   .Container {
     padding: 0 20px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
   }
   .Highlight {
     padding: 2px 5px;
@@ -121,31 +101,13 @@
     flex-direction: column;
     gap: 20px;
   }
-
-  .Button {
-    background-color: var(--textColor);
-    color: var(--backgroundColor);
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-weight: bold;
-    outline: 0;
-    border: 2px solid transparent;
-  }
-
-  .Button:hover {
-    background-color: var(--backgroundColor);
-    color: var(--textColor);
-    border-color: var(--textColor);
-  }
-  .Button:focus-visible {
-    background-color: var(--backgroundColor);
-    color: var(--textColor);
-    border-color: var(--textColor);
-  }
-
-  .Button:active {
-    border-color: MediumSlateBlue;
-    color: MediumSlateBlue;
+  .TopBar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid;
+    border-color: var(--stripeA);
+    padding-bottom: 10px;
   }
 </style>
