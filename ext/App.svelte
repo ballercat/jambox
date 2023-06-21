@@ -88,11 +88,6 @@
   .Container {
     padding: 0 20px;
   }
-  .Highlight {
-    padding: 2px 5px;
-    background: var(--textColor);
-    color: var(--backgroundColor);
-  }
   .Text {
     font-weight: bold;
   }
