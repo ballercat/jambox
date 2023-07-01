@@ -5795,6 +5795,7 @@ __metadata:
     supertest: ^6.3.1
     superwstest: ^2.0.3
     svelte: ^3.55.0
+    svelte-icons: ^2.1.0
     svelte-loader: ^3.1.4
     svelte-watch-resize: ^1.0.3
     tail-file: ^1.4.15
@@ -8805,6 +8806,13 @@ __metadata:
   peerDependencies:
     svelte: ">=3.19.0"
   checksum: ac5f91030007c709e92992e9a06cda59304fe99c428d163aeff11c005b4bb293c504f1d1aa4a173cf27bbe38eaf7544956299074402efa1abb5ef61573b3f408
+  languageName: node
+  linkType: hard
+
+"svelte-icons@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "svelte-icons@npm:2.1.0"
+  checksum: a32e305152be010a694cc7afe5848fb8f88dd2dba36624cbd3c92a2bf54e5683c57c44b4faa31bccee19cf9cc855158e588591672c4ae89984e3500bef0c488a
   languageName: node
   linkType: hard
 

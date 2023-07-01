@@ -46,10 +46,10 @@
     font-weight: bold;
   }
   .Primary {
-    accent-color: MediumSlateBlue;
+    accent-color: var(--cerulean);
   }
   .Secondary {
-    accent-color: fuchsia;
+    accent-color: var(--magenta);
   }
   .Label {
     cursor: pointer;

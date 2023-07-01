@@ -2,6 +2,7 @@
   import { store, reducer } from './store.js';
   import Checkbox from './Checkbox.svelte';
   import Waterfall from './Waterfall.svelte';
+  import SideNav from './SideNav.svelte';
 
   export let api;
 
@@ -34,9 +35,9 @@
 </script>
 
 <main class="Container">
+  <SideNav />
   <div class="Box">
     <div class="TopBar">
-      <div class="Text">📻 Jambox 📻</div>
       <Checkbox
         checked={$store.config.paused}
         inline
@@ -52,19 +53,49 @@
         onClick={() => {}}
       />
     </div>
+    <Waterfall data={$store} />
   </div>
-  <Waterfall data={$store} />
 </main>
 
 <style>
+  /* https://iamkate.com/data/12-bit-rainbow/ */
+  :root {
+    --magenta: #817;
+    --maroon: #a35;
+    --red: #c66;
+    --orange: #e94;
+    --yellow: #ed0;
+    --conifer: #9d5;
+    --aquamarine: #4d8;
+    --turquoise: #2cb;
+    --topaz: #0bc;
+    --cerulean: #09c;
+    --blue: #36b;
+    --purple: #639;
+
+    /* greyscale */
+    --gc-magenta: #696969;
+    --gc-maroon: #5b5b5b;
+    --gc-red: #4c4c4c;
+    --gc-orange: #979797;
+    --gc-yellow: #e2e2e2;
+    --gc-conifer: #bcbcbc;
+    --gc-aquamarine: #969696;
+    --gc-turquoise: #a4a4a4;
+    --gc-topaz: #b3b3b3;
+    --gc-cerulean: #686868;
+    --gc-blue: #1d1d1d;
+    --gc-purple: #434343;
+  }
+
   @media (prefers-color-scheme: dark) {
     :root {
       --backgroundColor: #000;
       --textColor: #fff;
-      --stripeA: #333;
+      --stripeA: var(--gc-purple);
       --stripeB: #000;
-      --aborted: DeepPink;
-      --borderColor: #666;
+      --aborted: var(--cerulean);
+      --borderColor: var(--gc-magenta);
     }
   }
 
@@ -72,10 +103,10 @@
     :root {
       --backgroundColor: #fff;
       --textColor: #000;
-      --stripeA: #efefef;
+      --stripeA: var(--gc-yellow);
       --stripeB: #fff;
-      --aborted: #a35;
-      --borderColor: #aaa;
+      --aborted: var(--maroon);
+      --borderColor: var(--gc-turquoise);
     }
   }
 
@@ -86,11 +117,20 @@
     color: var(--textColor);
   }
   .Container {
-    padding: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    height: 100vh;
   }
-  .Text {
-    font-weight: bold;
+  .Container > :first-child {
+    flex-grow: 1;
   }
+  .Container > :last-child {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-inline-size: 50%;
+  }
+
   .Box {
     display: flex;
     flex-direction: column;
