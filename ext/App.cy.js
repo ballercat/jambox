@@ -11,6 +11,9 @@ before(async () => {
         paths: ['**'],
       },
     },
+    cache: {
+      stage: ['jambox-test.com/**'],
+    },
   });
   api = await API.create();
 });
@@ -30,6 +33,26 @@ describe('Web Extension', () => {
 
     cy.get('[data-cy-id="request-info"]').as('modal');
 
+    cy.get('@modal').contains(testURL);
+    cy.get('[data-cy-id="select-response-tab"]').click();
+    cy.get('@modal').contains('path');
+    cy.get('@modal').contains('/returnThisAsJson');
+
+    cy.get('[data-cy-id="modal-background"]').click({ force: true });
+
+    cy.get('@modal').should('not.exist');
+
+    // When network requests are blocked no caching happens, so disable blocking
+    cy.get(`[data-cy-id="block-network"]`).as('block-network').uncheck();
+    cy.get('@block-network').should('have.prop', 'indeterminate');
+
+    cy.wait(50);
+    cy.request(testURL);
+
+    cy.get('[data-cy-id="cache-link"]').click();
+
+    // Same modal as the waterfall should be available for cache
+    cy.get('[data-cy-id="cache-id"]').click();
     cy.get('@modal').contains(testURL);
     cy.get('[data-cy-id="select-response-tab"]').click();
     cy.get('@modal').contains('path');

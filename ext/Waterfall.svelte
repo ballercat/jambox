@@ -1,12 +1,13 @@
 <script>
   import { watchResize } from 'svelte-watch-resize';
+  import { store, reducer } from './store.js';
   import Row from './Row.svelte';
-  import RequestInfo from './RequestInfo';
-  import Modal from './Modal.svelte';
+  import Checkbox from './Checkbox.svelte';
 
+  export let onSelection;
   export let data;
-  export let selection = null;
 
+  const chrome = window.chrome;
   const CONTENT_MAP = {
     'application/javascript': 'js',
     'application/json': 'fetch',
@@ -94,41 +95,55 @@
 </script>
 
 <div class="Box">
-  <div class="Checkbox-wrapper">
-    <input
-      on:click={() => {
-        if (checked.length === possibleChecks.length) {
-          checked = [];
+  <button
+    type="button"
+    class="Button"
+    on:click={() => store.update((state) => reducer(state, { type: 'clear' }))}
+    >Clear</button
+  >
+  <button
+    class="Button"
+    type="button"
+    on:click={() => {
+      chrome.tabs.query(
+        { active: true, currentWindow: true },
+        (arrayOfTabs) => {
+          store.update((state) => reducer(state, { type: 'refresh' }));
+          chrome.tabs.reload(arrayOfTabs[0].id);
+        }
+      );
+    }}>Refresh</button
+  >
+  <Checkbox
+    onClick={() => {
+      if (checked.length === possibleChecks.length) {
+        checked = [];
+      } else {
+        checked = [...possibleChecks];
+      }
+    }}
+    inline
+    variation="secondary"
+    checked={checked.length === possibleChecks.length}
+    id="all-check"
+    name="all-check"
+    label="All"
+  />
+  {#each possibleChecks as type}
+    <Checkbox
+      inline
+      onClick={() => {
+        if (checked.includes(type)) {
+          checked = checked.filter((check) => check !== type);
         } else {
-          checked = [...possibleChecks];
+          checked = [...checked, type];
         }
       }}
-      checked={checked.length === possibleChecks.length}
-      type="checkbox"
-      id="all-check"
-      name="all-check"
-      class="AllCheckbox Checkbox"
+      checked={checked.includes(type)}
+      id="{type}-check"
+      name="{type}-check"
+      label={type}
     />
-    <label class="Label" for="all-check">All</label>
-  </div>
-  {#each possibleChecks as type}
-    <div class="Checkbox-wrapper">
-      <input
-        on:click={() => {
-          if (checked.includes(type)) {
-            checked = checked.filter((check) => check !== type);
-          } else {
-            checked = [...checked, type];
-          }
-        }}
-        checked={checked.includes(type)}
-        type="checkbox"
-        id="{type}-check"
-        name="{type}-check"
-        class="IndvidualCheckbox Checkbox"
-      />
-      <label class="Label" for="{type}-check">{type}</label>
-    </div>
   {/each}
 </div>
 
@@ -152,7 +167,7 @@
         {barOffset}
         {scaleFactor}
         onClick={(id) =>
-          (selection = {
+          onSelection({
             request: data.requestById[id],
             response: data.responseById[id],
           })}
@@ -160,43 +175,43 @@
     {/each}
   </svg>
 </div>
-{#if selection}
-  <Modal on:close={() => (selection = null)}>
-    <RequestInfo {...selection} />
-  </Modal>
-{/if}
 
 <style>
   .Box {
-    margin: 20px;
-  }
-  .Checkbox-wrapper {
+    margin-top: 20px;
     display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 10px;
-  }
-  .Checkbox-wrapper:not(:first-child) {
-    margin-top: 5px;
-  }
-  .Checkbox {
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-  }
-  .Checkbox:checked ~ .Label {
-    font-weight: bold;
-  }
-  .IndvidualCheckbox {
-    accent-color: MediumSlateBlue;
-  }
-  .AllCheckbox {
-    accent-color: fuchsia;
-  }
-  .Label {
-    cursor: pointer;
-    width: 100%;
+    gap: 5px;
   }
   .Content {
     grid-column: 1 / 3;
+  }
+
+  .Button {
+    background-color: var(--textColor);
+    color: var(--backgroundColor);
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-weight: bold;
+    outline: 0;
+    border: 2px solid transparent;
+  }
+
+  .Button:hover {
+    background-color: var(--backgroundColor);
+    color: var(--textColor);
+    border-color: var(--textColor);
+  }
+  .Button:focus-visible {
+    background-color: var(--backgroundColor);
+    color: var(--textColor);
+    border-color: var(--textColor);
+  }
+
+  .Button:active {
+    border-color: MediumSlateBlue;
+    color: MediumSlateBlue;
   }
 </style>

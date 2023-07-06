@@ -4,7 +4,7 @@ import deepmerge from 'deepmerge';
 import getConfig from '../config.mjs';
 import setupHandlers from './handlers.mjs';
 import debounce from '../utils/debounce.mjs';
-
+import { serializeRequest, serializeResponse } from '../cache.mjs';
 const debug = _debug('jambox.backend');
 
 const getInfo = (svc, config) => {
@@ -77,8 +77,17 @@ const backend = async (svc, config) => {
     }
   });
 
-  svc.app.get('/api/cache', (_, res) => {
-    res.send(svc.cache.all());
+  svc.app.get('/api/cache', async (_, res) => {
+    const raw = svc.cache.all();
+    const all = {};
+    for (const key in raw) {
+      const entry = raw[key];
+      all[key] = {
+        request: await serializeRequest(entry.request),
+        response: await serializeResponse(entry.response),
+      };
+    }
+    res.send(all);
   });
 
   svc.app.post('/api/reset', async (req, res) => {

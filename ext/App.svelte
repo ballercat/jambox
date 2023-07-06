@@ -1,11 +1,19 @@
 <script>
   import { store, reducer } from './store.js';
+  import Cache from './Cache';
+  import Checkbox from './Checkbox.svelte';
   import Waterfall from './Waterfall.svelte';
+  import SideNav from './SideNav.svelte';
+  import RequestInfo from './RequestInfo';
+  import Modal from './Modal.svelte';
 
   export let api;
 
   const chrome = window.chrome;
+  let pauseChecked = false;
   let cleanup;
+  let path = '/Waterfall';
+  let selection = null;
 
   api.getConfig().then((payload) => {
     store.update((state) => reducer(state, { type: 'config', payload }));
@@ -13,9 +21,11 @@
 
   $: {
     cleanup?.();
+    pauseChecked = $store.config.pause;
 
     cleanup = api.subscribe((action) => {
       if (action.type === 'config') {
+        console.log(action);
         chrome.notifications?.create('', {
           title: 'Jambox Config Updated!',
           message: `Loaded ${action.payload.filepath}`,
@@ -31,59 +41,93 @@
 </script>
 
 <main class="Container">
+  <SideNav
+    onNavigation={(selection) => {
+      path = selection;
+    }}
+    {path}
+  />
   <div class="Box">
-    <h1>📻 Jambox 📻</h1>
-    <div>
-      <button
-        type="button"
-        class="Button"
-        on:click={() =>
-          store.update((state) => reducer(state, { type: 'clear' }))}
-        >Clear</button
-      >
-      <button
-        class="Button"
-        type="button"
-        on:click={() => {
-          chrome.tabs.query(
-            { active: true, currentWindow: true },
-            (arrayOfTabs) => {
-              store.update((state) => reducer(state, { type: 'refresh' }));
-              chrome.tabs.reload(arrayOfTabs[0].id);
-            }
-          );
-        }}>Refresh</button
-      >
-      <button
-        class="Button"
-        type="button"
-        on:click={() => api.pause(!$store.config.paused)}
-        >{$store.config.paused ? 'Unpause' : 'Pause'}</button
-      >
+    <div class="TopBar">
+      <Checkbox
+        checked={$store.config.paused}
+        inline
+        id="pause-proxy"
+        name="pause-proxy"
+        label="Pause Proxy"
+        onClick={() => {
+          api.pause(!$store.config.paused);
+        }}
+      />
+      <Checkbox
+        inline
+        id="block-network"
+        name="block-network"
+        checked={$store.config.blockNetworkRequests}
+        label="Block Network"
+        onClick={() => {
+          api.blockNetworkRequests(!$store.config.blockNetworkRequests);
+        }}
+      />
     </div>
-    <div>
-      Network Requests Are Blocked: <span class="Highlight Text"
-        >{$store.config.blockNetworkRequests ? 'yes' : 'no'}
-      </span>
-    </div>
-    <div>
-      Proxy is paused: <span class="Highlight Text"
-        >{$store.config.paused ? 'yes' : 'no'}</span
-      >
-    </div>
+    {#if path === '/Waterfall'}
+      <Waterfall data={$store} onSelection={(value) => (selection = value)} />
+    {/if}
+    {#if path === '/Cache'}
+      <Cache
+        {api}
+        onSelection={(row) => {
+          selection = row;
+        }}
+      />
+    {/if}
   </div>
-  <Waterfall data={$store} />
+  {#if selection}
+    <Modal on:close={() => (selection = null)}>
+      <RequestInfo {...selection} />
+    </Modal>
+  {/if}
 </main>
 
 <style>
+  /* https://iamkate.com/data/12-bit-rainbow/ */
+  :root {
+    --magenta: #817;
+    --maroon: #a35;
+    --red: #c66;
+    --orange: #e94;
+    --yellow: #ed0;
+    --conifer: #9d5;
+    --aquamarine: #4d8;
+    --turquoise: #2cb;
+    --topaz: #0bc;
+    --cerulean: #09c;
+    --blue: #36b;
+    --purple: #639;
+
+    /* greyscale */
+    --gc-magenta: #696969;
+    --gc-maroon: #5b5b5b;
+    --gc-red: #4c4c4c;
+    --gc-orange: #979797;
+    --gc-yellow: #e2e2e2;
+    --gc-conifer: #bcbcbc;
+    --gc-aquamarine: #969696;
+    --gc-turquoise: #a4a4a4;
+    --gc-topaz: #b3b3b3;
+    --gc-cerulean: #686868;
+    --gc-blue: #1d1d1d;
+    --gc-purple: #434343;
+  }
+
   @media (prefers-color-scheme: dark) {
     :root {
       --backgroundColor: #000;
       --textColor: #fff;
-      --stripeA: #333;
+      --stripeA: var(--gc-purple);
       --stripeB: #000;
-      --aborted: DeepPink;
-      --borderColor: #666;
+      --aborted: var(--cerulean);
+      --borderColor: var(--gc-magenta);
     }
   }
 
@@ -91,61 +135,46 @@
     :root {
       --backgroundColor: #fff;
       --textColor: #000;
-      --stripeA: #efefef;
+      --stripeA: var(--gc-yellow);
       --stripeB: #fff;
-      --aborted: #a35;
-      --borderColor: #aaa;
+      --aborted: var(--maroon);
+      --borderColor: var(--gc-turquoise);
     }
   }
 
   :global(html, body) {
+    font-family: menlo, monospace;
     font-size: 1rem;
     background-color: var(--backgroundColor);
     color: var(--textColor);
   }
   .Container {
-    padding: 0 20px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    height: 100vh;
   }
-  .Highlight {
-    padding: 2px 5px;
-    background: var(--textColor);
-    color: var(--backgroundColor);
+  .Container > :first-child {
+    flex-grow: 1;
   }
-  .Text {
-    font-weight: bold;
+  .Container > :last-child {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-inline-size: 50%;
   }
+
   .Box {
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
-
-  .Button {
-    background-color: var(--textColor);
-    color: var(--backgroundColor);
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-weight: bold;
-    outline: 0;
-    border: 2px solid transparent;
-  }
-
-  .Button:hover {
-    background-color: var(--backgroundColor);
-    color: var(--textColor);
-    border-color: var(--textColor);
-  }
-  .Button:focus-visible {
-    background-color: var(--backgroundColor);
-    color: var(--textColor);
-    border-color: var(--textColor);
-  }
-
-  .Button:active {
-    border-color: MediumSlateBlue;
-    color: MediumSlateBlue;
+  .TopBar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid;
+    border-color: var(--stripeA);
+    padding-bottom: 10px;
   }
 </style>

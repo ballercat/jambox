@@ -1,6 +1,6 @@
 {
   "name": "jambox",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Tool for recording and playing back HTTP requests.",
   "bin": {
     "jam": "./jam.mjs",
@@ -41,6 +41,7 @@
     "nock": "^13.2.9",
     "node-fetch": "^2",
     "osenv": "^0.1.5",
+    "svelte-table": "^0.6.1",
     "tail-file": "^1.4.15",
     "wait-on": "^6.0.1",
     "zen-observable": "^0.9.0"
