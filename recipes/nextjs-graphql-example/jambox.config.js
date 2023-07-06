@@ -11,7 +11,7 @@ module.exports = {
     },
   },
   auto: {
-    //  '**/*.jpg': { status: 200, file: path.join(__dirname, '200x200.jpg') },
+    '**/*.jpg': { status: 200, file: path.join(__dirname, '200x200.jpg') },
   },
   cache: {
     write: 'auto',
