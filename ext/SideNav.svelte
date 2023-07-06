@@ -1,20 +1,33 @@
 <script>
-  import FaSortAmountDown from 'svelte-icons/fa/FaSortAmountDown.svelte';
-  import FaDatabase from 'svelte-icons/fa/FaDatabase.svelte';
+  export let onNavigation;
+  export let path;
 </script>
 
 <div class="SideNav">
   <div class="Title">Jambox</div>
   <ul>
     <li>
-      <a href="#" class="selected">
-        <span class="icon"><FaSortAmountDown /></span>
-      </a>
+      <a
+        on:click={(e) => {
+          e.preventDefault();
+          onNavigation('/Waterfall');
+        }}
+        href="/Waterfall"
+        data-cy-id="waterfall-link"
+        class="SideNav-Link {path === '/Waterfall' ? 'selected' : ''}"
+        >Waterfall</a
+      >
     </li>
     <li>
-      <a href="#" class="selected">
-        <span class="icon"><FaDatabase /></span>
-      </a>
+      <a
+        on:click={(e) => {
+          e.preventDefault();
+          onNavigation('/Cache');
+        }}
+        data-cy-id="cache-link"
+        href="/Cache"
+        class="SideNav-Link {path === '/Cache' ? 'selected' : ''}">Cache</a
+      >
     </li>
   </ul>
 </div>
@@ -23,29 +36,34 @@
   .Title {
     font-weight: bold;
     font-size: 20px;
-    padding: 14px;
+    padding: 0 10px;
   }
 
   ul {
     list-style-type: none;
+    padding: 0;
   }
-  ul li a {
+  li {
+    margin: 5px;
     display: block;
-    border-bottom: 1px solid #10558d;
-    color: rgb(241, 237, 237);
-    font-size: 10px;
-    position: relative;
-  }
-
-  .icon {
-    width: 20px;
-    height: 20px;
-    display: inline-block;
+    font-size: 18px;
   }
 
   .SideNav {
-    background-color: var(--blue);
-    color: #dee4ec;
     text-decoration: none;
+    border-right: 1px solid var(--magenta);
+  }
+
+  .SideNav-Link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .SideNav-Link:hover {
+    cursor: pointer;
+  }
+
+  .selected {
+    color: var(--cerulean);
   }
 </style>

@@ -2,12 +2,10 @@
   import { watchResize } from 'svelte-watch-resize';
   import { store, reducer } from './store.js';
   import Row from './Row.svelte';
-  import RequestInfo from './RequestInfo';
-  import Modal from './Modal.svelte';
   import Checkbox from './Checkbox.svelte';
 
+  export let onSelection;
   export let data;
-  export let selection = null;
 
   const chrome = window.chrome;
   const CONTENT_MAP = {
@@ -169,7 +167,7 @@
         {barOffset}
         {scaleFactor}
         onClick={(id) =>
-          (selection = {
+          onSelection({
             request: data.requestById[id],
             response: data.responseById[id],
           })}
@@ -177,11 +175,6 @@
     {/each}
   </svg>
 </div>
-{#if selection}
-  <Modal on:close={() => (selection = null)}>
-    <RequestInfo {...selection} />
-  </Modal>
-{/if}
 
 <style>
   .Box {

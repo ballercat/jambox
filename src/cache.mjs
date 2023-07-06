@@ -8,6 +8,34 @@ import _debug from 'debug';
 
 const debug = _debug('jambox.cache');
 
+export const serializeRequest = async (request) => {
+  return {
+    id: request.id,
+    url: request.url,
+    path: request.path,
+    headers: request.headers,
+    status: request.status,
+    statusCode: request.statusCode,
+    statusMessage: request.statusMessage,
+    body: await request.body.getJson(),
+    ...request.timingEvents,
+  };
+};
+export const serializeResponse = async (response) => {
+  const text = await response.body.getText();
+  const sizeInBytes = text.length;
+  return {
+    id: response.id,
+    sizeInBytes,
+    status: response.status,
+    statusCode: response.statusCode,
+    statusMessage: response.statusMessage,
+    headers: response.headers,
+    body: await response.body.getJson(),
+    ...response.timingEvents,
+  };
+};
+
 export const events = {
   commit: 'cache.commit',
   reset: 'cache.reset',

@@ -1,3 +1,8 @@
+## 0.0.18 - Update UI: Add cache view, sidenav
+
+- feature: cache view
+- feature: side nav
+
 ## 0.0.17 - Housekeeping, cypress tests
 
 - chore: add cypress tests to the project

@@ -5795,8 +5795,8 @@ __metadata:
     supertest: ^6.3.1
     superwstest: ^2.0.3
     svelte: ^3.55.0
-    svelte-icons: ^2.1.0
     svelte-loader: ^3.1.4
+    svelte-table: ^0.6.1
     svelte-watch-resize: ^1.0.3
     tail-file: ^1.4.15
     typescript: ^5.1.3
@@ -8809,13 +8809,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte-icons@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "svelte-icons@npm:2.1.0"
-  checksum: a32e305152be010a694cc7afe5848fb8f88dd2dba36624cbd3c92a2bf54e5683c57c44b4faa31bccee19cf9cc855158e588591672c4ae89984e3500bef0c488a
-  languageName: node
-  linkType: hard
-
 "svelte-loader@npm:^3.1.4":
   version: 3.1.4
   resolution: "svelte-loader@npm:3.1.4"
@@ -8826,6 +8819,13 @@ __metadata:
   peerDependencies:
     svelte: ">3.0.0"
   checksum: 34fe4862f8c076a015b9f59195f3f39504fbdb17b9cc9c5a3366ec6fa51aa0b0621881339e5aedfdc1c89df77b90eb76f7cc08087d4bc30f805267d6a8c266eb
+  languageName: node
+  linkType: hard
+
+"svelte-table@npm:^0.6.1":
+  version: 0.6.1
+  resolution: "svelte-table@npm:0.6.1"
+  checksum: 3ac4be632b6033e24080b2dc8a810fc5b071e5db47bbbbe4be3d7c1702f69d413b0aa57bc9f400a845e1e78d6b6f774b282b938b93e1214f24ab605d0e4bf767
   languageName: node
   linkType: hard
 

@@ -1,7 +1,7 @@
 import _debug from 'debug';
 import minimatch from 'minimatch';
 import mockttp from 'mockttp';
-import Cache from '../cache.mjs';
+import Cache, { serializeRequest, serializeResponse } from '../cache.mjs';
 import fs from 'fs';
 
 const debug = _debug('jambox.handlers');
@@ -211,7 +211,6 @@ const events = (svc, config) => {
     const stageList = config.value.cache?.stage || [];
 
     const matchValue = url.hostname + url.pathname;
-
     if (ignoreList.some((glob) => minimatch(matchValue, glob))) {
       return false;
     }
@@ -230,20 +229,14 @@ const events = (svc, config) => {
         svc.cache.add(request);
       }
 
+      const serialized = await serializeRequest(request);
       const message = JSON.stringify({
         type: 'request',
         payload: {
-          id: request.id,
-          url: request.url,
+          ...serialized,
           hash,
           cached,
           staged,
-          headers: request.headers,
-          status: request.status,
-          statusCode: request.statusCode,
-          statusMessage: request.statusMessage,
-          body: await request.body.getJson(),
-          ...request.timingEvents,
         },
       });
 
@@ -255,9 +248,6 @@ const events = (svc, config) => {
 
   const onResponse = async (response) => {
     try {
-      const text = await response.body.getText();
-      const sizeInBytes = text.length;
-
       if (!svc.cache.bypass() && svc.cache.hasStaged(response)) {
         const hash = await svc.cache.commit(response);
         if (config.value.cache.write === 'auto') {
@@ -265,18 +255,10 @@ const events = (svc, config) => {
         }
       }
 
+      const payload = await serializeResponse(response);
       const message = JSON.stringify({
         type: 'response',
-        payload: {
-          id: response.id,
-          sizeInBytes,
-          status: response.status,
-          statusCode: response.statusCode,
-          statusMessage: response.statusMessage,
-          headers: response.headers,
-          body: await response.body.getJson(),
-          ...response.timingEvents,
-        },
+        payload,
       });
       svc.ws.getWss('/').clients.forEach((client) => client.send(message));
     } catch (e) {

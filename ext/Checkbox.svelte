@@ -22,6 +22,7 @@
     {id}
     name={id}
     class={`${cx[variation]} Checkbox`}
+    data-cy-id={id}
   />
   <label class="Label" for={name}>{label}</label>
 </div>

@@ -97,6 +97,9 @@ export default class API {
     return () => this.callbacks.delete(callback);
   }
 
+  /**
+   * @param paused {boolean}
+   */
   pause(paused) {
     return fetch(`${this.apiURL.toString()}/pause`, {
       headers: {
@@ -107,8 +110,26 @@ export default class API {
     });
   }
 
+  /**
+   * @param blockNetworkRequests {boolean}
+   */
+  blockNetworkRequests(blockNetworkRequests) {
+    return fetch(`${this.apiURL.toString()}/config`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({ blockNetworkRequests }),
+    });
+  }
+
   async getConfig() {
     const res = await fetch(`${this.apiURL.toString()}/config`);
+    return res.json();
+  }
+
+  async getCache() {
+    const res = await fetch(`${this.apiURL.toString()}/cache`);
     return res.json();
   }
 }
