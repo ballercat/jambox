@@ -2,6 +2,7 @@
 
 - feature: cache view
 - feature: side nav
+- chore: update CSS variables, colors
 
 ## 0.0.17 - Housekeeping, cypress tests
 
