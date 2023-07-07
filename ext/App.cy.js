@@ -12,11 +12,14 @@ before(async () => {
       },
     },
     cache: {
+      dir: '.jambox',
+      write: 'auto',
       stage: ['jambox-test.com/**'],
     },
   });
   api = await API.create();
 });
+
 describe('Web Extension', () => {
   it('can display seen requests', () => {
     const testURL = 'http://jambox-test.com/returnThisAsJson';
