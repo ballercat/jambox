@@ -248,10 +248,6 @@ class Cache {
    */
   async delete(dir, hash) {
     const record = this.#cache[hash];
-    if (record == null) {
-      debug(`Attempted to delete hash: ${hash}, but it's not found`);
-      return;
-    }
 
     await this.revert(record.request);
 
