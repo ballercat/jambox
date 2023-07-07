@@ -16,22 +16,21 @@ jobs:
           node-version: 16.x.x
       - run: yarn
       - run: yarn test
-      - uses: actions/checkout@v3
       - name: cypress
         uses: cypress-io/github-action@v5
         with:
           start: npm run e2e
           command: npm run cy-ci
-      - uses: actions/upload-artifact@v3
-        with:
-          name: cypress-videos
-          path: cypress/videos
-          if-no-files-found: ignore
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          if-no-files-found: ignore
   lint:
     runs-on: ubuntu-latest
     steps:
