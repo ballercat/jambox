@@ -1,5 +1,6 @@
 // @ts-check
 import fs from 'fs';
+import { unlink } from 'fs/promises';
 import path from 'path';
 import Observable from 'zen-observable';
 import crypto from 'crypto';
@@ -41,6 +42,7 @@ export const events = {
   reset: 'cache.reset',
   revert: 'cache.revert',
   stage: 'cache.stage',
+  delete: 'cache.delete',
 };
 
 class Cache {
@@ -147,6 +149,7 @@ class Cache {
 
     debug(`commit() url ${request.url} -- hash ${hash}`);
     this.#cache[hash] = {
+      id: hash,
       request,
       response,
     };
@@ -173,6 +176,7 @@ class Cache {
       return;
     }
 
+    debug(`Revert ${hash}`);
     this.#observer.next({
       type: events.revert,
       payload: { ...this.#cache[hash] },
@@ -237,9 +241,38 @@ class Cache {
   }
 
   /**
-   * TODO
+   * @param dir  {string} Cache directory
+   * @param hash {string} Entry hash
+   *
+   * @return {Promise}
    */
-  delete() {}
+  async delete(dir, hash) {
+    const record = this.#cache[hash];
+    if (record == null) {
+      debug(`Attempted to delete hash: ${hash}, but it's not found`);
+      return;
+    }
+
+    await this.revert(record.request);
+
+    if (dir == null) {
+      debug(`Attempted to delete hash: ${hash}, but cache directory isn't set`);
+      return;
+    }
+
+    try {
+      debug(`Delete ${hash}`);
+
+      await unlink(path.join(dir, `${hash}.json`));
+
+      this.#observer.next({
+        type: events.delete,
+        payload: { id: hash },
+      });
+    } catch (e) {
+      debug(`Attempted to delete hash: ${hash}, but it's not on disk`);
+    }
+  }
 
   clear() {
     this.#staged = {};

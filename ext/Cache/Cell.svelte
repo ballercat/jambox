@@ -1,9 +1,20 @@
 <script>
   export let row;
   export let col;
+  export let onDelete;
 
-  console.log(row, col);
   const value = row[col.key];
 </script>
 
-<span data-cy-id="cache-{col.key}">{value}</span>
+{#if col.key === 'delete'}
+  <button
+    data-cy-id="cache-delete"
+    on:click={(e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onDelete(row.id);
+    }}>Delete</button
+  >
+{:else}
+  <span data-cy-id="cache-cell-{col.key}">{value}</span>
+{/if}

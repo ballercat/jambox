@@ -90,6 +90,18 @@ const backend = async (svc, config) => {
     res.send(all);
   });
 
+  svc.app.post('/api/cache', async (req, res) => {
+    try {
+      const { action } = req.body;
+      if (action.type === 'delete') {
+        await svc.cache.delete(config.value.cache?.dir, action.payload);
+        res.sendStatus(200);
+      }
+    } catch (e) {
+      res.status(500).send(e.stack);
+    }
+  });
+
   svc.app.post('/api/reset', async (req, res) => {
     try {
       const setupWatcher = req.body.cwd !== config.value.cwd;
@@ -140,18 +152,19 @@ const backend = async (svc, config) => {
   });
 
   svc.cache.subscribe({
-    next(event) {
+    async next(event) {
       const data = {
         type: event.type,
-        payload: {},
+        payload: {
+          id: event.payload.id,
+        },
       };
+
       if (event.payload?.request) {
-        const { body, ...request } = event.payload.request;
-        data.payload.request = request;
+        data.payload.request = await serializeRequest(event.payload.request);
       }
       if (event.payload?.response) {
-        const { body, ...response } = event.payload.response;
-        data.payload.response = response;
+        data.payload.response = await serializeResponse(event.payload.response);
       }
 
       svc.ws.getWss('/').clients.forEach((client) => {

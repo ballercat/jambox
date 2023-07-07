@@ -4,7 +4,7 @@ import App from './App.svelte';
 let api;
 before(async () => {
   await cy.task('set-jambox-config', {
-    blockNetworkRequests: true,
+    blockNetworkRequests: false,
     forward: {
       'http://jambox-test.com/path': {
         target: 'http://localhost:7777',
@@ -52,14 +52,18 @@ describe('Web Extension', () => {
     cy.get('[data-cy-id="cache-link"]').click();
 
     // Same modal as the waterfall should be available for cache
-    cy.get('[data-cy-id="cache-id"]').click();
+    cy.get('[data-cy-id="cache-cell-path"]').click();
     cy.get('@modal').contains(testURL);
     cy.get('[data-cy-id="select-response-tab"]').click();
     cy.get('@modal').contains('path');
     cy.get('@modal').contains('/returnThisAsJson');
 
-    cy.get('[data-cy-id="modal-background"]').click({ force: true });
+    cy.get('[data-cy-id="cache-breadcrumb-link"]').click();
 
     cy.get('@modal').should('not.exist');
+
+    // clear cache
+    cy.get('[data-cy-id="cache-delete"]').click();
+    cy.get('[data-cy-id="cache-cell-path"]').should('not.exist');
   });
 });

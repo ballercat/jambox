@@ -25,7 +25,6 @@
 
     cleanup = api.subscribe((action) => {
       if (action.type === 'config') {
-        console.log(action);
         chrome.notifications?.create('', {
           title: 'Jambox Config Updated!',
           message: `Loaded ${action.payload.filepath}`,
@@ -75,6 +74,7 @@
     {/if}
     {#if path === '/Cache'}
       <Cache
+        cache={$store.cache}
         {api}
         onSelection={(row) => {
           selection = row;
