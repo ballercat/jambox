@@ -56,17 +56,17 @@ describe('Web Extension', () => {
 
     // Same modal as the waterfall should be available for cache
     cy.get('[data-cy-id="cache-cell-path"]').click();
-    cy.get('@modal').contains(testURL);
-    cy.get('[data-cy-id="select-response-tab"]').click();
-    cy.get('@modal').contains('path');
-    cy.get('@modal').contains('/returnThisAsJson');
+    cy.get('[data-cy-id="cache-detail"]').contains(testURL);
+
+    cy.get('[data-cy-id="cache-detail"]').contains('path');
+    cy.get('[data-cy-id="cache-detail"]').contains('/returnThisAsJson');
 
     cy.get('[data-cy-id="cache-breadcrumb-link"]').click();
 
-    cy.get('@modal').should('not.exist');
+    cy.get('[data-cy-id="cache-detail"]').should('not.exist');
 
     // clear cache
-    // cy.get('[data-cy-id="cache-delete"]').click();
-    // cy.get('[data-cy-id="cache-cell-path"]').should('not.exist');
+    cy.get('[data-cy-id="cache-delete"]').click();
+    cy.get('[data-cy-id="cache-cell-path"]').should('not.exist');
   });
 });

@@ -8,7 +8,7 @@
   }
 </script>
 
-<div class="Wrapper">
+<div data-cy-id="cache-detail" class="Wrapper">
   <div class="Request">
     <div>Request</div>
     <JSONEditor
