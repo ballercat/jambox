@@ -80,9 +80,10 @@ const backend = async (svc, config) => {
   svc.app.get('/api/cache', async (_, res) => {
     const raw = svc.cache.all();
     const all = {};
-    for (const key in raw) {
-      const entry = raw[key];
-      all[key] = {
+    for (const id in raw) {
+      const entry = raw[id];
+      all[id] = {
+        id,
         request: await serializeRequest(entry.request),
         response: await serializeResponse(entry.response),
       };

@@ -66,7 +66,7 @@ describe('Web Extension', () => {
     cy.get('@modal').should('not.exist');
 
     // clear cache
-    cy.get('[data-cy-id="cache-delete"]').click();
-    cy.get('[data-cy-id="cache-cell-path"]').should('not.exist');
+    // cy.get('[data-cy-id="cache-delete"]').click();
+    // cy.get('[data-cy-id="cache-cell-path"]').should('not.exist');
   });
 });

@@ -194,9 +194,7 @@ class Cache {
   }
 
   findById(id) {
-    return Object.values(this.#cache).find(
-      (pair) => console.log(pair.request.id) || pair.request.id === id
-    );
+    return Object.values(this.#cache).find((pair) => pair.request.id === id);
   }
 
   write(dir, hash) {
@@ -228,14 +226,14 @@ class Cache {
         fs.readFileSync(path.join(dir, filename), 'utf-8')
       );
       const obj = deserialize(json);
+
+      this.add(obj.request);
+      // TODO: this is actually async!
+      this.commit(obj.response);
+
       results[name] = obj;
     };
     fs.readdirSync(dir).forEach(readCacheFile);
-
-    this.#cache = {
-      ...this.#cache,
-      ...results,
-    };
 
     return results;
   }

@@ -18,6 +18,9 @@
   api.getConfig().then((payload) => {
     store.update((state) => reducer(state, { type: 'config', payload }));
   });
+  api.getCache().then((payload) => {
+    store.update((state) => reducer(state, { type: 'cache.load', payload }));
+  });
 
   $: {
     cleanup?.();

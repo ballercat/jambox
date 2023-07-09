@@ -68,6 +68,16 @@ export const reducer = (state, action) => {
         },
       };
     }
+    case 'cache.load': {
+      console.log('load cache');
+      return {
+        ...state,
+        cache: {
+          ...state.cache,
+          ...payload,
+        },
+      };
+    }
     case 'cache.revert': {
       const { [payload.id]: omit, ...cache } = state.cache;
       return {
