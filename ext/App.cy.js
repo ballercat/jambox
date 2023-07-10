@@ -22,10 +22,17 @@ before(async () => {
 
 describe('Web Extension', () => {
   it('can display seen requests', () => {
+    // Jambox should generate a static hash for the URL below
+    const HASH = '2be35430d93be811753ecfd6ba828878';
     const testURL = 'http://jambox-test.com/returnThisAsJson';
     cy.mount(App, { props: { api } });
 
     cy.request(testURL);
+
+    // Additional requests to fill up the cache
+    cy.request('http://jambox-test.com/pathA');
+    cy.request('http://jambox-test.com/pathB');
+    cy.request('http://jambox-test.com/pathC');
 
     cy.get(`[data-cy-id="${testURL}"]`).as('request');
 
@@ -54,8 +61,8 @@ describe('Web Extension', () => {
 
     cy.get('[data-cy-id="cache-link"]').click();
 
-    // Same modal as the waterfall should be available for cache
-    cy.get('[data-cy-id="cache-cell-path"]').click();
+    cy.get(`[data-cy-id="cache-cell-edit-${HASH}"]`).as('test-edit');
+    cy.get('@test-edit').click();
     cy.get('[data-cy-id="cache-detail"]').contains(testURL);
 
     cy.get('[data-cy-id="cache-detail"]').contains('path');
@@ -66,7 +73,18 @@ describe('Web Extension', () => {
     cy.get('[data-cy-id="cache-detail"]').should('not.exist');
 
     // clear cache
+    cy.get('@test-edit').click();
     cy.get('[data-cy-id="cache-delete"]').click();
-    cy.get('[data-cy-id="cache-cell-path"]').should('not.exist');
+    cy.get('[data-cy-id="cache-detail"]').should('not.exist');
+    cy.get('@test-edit')
+      .should('not.exist')
+      .then(() => {
+        // Delete the rest of the requests
+        // return api.delete([
+        //   'ba20ccbb470042f3200692cad1926c1c',
+        //   'f4c55ab257c689845921746061bfeb73',
+        //   'cd4482b36a608021cd943786ecb54c5d',
+        // ]);
+      });
   });
 });

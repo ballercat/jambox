@@ -24,7 +24,9 @@
     class={`${cx[variation]} Checkbox`}
     data-cy-id={id}
   />
-  <label class="Label" for={name}>{label}</label>
+  {#if label}
+    <label class="Label" for={name}>{label}</label>
+  {/if}
 </div>
 
 <style>

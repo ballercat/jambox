@@ -1,6 +1,6 @@
 <script>
   import Headers from './Headers.svelte';
-  import { JsonView } from '@zerodevx/svelte-json-view';
+  import { JSONEditor } from 'svelte-jsoneditor';
 
   export let request;
   export let response;
@@ -34,11 +34,19 @@
       <Headers {request} {response} />
     {/if}
     {#if currentTab === 'request'}
-      <JsonView json={request.body || {}} />
+      <JSONEditor
+        content={{ json: request.body }}
+        readOnly
+        mainMenuBar={false}
+      />
     {/if}
     {#if currentTab === 'response'}
       {#if response}
-        <JsonView json={response.body || {}} />
+        <JSONEditor
+          content={{ json: response.body || {} }}
+          readOnly
+          mainMenuBar={false}
+        />
       {/if}
     {/if}
   </div>

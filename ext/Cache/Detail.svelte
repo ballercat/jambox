@@ -2,6 +2,7 @@
   import { JSONEditor } from 'svelte-jsoneditor';
 
   export let cacheEntry;
+  export let onDelete;
 
   function onChange(prev, curr) {
     console.log(prev, curr);
@@ -9,6 +10,9 @@
 </script>
 
 <div data-cy-id="cache-detail" class="Wrapper">
+  <button data-cy-id="cache-delete" on:click={() => onDelete(cacheEntry.id)}
+    >Delete</button
+  >
   <div class="Request">
     <div>Request</div>
     <JSONEditor

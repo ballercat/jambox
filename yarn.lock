@@ -2220,15 +2220,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zerodevx/svelte-json-view@npm:^1.0.5":
-  version: 1.0.5
-  resolution: "@zerodevx/svelte-json-view@npm:1.0.5"
-  peerDependencies:
-    svelte: ^3.55.1
-  checksum: e469cfc268deb193ec628c3dc496413ba3c2efee305c9c24620f3c5ed4f6942f3156f5dc8dc6b67dc142549b20e4302545a3ea4439848faf4f671dd597a0d2bd
-  languageName: node
-  linkType: hard
-
 "abbrev@npm:1, abbrev@npm:^1.0.0":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -6001,7 +5992,6 @@ __metadata:
     "@httptoolkit/browser-launcher": ^2.0.2
     "@types/chrome": ^0.0.237
     "@types/zen-observable": ^0.8.3
-    "@zerodevx/svelte-json-view": ^1.0.5
     arg: ^5.0.2
     ava: ^5.0.1
     babel-loader: ^9.1.0

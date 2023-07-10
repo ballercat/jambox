@@ -1,20 +1,31 @@
 <script>
   export let row;
   export let col;
-  export let onDelete;
+  export let onEdit;
 
-  const value = row[col.key];
+  let value, cyID;
+  $: value = row[col.key];
+  $: cyID = col.key === 'edit' ? `edit-${row.id}` : col.key;
 </script>
 
-{#if col.key === 'delete'}
-  <button
-    data-cy-id="cache-delete"
-    on:click={(e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      onDelete(row.id);
-    }}>Delete</button
-  >
-{:else}
-  <span data-cy-id="cache-cell-{col.key}">{value}</span>
-{/if}
+<div class="Cell">
+  {#if col.key === 'edit'}
+    <button
+      inline
+      data-cy-id="cache-cell-{cyID}"
+      on:click={() => {
+        onEdit(row.id);
+      }}>Edit</button
+    >
+  {:else}
+    <span data-cy-id="cache-cell-{cyID}">{value}</span>
+  {/if}
+</div>
+
+<style>
+  .Cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>

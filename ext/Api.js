@@ -113,7 +113,7 @@ export default class API {
   /**
    * @param id {string}
    */
-  delete(id) {
+  delete(ids) {
     return fetch(`${this.apiURL.toString()}/cache`, {
       headers: {
         'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ export default class API {
       body: JSON.stringify({
         action: {
           type: 'delete',
-          payload: id,
+          payload: ids,
         },
       }),
     });
