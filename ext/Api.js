@@ -111,6 +111,37 @@ export default class API {
   }
 
   /**
+   * @param id {string}
+   */
+  delete(ids) {
+    return fetch(`${this.apiURL.toString()}/cache`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        action: {
+          type: 'delete',
+          payload: ids,
+        },
+      }),
+    });
+  }
+
+  updateCache(id, values) {
+    return fetch(`${this.apiURL.toString()}/cache`, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      body: JSON.stringify({
+        action: {
+          type: 'update',
+          payload: { id, values },
+        },
+      }),
+    });
+  }
+
+  /**
    * @param blockNetworkRequests {boolean}
    */
   blockNetworkRequests(blockNetworkRequests) {

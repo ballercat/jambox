@@ -42,7 +42,7 @@ const backend = async (svc, config) => {
     svc.cache.clear();
 
     if (config.value.cache?.dir) {
-      svc.cache.read(config.value.cache.dir);
+      await svc.cache.read(config.value.cache.dir);
     }
   };
 
@@ -80,14 +80,32 @@ const backend = async (svc, config) => {
   svc.app.get('/api/cache', async (_, res) => {
     const raw = svc.cache.all();
     const all = {};
-    for (const key in raw) {
-      const entry = raw[key];
-      all[key] = {
+    for (const id in raw) {
+      const entry = raw[id];
+      all[id] = {
+        id,
         request: await serializeRequest(entry.request),
         response: await serializeResponse(entry.response),
       };
     }
     res.send(all);
+  });
+
+  svc.app.post('/api/cache', async (req, res) => {
+    try {
+      const { action } = req.body;
+      if (action.type === 'delete') {
+        const ids = action.payload || [];
+        for (const id of ids) {
+          await svc.cache.delete(config.value.cache?.dir, id);
+        }
+      } else if (action.type === 'update') {
+        await svc.cache.update(action.payload.id, action.payload.values);
+      }
+      res.sendStatus(200);
+    } catch (e) {
+      res.status(500).send(e.stack);
+    }
   });
 
   svc.app.post('/api/reset', async (req, res) => {
@@ -140,18 +158,19 @@ const backend = async (svc, config) => {
   });
 
   svc.cache.subscribe({
-    next(event) {
+    async next(event) {
       const data = {
         type: event.type,
-        payload: {},
+        payload: {
+          id: event.payload.id,
+        },
       };
+
       if (event.payload?.request) {
-        const { body, ...request } = event.payload.request;
-        data.payload.request = request;
+        data.payload.request = await serializeRequest(event.payload.request);
       }
       if (event.payload?.response) {
-        const { body, ...response } = event.payload.response;
-        data.payload.response = response;
+        data.payload.response = await serializeResponse(event.payload.response);
       }
 
       svc.ws.getWss('/').clients.forEach((client) => {

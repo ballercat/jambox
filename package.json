@@ -1,6 +1,6 @@
 {
   "name": "jambox",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "Tool for recording and playing back HTTP requests.",
   "bin": {
     "jam": "./jam.mjs",
@@ -17,6 +17,7 @@
     "build": "webpack",
     "dev": "nodemon --watch ext --watch src --exec ./jam-server.mjs",
     "test": "c8 -r=text -r=lcov ava",
+    "e2e": "c8 -o ./coverage-cypress -r=text -r=lcov node ./e2e-backend.mjs",
     "e2e-dev": "nodemon --watch ext --watch src --exec ./e2e-backend.mjs",
     "cy": "HTTP_PROXY=http://localhost:8000 cypress open --component",
     "cy-ci": "HTTP_PROXY=http://localhost:8000 cypress run --component",
@@ -27,7 +28,6 @@
   },
   "dependencies": {
     "@httptoolkit/browser-launcher": "^2.0.2",
-    "@zerodevx/svelte-json-view": "^1.0.5",
     "arg": "^5.0.2",
     "body-parser": "^1.20.1",
     "debug": "^4.3.4",
@@ -41,6 +41,7 @@
     "nock": "^13.2.9",
     "node-fetch": "^2",
     "osenv": "^0.1.5",
+    "svelte-jsoneditor": "^0.17.8",
     "svelte-table": "^0.6.1",
     "tail-file": "^1.4.15",
     "wait-on": "^6.0.1",

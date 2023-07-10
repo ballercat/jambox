@@ -64,8 +64,25 @@ export const reducer = (state, action) => {
         ...state,
         cache: {
           ...state.cache,
-          [payload.request.id]: payload,
+          [payload.id]: payload,
         },
+      };
+    }
+    case 'cache.load': {
+      console.log('load cache');
+      return {
+        ...state,
+        cache: {
+          ...state.cache,
+          ...payload,
+        },
+      };
+    }
+    case 'cache.revert': {
+      const { [payload.id]: omit, ...cache } = state.cache;
+      return {
+        ...state,
+        cache,
       };
     }
     default:

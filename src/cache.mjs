@@ -1,5 +1,7 @@
 // @ts-check
 import fs from 'fs';
+import { readdir } from 'fs/promises';
+import { unlink } from 'fs/promises';
 import path from 'path';
 import Observable from 'zen-observable';
 import crypto from 'crypto';
@@ -41,6 +43,7 @@ export const events = {
   reset: 'cache.reset',
   revert: 'cache.revert',
   stage: 'cache.stage',
+  delete: 'cache.delete',
 };
 
 class Cache {
@@ -147,6 +150,7 @@ class Cache {
 
     debug(`commit() url ${request.url} -- hash ${hash}`);
     this.#cache[hash] = {
+      id: hash,
       request,
       response,
     };
@@ -173,6 +177,7 @@ class Cache {
       return;
     }
 
+    debug(`Revert ${hash}`);
     this.#observer.next({
       type: events.revert,
       payload: { ...this.#cache[hash] },
@@ -190,9 +195,7 @@ class Cache {
   }
 
   findById(id) {
-    return Object.values(this.#cache).find(
-      (pair) => console.log(pair.request.id) || pair.request.id === id
-    );
+    return Object.values(this.#cache).find((pair) => pair.request.id === id);
   }
 
   write(dir, hash) {
@@ -205,14 +208,18 @@ class Cache {
     fs.writeFileSync(path.join(dir, `${hash}.json`), JSON.stringify(record));
   }
 
-  read(dir) {
+  /**
+   * @param dir {string} Cache directory
+   */
+  async read(dir) {
     if (!fs.existsSync(dir)) {
       return [];
     }
 
     const results = {};
 
-    const readCacheFile = (filename) => {
+    const files = await readdir(dir);
+    for (const filename of files) {
       const { ext, name } = path.parse(filename);
 
       if (ext !== '.json') {
@@ -224,22 +231,48 @@ class Cache {
         fs.readFileSync(path.join(dir, filename), 'utf-8')
       );
       const obj = deserialize(json);
-      results[name] = obj;
-    };
-    fs.readdirSync(dir).forEach(readCacheFile);
 
-    this.#cache = {
-      ...this.#cache,
-      ...results,
-    };
+      this.add(obj.request);
+      await this.commit(obj.response);
+
+      results[name] = obj;
+    }
 
     return results;
   }
 
   /**
-   * TODO
+   * @param dir  {string} Cache directory
+   * @param hash {string} Entry hash
+   *
+   * @return {Promise}
    */
-  delete() {}
+  async delete(dir, hash) {
+    const record = this.#cache[hash];
+
+    await this.revert(record.request);
+
+    if (dir == null) {
+      debug(`Attempted to delete hash: ${hash}, but cache directory isn't set`);
+      return;
+    }
+
+    try {
+      debug(`Delete ${hash}`);
+
+      await unlink(path.join(dir, `${hash}.json`));
+
+      this.#observer.next({
+        type: events.delete,
+        payload: { id: hash },
+      });
+    } catch (e) {
+      debug(`Attempted to delete hash: ${hash}, but it's not on disk`);
+    }
+  }
+
+  // TODO
+  async update(/* id, { response, request } */) {}
 
   clear() {
     this.#staged = {};
