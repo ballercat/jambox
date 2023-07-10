@@ -2,6 +2,9 @@
 
 - feat: delete cache from UI
 - feat: new json editor
+- feat: add /api/cache POST api
+- fix: collect coverage on cypress tests via c8
+- fix: properly run github actions
 
 ## 0.0.18 - Update UI: Add cache view, sidenav
 
