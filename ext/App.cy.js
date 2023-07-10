@@ -80,11 +80,11 @@ describe('Web Extension', () => {
       .should('not.exist')
       .then(() => {
         // Delete the rest of the requests
-        // return api.delete([
-        //   'ba20ccbb470042f3200692cad1926c1c',
-        //   'f4c55ab257c689845921746061bfeb73',
-        //   'cd4482b36a608021cd943786ecb54c5d',
-        // ]);
+        return api.delete([
+          'ba20ccbb470042f3200692cad1926c1c',
+          'f4c55ab257c689845921746061bfeb73',
+          'cd4482b36a608021cd943786ecb54c5d',
+        ]);
       });
   });
 });
