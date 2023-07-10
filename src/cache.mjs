@@ -268,6 +268,9 @@ class Cache {
     }
   }
 
+  // TODO
+  async update(/* id, { response, request } */) {}
+
   clear() {
     this.#staged = {};
     this.#cache = {};

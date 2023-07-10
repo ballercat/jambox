@@ -99,8 +99,10 @@ const backend = async (svc, config) => {
         for (const id of ids) {
           await svc.cache.delete(config.value.cache?.dir, id);
         }
-        res.sendStatus(200);
+      } else if (action.type === 'update') {
+        await svc.cache.update(action.payload.id, action.payload.values);
       }
+      res.sendStatus(200);
     } catch (e) {
       res.status(500).send(e.stack);
     }

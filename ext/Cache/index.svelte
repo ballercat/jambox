@@ -94,7 +94,13 @@
   {#if cacheEntry === null}
     <SvelteTable columns={COLUMNS} rows={data} classNameRow="Row" />
   {:else}
-    <Detail {cacheEntry} {onDelete} />
+    <Detail
+      {cacheEntry}
+      {onDelete}
+      onUpdateResponse={(response) => {
+        api.updateCache(cacheEntry.id, { response });
+      }}
+    />
   {/if}
 </div>
 

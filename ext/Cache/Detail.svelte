@@ -3,9 +3,11 @@
 
   export let cacheEntry;
   export let onDelete;
+  export let onUpdateResponse;
+  let changes = null;
 
   function onChange(prev, curr) {
-    console.log(prev, curr);
+    changes = curr.json;
   }
 </script>
 
@@ -22,12 +24,25 @@
     />
   </div>
   <div>
-    <div>Response</div>
+    <div>
+      Response
+      <button
+        class="inline"
+        disabled={changes === null}
+        on:click={() => {
+          onUpdateResponse(changes);
+          changes = null;
+        }}>Update (not yet implemented)</button
+      >
+    </div>
     <JSONEditor content={{ json: cacheEntry.response }} {onChange} />
   </div>
 </div>
 
 <style>
+  .inline {
+    display: inline;
+  }
   .Wrapper {
     display: flex;
     flex-direction: column;

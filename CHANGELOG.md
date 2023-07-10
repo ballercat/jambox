@@ -1,3 +1,8 @@
+## 0.0.19 - Cache view updates
+
+- feat: delete cache from UI
+- feat: new json editor
+
 ## 0.0.18 - Update UI: Add cache view, sidenav
 
 - feature: cache view

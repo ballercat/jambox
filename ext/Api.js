@@ -128,6 +128,19 @@ export default class API {
     });
   }
 
+  updateCache(id, values) {
+    return fetch(`${this.apiURL.toString()}/cache`, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      body: JSON.stringify({
+        action: {
+          type: 'update',
+          payload: { id, values },
+        },
+      }),
+    });
+  }
+
   /**
    * @param blockNetworkRequests {boolean}
    */
