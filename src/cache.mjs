@@ -1,5 +1,6 @@
 // @ts-check
 import fs from 'fs';
+import { readdir } from 'fs/promises';
 import { unlink } from 'fs/promises';
 import path from 'path';
 import Observable from 'zen-observable';
@@ -207,14 +208,18 @@ class Cache {
     fs.writeFileSync(path.join(dir, `${hash}.json`), JSON.stringify(record));
   }
 
-  read(dir) {
+  /**
+   * @param dir {string} Cache directory
+   */
+  async read(dir) {
     if (!fs.existsSync(dir)) {
       return [];
     }
 
     const results = {};
 
-    const readCacheFile = (filename) => {
+    const files = await readdir(dir);
+    for (const filename of files) {
       const { ext, name } = path.parse(filename);
 
       if (ext !== '.json') {
@@ -228,12 +233,10 @@ class Cache {
       const obj = deserialize(json);
 
       this.add(obj.request);
-      // TODO: this is actually async!
-      this.commit(obj.response);
+      await this.commit(obj.response);
 
       results[name] = obj;
-    };
-    fs.readdirSync(dir).forEach(readCacheFile);
+    }
 
     return results;
   }
