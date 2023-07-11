@@ -19,6 +19,7 @@ export const serializeRequest = async (request) => {
     status: request.status,
     statusCode: request.statusCode,
     statusMessage: request.statusMessage,
+    method: request.method,
     body: await request.body.getJson(),
     ...request.timingEvents,
   };

@@ -63,12 +63,13 @@ describe('Web Extension', () => {
 
     cy.get(`[data-cy-id="cache-cell-edit-${HASH}"]`).as('test-edit');
     cy.get('@test-edit').click();
+    cy.get('[data-cy-id="select-request-tab"]').click();
     cy.get('[data-cy-id="cache-detail"]').contains(testURL);
 
     cy.get('[data-cy-id="cache-detail"]').contains('path');
     cy.get('[data-cy-id="cache-detail"]').contains('/returnThisAsJson');
 
-    cy.get('[data-cy-id="cache-breadcrumb-link"]').click();
+    cy.get('[data-cy-id="modal-background"]').click({ force: true });
 
     cy.get('[data-cy-id="cache-detail"]').should('not.exist');
 

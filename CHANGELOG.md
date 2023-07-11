@@ -1,3 +1,9 @@
+## 0.0.20 - Update Cache UI usability
+
+- feat: searchable cache
+- feat: searchable statusCode
+- feat: cache detail modal
+
 ## 0.0.19 - Cache view updates
 
 - feat: delete cache from UI
