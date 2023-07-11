@@ -69,7 +69,6 @@ export const reducer = (state, action) => {
       };
     }
     case 'cache.load': {
-      console.log('load cache');
       return {
         ...state,
         cache: {

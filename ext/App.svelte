@@ -22,6 +22,13 @@
     store.update((state) => reducer(state, { type: 'cache.load', payload }));
   });
 
+  // Refresh when the page reloads
+  chrome.webNavigation?.onBeforeNavigate.addListener((details) => {
+    if (details.tabId === chrome.devtools.inspectedWindow.tabId) {
+      store.update((state) => reducer(state, { type: 'refresh' }));
+    }
+  });
+
   $: {
     cleanup?.();
     pauseChecked = $store.config.pause;

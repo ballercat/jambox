@@ -3,8 +3,19 @@
   export let col;
   export let onEdit;
 
+  const shorten = (str) => {
+    if (str.length > 30) {
+      return str.slice(0, 15) + ' ... ' + str.slice(-10);
+    }
+
+    return str;
+  };
+
   let value, cyID;
-  $: value = row[col.key];
+  $: value =
+    col.key === 'host' || col.key === 'path'
+      ? shorten(row[col.key])
+      : row[col.key];
   $: cyID = col.key === 'edit' ? `edit-${row.id}` : col.key;
 </script>
 
@@ -26,6 +37,6 @@
   .Cell {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
   }
 </style>

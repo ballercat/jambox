@@ -2,18 +2,27 @@
   import SvelteTable from 'svelte-table';
   import Breadcrumb from './Breadcrumb.svelte';
   import Detail from './Detail.svelte';
+  import Modal from '../Modal.svelte';
   import Cell from './Cell.svelte';
-  import Checkbox from '../Checkbox.svelte';
 
   export let api;
   export let cache;
 
+  let search;
   let cacheEntry = null;
   let data;
   $: {
-    data = Object.values(cache).map(({ id, request, response }) => {
+    data = Object.values(cache).reduce((acc, { id, request, response }) => {
       const url = new URL(request.url);
-      return {
+      const include =
+        typeof search === 'string' && search.length
+          ? JSON.stringify(response.body || '').includes(search)
+          : true;
+      if (!include) {
+        return acc;
+      }
+
+      acc.push({
         id,
         host: url.hostname,
         path: request.path,
@@ -21,12 +30,14 @@
         statusCode: response?.statusCode,
         request,
         response,
-      };
-    });
+      });
+
+      return acc;
+    }, []);
   }
 
   const onEdit = (id) => {
-    cacheEntry = cache[id];
+    cacheEntry = data.find((entry) => entry.id === id);
   };
   const onDelete = (id) => {
     cacheEntry = null;
@@ -83,6 +94,9 @@
           onEdit,
         },
       },
+      searchValue: (row, searchTerm) => {
+        return `${row.statusCode}`.includes(searchTerm);
+      },
     },
   ];
 </script>
@@ -91,16 +105,27 @@
   <div>
     <Breadcrumb {cacheEntry} onCacheClick={() => (cacheEntry = null)} />
   </div>
-  {#if cacheEntry === null}
-    <SvelteTable columns={COLUMNS} rows={data} classNameRow="Row" />
-  {:else}
-    <Detail
-      {cacheEntry}
-      {onDelete}
-      onUpdateResponse={(response) => {
-        api.updateCache(cacheEntry.id, { response });
-      }}
+  <div>
+    Search by response body: <input
+      bind:value={search}
+      placeholder="search json content"
     />
+    <button disabled={!search} on:click={() => (search = '')}>Clear</button>
+  </div>
+  <div>
+    Cache entries: {data.length}
+  </div>
+  <SvelteTable columns={COLUMNS} rows={data} classNameRow="Row" />
+  {#if cacheEntry != null}
+    <Modal on:close={() => (cacheEntry = null)}>
+      <Detail
+        {cacheEntry}
+        {onDelete}
+        onUpdateResponse={(response) => {
+          api.updateCache(cacheEntry.id, { response });
+        }}
+      />
+    </Modal>
   {/if}
 </div>
 
