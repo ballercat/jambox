@@ -17,7 +17,7 @@
 <div data-cy-id="cache-detail" class="Wrapper">
   <div class="Box">
     <button
-      data-cy-id="select-headers-tab"
+      data-cy-id="select-details-tab"
       on:click={() => {
         currentTab = 'details';
       }}>Details</button
