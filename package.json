@@ -1,6 +1,6 @@
 {
   "name": "jambox",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "Tool for recording and playing back HTTP requests.",
   "bin": {
     "jam": "./jam.mjs",

@@ -1,3 +1,7 @@
+## 0.0.21 - Bugfix cache read on startup
+
+- fix: correctly read all json caches on startup
+
 ## 0.0.20 - Update Cache UI usability
 
 - feat: searchable cache

@@ -220,23 +220,22 @@ class Cache {
     const results = {};
 
     const files = await readdir(dir);
+
     for (const filename of files) {
       const { ext, name } = path.parse(filename);
 
-      if (ext !== '.json') {
-        return;
+      if (ext === '.json') {
+        debug(`read ${filename}`);
+        const json = JSON.parse(
+          fs.readFileSync(path.join(dir, filename), 'utf-8')
+        );
+        const obj = deserialize(json);
+
+        this.add(obj.request);
+        await this.commit(obj.response);
+
+        results[name] = obj;
       }
-
-      debug(`read ${filename}`);
-      const json = JSON.parse(
-        fs.readFileSync(path.join(dir, filename), 'utf-8')
-      );
-      const obj = deserialize(json);
-
-      this.add(obj.request);
-      await this.commit(obj.response);
-
-      results[name] = obj;
     }
 
     return results;
