@@ -20,7 +20,7 @@ export const serializeRequest = async (request) => {
     statusCode: request.statusCode,
     statusMessage: request.statusMessage,
     method: request.method,
-    body: await request.body.getJson(),
+    body: (await request.body?.getJson()) || {},
     ...request.timingEvents,
   };
 };
@@ -34,7 +34,7 @@ export const serializeResponse = async (response) => {
     statusCode: response.statusCode,
     statusMessage: response.statusMessage,
     headers: response.headers,
-    body: await response.body.getJson(),
+    body: (await response.body?.getJson()) || {},
     ...response.timingEvents,
   };
 };
