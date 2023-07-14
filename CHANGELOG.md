@@ -1,3 +1,7 @@
+## 0.0.22 - Implement cached response update flow
+
+- feat: users may now edit the cached responses
+
 ## 0.0.21 - Bugfix cache read on startup
 
 - fix: correctly read all json caches on startup
