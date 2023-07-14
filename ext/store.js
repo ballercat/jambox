@@ -84,6 +84,15 @@ export const reducer = (state, action) => {
         cache,
       };
     }
+    case 'cache.update': {
+      return {
+        ...state,
+        cache: {
+          ...state.cache,
+          [payload.id]: payload,
+        },
+      };
+    }
     default:
       return state;
   }

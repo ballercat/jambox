@@ -77,6 +77,7 @@ describe('Web Extension', () => {
     cy.get('@test-edit').click();
     cy.get('[data-cy-id="cache-delete"]').click();
     cy.get('[data-cy-id="cache-detail"]').should('not.exist');
+
     cy.get('@test-edit')
       .should('not.exist')
       .then(() => {

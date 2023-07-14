@@ -100,7 +100,7 @@ const backend = async (svc, config) => {
           await svc.cache.delete(config.value.cache?.dir, id);
         }
       } else if (action.type === 'update') {
-        await svc.cache.update(action.payload.id, action.payload.values);
+        await svc.cache.update(action.payload);
       }
       res.sendStatus(200);
     } catch (e) {

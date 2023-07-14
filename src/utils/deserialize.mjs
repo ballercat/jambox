@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import httpEncoder from 'http-encoding';
 
 const decodeBuffer = async (buffer, headers) => {
   const encoding = headers['content-encoding'];
@@ -7,7 +8,7 @@ const decodeBuffer = async (buffer, headers) => {
     return buffer;
   }
 
-  return await (await import('http-encoding')).decodeBuffer(buffer, encoding);
+  return await httpEncoder.decodeBuffer(buffer, encoding);
 };
 
 const parseBody = ({
@@ -20,7 +21,7 @@ const parseBody = ({
   return {
     buffer,
     getDecodedBuffer() {
-      return decodeBuffer(buffer, headers);
+      return decodeBuffer(this.buffer, headers);
     },
     async getText() {
       return (await this.getDecodedBuffer()).toString();
