@@ -13,6 +13,16 @@
     'application/json': 'fetch',
     'text/html': 'html',
   };
+  const getContentType = (url, response) => {
+    const contentTypeHeader = response?.headers['content-type'] ?? null;
+
+    if (!contentTypeHeader || url.pathname.endsWith('.map')) {
+      return 'other';
+    }
+
+    return CONTENT_MAP[contentTypeHeader.split(';')[0]] || 'other';
+  };
+
   const possibleChecks = [...Object.values(CONTENT_MAP), 'other'];
 
   const shortenURL = (url) => {
@@ -46,10 +56,7 @@
       (acc, request) => {
         const url = new URL(request.url);
         const response = data.responseById[request.id];
-        const contentTypeHeader = response?.headers['content-type'] ?? null;
-        const contentType = contentTypeHeader
-          ? CONTENT_MAP[contentTypeHeader.split(';')[0]]
-          : 'other';
+        const contentType = getContentType(url, response);
 
         if (!checked.includes(contentType)) {
           return acc;
