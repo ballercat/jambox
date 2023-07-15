@@ -1,5 +1,5 @@
 <script>
-  import { without } from '../nodash.js';
+  import { without } from './nodash';
   import { JSONEditor } from 'svelte-jsoneditor';
   import { Link } from 'svelte-routing';
 

@@ -38,17 +38,4 @@
     text-decoration: none;
     border-right: 1px solid var(--magenta);
   }
-
-  .SideNav-Link {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .SideNav-Link:hover {
-    cursor: pointer;
-  }
-
-  .selected {
-    color: var(--cerulean);
-  }
 </style>

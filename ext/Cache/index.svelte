@@ -5,7 +5,6 @@
   export let cache;
 
   let search;
-  let cacheEntry = null;
   let data;
   $: {
     data = Object.values(cache).filter(({ response }) => {

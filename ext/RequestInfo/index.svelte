@@ -1,5 +1,6 @@
 <script>
   import Headers from './Headers.svelte';
+  import { Link } from 'svelte-routing';
   import { JSONEditor } from 'svelte-jsoneditor';
 
   export let request;
@@ -10,6 +11,7 @@
 
 <div class="Wrapper" data-cy-id="request-info">
   <div>
+    <Link to="/">Back</Link>
     <button
       data-cy-id="select-headers-tab"
       on:click={() => {

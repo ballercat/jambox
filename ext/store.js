@@ -1,12 +1,39 @@
 import { writable } from 'svelte/store';
 
+export const CONTENT_MAP = {
+  'application/javascript': 'js',
+  'application/json': 'fetch',
+  'text/html': 'html',
+};
+
+const getContentType = (url, response) => {
+  const contentTypeHeader = response?.headers['content-type'] ?? null;
+
+  if (!contentTypeHeader || url.pathname.endsWith('.map')) {
+    return 'other';
+  }
+
+  return CONTENT_MAP[contentTypeHeader.split(';')[0]] || 'other';
+};
+
 export const initialState = {
   config: {},
-  requestById: {},
-  responseById: {},
+  http: {},
   abortedRequestById: {},
   blockNetwork: false,
   cache: {},
+};
+
+const mapCacheEntry = (entry) => {
+  const url = new URL(entry.request.url);
+  return {
+    ...entry,
+    url,
+    host: url.hostname,
+    path: entry.request.path,
+    method: entry.request.method,
+    statusCode: entry.response?.statusCode,
+  };
 };
 
 export const reducer = (state, action) => {
@@ -15,8 +42,7 @@ export const reducer = (state, action) => {
     case 'clear': {
       return {
         ...state,
-        requestById: {},
-        responseById: {},
+        http: {},
       };
     }
     case 'config': {
@@ -28,66 +54,65 @@ export const reducer = (state, action) => {
     case 'refresh': {
       return {
         ...state,
-        requestById: {},
-        responseById: {},
+        http: {},
       };
     }
     case 'abort': {
       return {
         ...state,
-        abortedRequestById: {
-          ...state.abortedRequestById,
-          [payload.id]: payload,
+        http: {
+          ...state.http,
+          [payload.id]: {
+            ...state.http[payload.id],
+            aborted: payload,
+          },
         },
       };
     }
     case 'request': {
+      const url = new URL(payload.url);
       return {
         ...state,
-        requestById: {
-          ...state.requestById,
-          [payload.id]: payload,
+        http: {
+          firstRequest: state.firstRequest || payload,
+          lastRequest: payload,
+          ...state.http,
+          [payload.id]: {
+            id: payload.id,
+            url,
+            request: payload,
+          },
         },
       };
     }
     case 'response': {
+      const contentType = getContentType(state.http[payload.id].url, payload);
       return {
         ...state,
-        responseById: {
-          ...state.responseById,
-          [payload.id]: payload,
+        http: {
+          lastResponse: payload,
+          ...state.http,
+          [payload.id]: {
+            ...state.http[payload.id],
+            contentType,
+            response: payload,
+          },
         },
       };
     }
-    case 'cache.commit': {
-      const url = new URL(payload.request.url);
+    case 'cache.commit':
+    case 'cache.update': {
       return {
         ...state,
         cache: {
           ...state.cache,
-          [payload.id]: {
-            ...payload,
-            host: url.hostname,
-            path: payload.request.path,
-            method: payload.request.method,
-            statusCode: payload.response?.statusCode,
-          },
+          [payload.id]: mapCacheEntry(payload),
         },
       };
     }
     case 'cache.load': {
       for (const id in payload) {
-        const { request, response } = payload[id];
-        const url = new URL(request.url);
-        payload[id] = {
-          id,
-          host: url.hostname,
-          path: request.path,
-          method: request.method,
-          statusCode: response?.statusCode,
-          request,
-          response,
-        };
+        payload[id] = mapCacheEntry(payload[id]);
       }
       return {
         ...state,
@@ -104,34 +129,9 @@ export const reducer = (state, action) => {
         cache,
       };
     }
-    case 'cache.update': {
-      const url = new URL(payload.request.url);
-      return {
-        ...state,
-        cache: {
-          ...state.cache,
-          [payload.id]: {
-            ...payload,
-            host: url.hostname,
-            path: payload.request.path,
-            method: payload.request.method,
-            statusCode: payload.response?.statusCode,
-          },
-        },
-      };
-    }
     default:
       return state;
   }
 };
 
 export const store = writable(initialState);
-
-export const createActions = (api) => {
-  return {
-    cacheUpdate(id, { response }) {
-      api.updateCache(id, { response });
-    },
-    cacheDelete(id) {},
-  };
-};

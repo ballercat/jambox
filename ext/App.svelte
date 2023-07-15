@@ -10,8 +10,7 @@
   import Waterfall from './Waterfall.svelte';
   import SideNav from './SideNav.svelte';
   import RequestInfo from './RequestInfo';
-  import Modal from './Modal.svelte';
-  import CacheEntry from './Cache/Detail.svelte';
+  import CacheEntry from './CacheEntry.svelte';
 
   export let api;
 
@@ -20,7 +19,6 @@
   let pauseChecked = false;
   let cleanup;
   let url = '/';
-  let selection = null;
 
   api.getConfig().then((payload) => {
     store.update((state) => reducer(state, { type: 'config', payload }));
@@ -83,26 +81,18 @@
         />
       </div>
       <Route path="/">
-        <Waterfall data={$store} onSelection={(value) => (selection = value)} />
+        <Waterfall data={$store} {history} />
       </Route>
       <Route path="/cache">
-        <Cache
-          cache={$store.cache}
-          {api}
-          onSelection={(row) => {
-            selection = row;
-          }}
-        />
+        <Cache cache={$store.cache} {api} />
       </Route>
       <Route path="/cache/entry/:id" let:params>
         <CacheEntry cacheEntry={$store.cache[params.id]} {api} {history} />
       </Route>
+      <Route path="/request/:id" let:params>
+        <RequestInfo {...$store.http[params.id]} />
+      </Route>
     </div>
-    {#if selection}
-      <Modal on:close={() => (selection = null)}>
-        <RequestInfo {...selection} />
-      </Modal>
-    {/if}
   </Router>
 </main>
 

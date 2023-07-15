@@ -2,21 +2,26 @@
   export let id;
   export let contentType;
   export let index;
-  export let start;
   export let url;
   export let response;
   export let request;
-  export let received;
-  export let duration;
   export let title;
   export let scaleFactor;
-  export let statusCode;
   export let rowHeight;
   export let rowPadding;
   export let barOffset;
   export let minTime;
   export let onClick;
   export let aborted;
+
+  let statusCode = response?.statusCode || null;
+  const start = Math.ceil(request.startTimestamp);
+  const received = Math.ceil(
+    request.bodyReceivedTimestamp - request.startTimestamp
+  );
+  const duration = response?.responseSentTimestamp
+    ? Math.ceil(response.responseSentTimestamp - request.startTimestamp)
+    : null;
 
   let hover = false;
 
