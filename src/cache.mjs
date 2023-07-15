@@ -208,7 +208,6 @@ class Cache {
       return;
     }
     debug(`Writing ${hash} to disk`);
-    // fs.writeFileSync(path.join(dir, `${hash}.json`), JSON.stringify(record));
     const filepath = path.join(dir, `${hash}.json`);
     await writeFile(filepath, JSON.stringify(record));
 
