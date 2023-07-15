@@ -46,16 +46,19 @@ describe('Cache UI', () => {
     cy.get('.jse-editable-div').type('foobar{enter}');
     cy.get('[data-cy-id="update-response-btn"]').click();
 
-    // Close modal
-    cy.get('[data-cy-id="modal-background"]').click({ force: true });
+    // Close
+    cy.get('[data-cy-id="back-to-cache"]').click({ force: true });
 
     // Open modal
     cy.get('@test-edit').click();
     cy.get('[data-cy-id="select-response-tab"]').click();
     cy.get('[data-cy-id="cache-detail"]').contains('foobar');
 
-    // Close modal
-    cy.get('[data-cy-id="modal-background"]').click({ force: true });
+    // clear cache
+    cy.get('[data-cy-id="select-details-tab"]').click();
+    cy.get('[data-cy-id="cache-delete"]').click();
+    cy.get('[data-cy-id="cache-detail"]').should('not.exist');
+
     cy.wait(1).then(() => {
       // cleanup
       return api.delete([

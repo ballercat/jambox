@@ -6029,6 +6029,7 @@ __metadata:
     svelte: ^3.55.0
     svelte-jsoneditor: ^0.17.8
     svelte-loader: ^3.1.4
+    svelte-routing: ^1.11.0
     svelte-table: ^0.6.1
     svelte-watch-resize: ^1.0.3
     tail-file: ^1.4.15
@@ -9169,6 +9170,13 @@ __metadata:
   peerDependencies:
     svelte: ">3.0.0"
   checksum: 34fe4862f8c076a015b9f59195f3f39504fbdb17b9cc9c5a3366ec6fa51aa0b0621881339e5aedfdc1c89df77b90eb76f7cc08087d4bc30f805267d6a8c266eb
+  languageName: node
+  linkType: hard
+
+"svelte-routing@npm:^1.11.0":
+  version: 1.11.0
+  resolution: "svelte-routing@npm:1.11.0"
+  checksum: a2924bfb9ccc223ba3a44aefee093861ac90c88026e88574f3c87124328013482112a0d2d0e538e6dd76c51e9a700c572bd8f35372c6f5a73cd9ccece728690c
   languageName: node
   linkType: hard
 

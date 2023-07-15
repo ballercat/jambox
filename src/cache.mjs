@@ -262,6 +262,12 @@ class Cache {
   async delete(dir, hash) {
     const record = this.#cache[hash];
 
+    if (!record) {
+      const errorMessage = `Attempted to delete a record that does not exist ${hash}`;
+      debug(errorMessage);
+      throw new Error(errorMessage);
+    }
+
     await this.revert(record.request);
 
     if (dir == null) {
@@ -279,7 +285,9 @@ class Cache {
         payload: { id: hash },
       });
     } catch (e) {
-      debug(`Attempted to delete hash: ${hash}, but it's not on disk`);
+      const errorMessage = `Attempted to delete hash: ${hash}, but it's not on disk`;
+      debug(errorMessage);
+      throw new Error(errorMessage);
     }
   }
 

@@ -60,15 +60,35 @@ export const reducer = (state, action) => {
       };
     }
     case 'cache.commit': {
+      const url = new URL(payload.request.url);
       return {
         ...state,
         cache: {
           ...state.cache,
-          [payload.id]: payload,
+          [payload.id]: {
+            ...payload,
+            host: url.hostname,
+            path: payload.request.path,
+            method: payload.request.method,
+            statusCode: payload.response?.statusCode,
+          },
         },
       };
     }
     case 'cache.load': {
+      for (const id in payload) {
+        const { request, response } = payload[id];
+        const url = new URL(request.url);
+        payload[id] = {
+          id,
+          host: url.hostname,
+          path: request.path,
+          method: request.method,
+          statusCode: response?.statusCode,
+          request,
+          response,
+        };
+      }
       return {
         ...state,
         cache: {
@@ -85,11 +105,18 @@ export const reducer = (state, action) => {
       };
     }
     case 'cache.update': {
+      const url = new URL(payload.request.url);
       return {
         ...state,
         cache: {
           ...state.cache,
-          [payload.id]: payload,
+          [payload.id]: {
+            ...payload,
+            host: url.hostname,
+            path: payload.request.path,
+            method: payload.request.method,
+            statusCode: payload.response?.statusCode,
+          },
         },
       };
     }
@@ -99,3 +126,12 @@ export const reducer = (state, action) => {
 };
 
 export const store = writable(initialState);
+
+export const createActions = (api) => {
+  return {
+    cacheUpdate(id, { response }) {
+      api.updateCache(id, { response });
+    },
+    cacheDelete(id) {},
+  };
+};

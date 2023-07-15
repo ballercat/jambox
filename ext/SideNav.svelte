@@ -1,32 +1,17 @@
 <script>
-  export let onNavigation;
-  export let path;
+  import { Link } from 'svelte-routing';
 </script>
 
 <div class="SideNav">
   <div class="Title">Jambox</div>
   <ul>
     <li>
-      <a
-        on:click={(e) => {
-          e.preventDefault();
-          onNavigation('/Waterfall');
-        }}
-        href="/Waterfall"
-        data-cy-id="waterfall-link"
-        class="SideNav-Link {path === '/Waterfall' ? 'selected' : ''}"
-        >Waterfall</a
+      <Link to="/" data-cy-id="waterfall-link" class="SideNav-Link"
+        >Waterfall</Link
       >
     </li>
     <li>
-      <a
-        on:click={(e) => {
-          e.preventDefault();
-          onNavigation('/Cache');
-        }}
-        data-cy-id="cache-link"
-        href="/Cache"
-        class="SideNav-Link {path === '/Cache' ? 'selected' : ''}">Cache</a
+      <Link data-cy-id="cache-link" to="/cache" class="SideNav-Link">Cache</Link
       >
     </li>
   </ul>
