@@ -48,7 +48,7 @@ describe('Web Extension', () => {
     cy.get('@modal').contains('path');
     cy.get('@modal').contains('/returnThisAsJson');
 
-    cy.get('[data-cy-id="modal-background"]').click({ force: true });
+    cy.get('[data-cy-id="back-to-waterfall"]').click();
 
     cy.get('@modal').should('not.exist');
 
@@ -69,7 +69,7 @@ describe('Web Extension', () => {
     cy.get('[data-cy-id="cache-detail"]').contains('path');
     cy.get('[data-cy-id="cache-detail"]').contains('/returnThisAsJson');
 
-    cy.get('[data-cy-id="modal-background"]').click({ force: true });
+    cy.get('[data-cy-id="back-to-cache"]').click();
 
     cy.get('[data-cy-id="cache-detail"]').should('not.exist');
 

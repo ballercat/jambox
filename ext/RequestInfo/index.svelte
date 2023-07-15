@@ -11,7 +11,7 @@
 
 <div class="Wrapper" data-cy-id="request-info">
   <div>
-    <Link to="/">Back</Link>
+    <Link data-cy-id="back-to-waterfall" to="/">Back</Link>
     <button
       data-cy-id="select-headers-tab"
       on:click={() => {
