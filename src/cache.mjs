@@ -1,6 +1,5 @@
 // @ts-check
 import fs from 'fs';
-import { Buffer } from 'buffer';
 import { readdir, writeFile } from 'fs/promises';
 import { unlink } from 'fs/promises';
 import path from 'path';
