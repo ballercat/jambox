@@ -1,10 +1,11 @@
 <script>
+  import { store, reducer } from '../store.js';
   import SvelteTable from 'svelte-table';
   import Cell from './Cell.svelte';
 
   export let cache;
 
-  let search;
+  let search = $store.filters.cache;
   let data;
   $: {
     data = Object.values(cache).filter(({ response }) => {
@@ -63,9 +64,21 @@
   <div>
     Search by response body: <input
       bind:value={search}
+      on:change={() =>
+        store.update((state) =>
+          reducer(state, { type: 'search.cache', payload: search })
+        )}
       placeholder="search json content"
     />
-    <button disabled={!search} on:click={() => (search = '')}>Clear</button>
+    <button
+      disabled={!search}
+      on:click={() => {
+        search = '';
+        store.update((state) =>
+          reducer(state, { type: 'search.cache', payload: search })
+        );
+      }}>Clear</button
+    >
   </div>
   <div>
     Cache entries: {data.length}

@@ -22,6 +22,9 @@ export const initialState = {
   abortedRequestById: {},
   blockNetwork: false,
   cache: {},
+  filters: {
+    cache: '',
+  },
 };
 
 const mapCacheEntry = (entry) => {
@@ -127,6 +130,14 @@ export const reducer = (state, action) => {
       return {
         ...state,
         cache,
+      };
+    }
+    case 'search.cache': {
+      return {
+        ...state,
+        filters: {
+          cache: payload,
+        },
       };
     }
     default:
