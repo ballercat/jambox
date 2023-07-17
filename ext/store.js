@@ -4,6 +4,7 @@ export const CONTENT_MAP = {
   'application/javascript': 'js',
   'application/json': 'fetch',
   'text/html': 'html',
+  'text/css': 'css',
 };
 
 const getContentType = (url, response) => {
@@ -77,8 +78,6 @@ export const reducer = (state, action) => {
       return {
         ...state,
         http: {
-          firstRequest: state.firstRequest || payload,
-          lastRequest: payload,
           ...state.http,
           [payload.id]: {
             id: payload.id,
@@ -89,11 +88,15 @@ export const reducer = (state, action) => {
       };
     }
     case 'response': {
+      // Extension refresh in the middle of a request -> response cycle
+      if (!state.http[payload.id]) {
+        return state;
+      }
       const contentType = getContentType(state.http[payload.id].url, payload);
+
       return {
         ...state,
         http: {
-          lastResponse: payload,
           ...state.http,
           [payload.id]: {
             ...state.http[payload.id],

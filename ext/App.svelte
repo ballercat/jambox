@@ -84,13 +84,16 @@
         <Waterfall data={$store} {history} />
       </Route>
       <Route path="/cache">
-        <Cache cache={$store.cache} {api} />
+        <Cache cache={$store.cache} />
       </Route>
       <Route path="/cache/entry/:id" let:params>
         <CacheEntry cacheEntry={$store.cache[params.id]} {api} {history} />
       </Route>
       <Route path="/request/:id" let:params>
-        <RequestInfo {...$store.http[params.id]} />
+        <RequestInfo
+          response={$store.http[params.id].response}
+          request={$store.http[params.id].request}
+        />
       </Route>
     </div>
   </Router>

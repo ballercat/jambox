@@ -40,16 +40,16 @@
   }
 
   $: {
-    minTime = data.http.firstRequest?.startTimestamp || 0;
-
-    maxTime = Math.max(
-      data.http.lastResponse?.responseSentTimestamp || 0,
-      data.http.lastRequest?.bodyReceivedTimestamp || 0
-    );
-
     rows = Object.values(data.http).filter(({ contentType }) => {
       return checked.includes(contentType);
     });
+
+    if (rows.length) {
+      minTime = rows[0].request.bodyReceivedTimestamp;
+      maxTime =
+        rows[rows.length - 1].response?.responseSentTimestamp ||
+        [rows.length - 1].request.bodyReceivedTimestamp;
+    }
 
     height = (rows.length + 1) * (rowHeight + rowPadding); // +1 for axis
     scaleFactor = Math.ceil((maxTime - minTime) / (1000 - 5 - barOffset));
@@ -119,6 +119,7 @@
   >
     {#each rows as http, index}
       <Row
+        aborted={false}
         {...http}
         title={shortenURL(new URL(http.url))}
         {minTime}

@@ -14,26 +14,27 @@
   export let onClick;
   export let aborted;
 
-  let statusCode = response?.statusCode || null;
-  const start = Math.ceil(request.startTimestamp);
-  const received = Math.ceil(
-    request.bodyReceivedTimestamp - request.startTimestamp
-  );
-  const duration = response?.responseSentTimestamp
-    ? Math.ceil(response.responseSentTimestamp - request.startTimestamp)
-    : null;
-
+  let statusCode, start, received, duration;
   let hover = false;
 
   const CONTENT_COLOR_MAP = {
     js: '#2cb',
     fetch: '#9d5',
     html: '#36b',
+    css: '#09c',
   };
 
   let font, fill, sizeText, cacheColor;
 
   $: {
+    statusCode = response?.statusCode || null;
+    start = Math.ceil(request.startTimestamp);
+    received = Math.ceil(
+      request.bodyReceivedTimestamp - request.startTimestamp
+    );
+    duration = response?.responseSentTimestamp
+      ? Math.ceil(response.responseSentTimestamp - request.startTimestamp)
+      : null;
     font = `${statusCode ? '' : 'italic '} 1rem sans-serif`;
     fill = statusCode && statusCode >= 400 ? '#a35' : 'black';
 
