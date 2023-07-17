@@ -112,13 +112,13 @@ module.exports = {
       websocket: true,
     },
   },
-  auto: {
+  stub: {
     '**/*.png': 204,
     // It's possible to respond with placeholder images instead of blank/broken 204s
     // Note that you must spcify a filepath, not file contents
     '**/*.jpg': { status: 200, file: 'placeholder.jpg', preferNetwork: true },
     '**/*.ico': 204,
-    '**/log': { status: 200, statusMessage: 'auto mock log' },
+    '**/log': { status: 200, statusMessage: 'stub log' },
   },
   cache: {
     write: 'auto',

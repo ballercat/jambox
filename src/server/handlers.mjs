@@ -179,20 +179,27 @@ export const forward = (svc, config) => {
   );
 };
 
-export const auto = (svc, config) => {
+export const stub = (svc, config) => {
   return Promise.all(
-    Object.entries(config.value.auto).map(([path, value]) => {
+    Object.entries(config.value.stub).map(([path, value]) => {
       const options = typeof value === 'object' ? value : { status: value };
       if (options.preferNetwork && !config.value.blockNetworkRequests) {
         return;
+      }
+
+      let response = null;
+      if (options.file) {
+        response = fs.readFileSync(options.file);
+      } else if (options.body) {
+        response = options.body;
       }
       return svc.proxy.addRequestRule({
         priority: 99,
         matchers: [new GlobMatcher('*', { paths: [path] })],
         handler: new mockttp.requestHandlers.SimpleHandler(
           options.status,
-          options.statusMessage || (options.file ? 'OK' : 'jambox auto-mock'),
-          options.file ? fs.readFileSync(options.file) : null
+          options.statusMessage || (options.file ? 'OK' : 'jambox stub'),
+          response
         ),
       });
     })
@@ -313,6 +320,6 @@ export default async function handlers(svc, config) {
   }
 
   if (config.value.auto) {
-    await auto(svc, config);
+    await stub(svc, config);
   }
 }
