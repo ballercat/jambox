@@ -2,9 +2,12 @@
   import Headers from './Headers.svelte';
   import { Link } from 'svelte-routing';
   import { JSONEditor } from 'svelte-jsoneditor';
+  import { store } from '../store.js';
 
-  export let request;
-  export let response;
+  export let id;
+
+  const response = $store.http[id].response;
+  const request = $store.http[id].request;
 
   let currentTab = 'headers';
 </script>

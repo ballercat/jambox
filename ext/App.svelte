@@ -81,20 +81,15 @@
         />
       </div>
       <Route path="/">
-        <Waterfall data={$store} {history} />
+        <Waterfall {history} />
       </Route>
       <Route path="/cache">
-        <Cache cache={$store.cache} />
+        <Cache />
       </Route>
       <Route path="/cache/entry/:id" let:params>
-        <CacheEntry cacheEntry={$store.cache[params.id]} {api} {history} />
+        <CacheEntry id={params.id} {api} {history} />
       </Route>
-      <Route path="/request/:id" let:params>
-        <RequestInfo
-          response={$store.http[params.id].response}
-          request={$store.http[params.id].request}
-        />
-      </Route>
+      <Route path="/request/:id" component={RequestInfo} />
     </div>
   </Router>
 </main>

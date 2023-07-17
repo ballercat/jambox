@@ -5,7 +5,6 @@
   import Checkbox from './Checkbox.svelte';
 
   export let history;
-  export let data;
 
   const chrome = window.chrome;
 
@@ -40,7 +39,7 @@
   }
 
   $: {
-    rows = Object.values(data.http).filter(({ contentType }) => {
+    rows = Object.values($store.http).filter(({ contentType }) => {
       return checked.includes(contentType);
     });
 
