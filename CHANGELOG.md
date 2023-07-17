@@ -1,3 +1,9 @@
+## 0.0.23 - Fix re-renders
+
+- fix: unnecessary re-renders
+- feat: stop rendering waterfall after document loads
+- feat: clearing waterfall continues rendering incoming requests
+
 ## 0.0.22 - Implement cached response update flow
 
 - feat: users may now edit the cached responses
