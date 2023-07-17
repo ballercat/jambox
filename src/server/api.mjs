@@ -96,13 +96,20 @@ const backend = async (svc, config) => {
       const { action } = req.body;
       if (action.type === 'delete') {
         const ids = action.payload || [];
+        const errors = [];
         for (const id of ids) {
-          await svc.cache.delete(config.value.cache?.dir, id);
+          try {
+            await svc.cache.delete(config.value.cache?.dir, id);
+          } catch (e) {
+            errors.push(e.toString());
+          }
         }
+
+        res.status(200).send({ errors });
       } else if (action.type === 'update') {
-        await svc.cache.update(action.payload.id, action.payload.values);
+        await svc.cache.update(action.payload);
+        res.sendStatus(200);
       }
-      res.sendStatus(200);
     } catch (e) {
       res.status(500).send(e.stack);
     }

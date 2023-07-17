@@ -1,6 +1,8 @@
 <script>
   import { createEventDispatcher, onDestroy } from 'svelte';
 
+  export let title;
+
   const dispatch = createEventDispatcher();
   const close = () => dispatch('close');
 
@@ -40,15 +42,24 @@
 
 <svelte:window on:keydown={handle_keydown} />
 
-<div data-cy-id="modal-background" class="modal-background" on:click={close} on:keydown={close} />
+<div
+  data-cy-id="modal-background"
+  class="Modal-Background"
+  on:click={close}
+  on:keydown={close}
+/>
 
-<div class="modal" role="dialog" aria-modal="true" bind:this={modal}>
-  <slot name="header" />
-  <slot />
+<div class="Modal" role="dialog" aria-modal="true" bind:this={modal}>
+  <div class="Modal-Header">
+    <h3>{title}</h3>
+  </div>
+  <div class="Modal-Content">
+    <slot />
+  </div>
 </div>
 
 <style>
-  .modal-background {
+  .Modal-Background {
     position: fixed;
     top: 0;
     left: 0;
@@ -57,12 +68,23 @@
     background: rgba(0, 0, 0, 0.3);
   }
 
-  .modal {
+  .Modal {
     position: fixed;
-    inset: 10%;
-    overflow: auto;
-    padding: 1em;
+    inset: 5%;
     border-radius: 0.2em;
     background: var(--backgroundColor);
+  }
+
+  .Modal-Content {
+    padding: 1em;
+    overflow: auto;
+  }
+
+  .Modal-Header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--blue);
+    color: var(--gc-yellow);
   }
 </style>

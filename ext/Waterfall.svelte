@@ -1,19 +1,13 @@
 <script>
   import { watchResize } from 'svelte-watch-resize';
-  import { store, reducer } from './store.js';
+  import { store, reducer, CONTENT_MAP } from './store.js';
   import Row from './Row.svelte';
   import Checkbox from './Checkbox.svelte';
 
-  export let onSelection;
+  export let history;
   export let data;
 
   const chrome = window.chrome;
-  const CONTENT_MAP = {
-    'application/javascript': 'js',
-    'application/json': 'fetch',
-    'text/html': 'html',
-  };
-  const possibleChecks = [...Object.values(CONTENT_MAP), 'other'];
 
   const shortenURL = (url) => {
     const shorterURL = url.host + url.pathname;
@@ -25,6 +19,8 @@
     return shorterURL;
   };
 
+  const possibleChecks = [...Object.values(CONTENT_MAP), 'other'];
+
   let checked = possibleChecks;
 
   const rowHeight = 15;
@@ -33,62 +29,28 @@
 
   const width = '100%';
 
-  let rows, minTime, maxTime;
+  let rows,
+    minTime = 0,
+    maxTime = 0;
   let height, scaleFactor;
-  let contentWidth = 100;
+  let contentWidth = 600;
 
   function handleContentResize(node) {
     contentWidth = node.clientWidth;
   }
 
   $: {
-    ({ rows, minTime, maxTime } = Object.values(data.requestById).reduce(
-      (acc, request) => {
-        const url = new URL(request.url);
-        const response = data.responseById[request.id];
-        const contentTypeHeader = response?.headers['content-type'] ?? null;
-        const contentType = contentTypeHeader
-          ? CONTENT_MAP[contentTypeHeader.split(';')[0]]
-          : 'other';
+    rows = Object.values(data.http).filter(({ contentType }) => {
+      return checked.includes(contentType);
+    });
 
-        if (!checked.includes(contentType)) {
-          return acc;
-        }
+    if (rows.length) {
+      minTime = rows[0].request.bodyReceivedTimestamp;
+      maxTime =
+        rows[rows.length - 1].response?.responseSentTimestamp ||
+        [rows.length - 1].request.bodyReceivedTimestamp;
+    }
 
-        acc.maxTime = Math.max(
-          acc.maxTime,
-          response?.responseSentTimestamp || request.bodyReceivedTimestamp
-        );
-        acc.minTime = Math.min(acc.minTime, request.startTimestamp);
-
-        const start = Math.ceil(request.startTimestamp);
-        const received = Math.ceil(
-          request.bodyReceivedTimestamp - request.startTimestamp
-        );
-        const duration = response?.responseSentTimestamp
-          ? Math.ceil(response.responseSentTimestamp - request.startTimestamp)
-          : null;
-
-        acc.rows.push({
-          id: request.id,
-          url,
-          title: shortenURL(url),
-          start,
-          received,
-          duration,
-          statusCode: response?.statusCode || null,
-          contentType,
-          aborted: Boolean(data.abortedRequestById[request.id]),
-        });
-
-        return acc;
-      },
-      {
-        rows: [],
-        minTime: Number.MAX_SAFE_INTEGER,
-        maxTime: 0,
-      }
-    ));
     height = (rows.length + 1) * (rowHeight + rowPadding); // +1 for axis
     scaleFactor = Math.ceil((maxTime - minTime) / (1000 - 5 - barOffset));
   }
@@ -155,22 +117,18 @@
     preserveAspectRatio="none"
     style="overflow: auto;"
   >
-    {#each rows as row, index}
+    {#each rows as http, index}
       <Row
-        {...row}
-        request={data.requestById[row.id]}
-        response={data.responseById[row.id]}
+        aborted={false}
+        {...http}
+        title={shortenURL(new URL(http.url))}
         {minTime}
         {rowHeight}
         {rowPadding}
         {index}
         {barOffset}
         {scaleFactor}
-        onClick={(id) =>
-          onSelection({
-            request: data.requestById[id],
-            response: data.responseById[id],
-          })}
+        onClick={(id) => history.navigate(`/request/${id}`)}
       />
     {/each}
   </svg>

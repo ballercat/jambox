@@ -9,7 +9,6 @@ module.exports = {
     'debugger',
     'notifications',
     'webNavigation',
-    'devtools_page',
   ],
   devtools_page: 'devtool.html',
   host_permissions: ['<all_urls>'],

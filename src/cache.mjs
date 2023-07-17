@@ -1,12 +1,13 @@
 // @ts-check
 import fs from 'fs';
-import { readdir } from 'fs/promises';
+import { readdir, writeFile } from 'fs/promises';
 import { unlink } from 'fs/promises';
 import path from 'path';
 import Observable from 'zen-observable';
 import crypto from 'crypto';
 import deserialize from './utils/deserialize.mjs';
 import _debug from 'debug';
+import { updateResponse } from './utils/serialize.mjs';
 
 const debug = _debug('jambox.cache');
 
@@ -20,7 +21,7 @@ export const serializeRequest = async (request) => {
     statusCode: request.statusCode,
     statusMessage: request.statusMessage,
     method: request.method,
-    body: await request.body.getJson(),
+    body: (await request.body?.getJson()) || {},
     ...request.timingEvents,
   };
 };
@@ -34,7 +35,7 @@ export const serializeResponse = async (response) => {
     statusCode: response.statusCode,
     statusMessage: response.statusMessage,
     headers: response.headers,
-    body: await response.body.getJson(),
+    body: (await response.body?.getJson()) || {},
     ...response.timingEvents,
   };
 };
@@ -45,6 +46,7 @@ export const events = {
   revert: 'cache.revert',
   stage: 'cache.stage',
   delete: 'cache.delete',
+  update: 'cache.update',
 };
 
 class Cache {
@@ -199,14 +201,21 @@ class Cache {
     return Object.values(this.#cache).find((pair) => pair.request.id === id);
   }
 
-  write(dir, hash) {
+  async write(dir, hash) {
     const record = this.#cache[hash];
     if (!record) {
       debug(`Attempted to write ${hash} but it's not found`);
       return;
     }
     debug(`Writing ${hash} to disk`);
-    fs.writeFileSync(path.join(dir, `${hash}.json`), JSON.stringify(record));
+    const filepath = path.join(dir, `${hash}.json`);
+    await writeFile(filepath, JSON.stringify(record));
+
+    this.#cache[hash] = {
+      ...this.#cache[hash],
+      dir,
+      filepath,
+    };
   }
 
   /**
@@ -233,6 +242,8 @@ class Cache {
 
         this.add(obj.request);
         await this.commit(obj.response);
+        this.#cache[name].filename = filename;
+        this.#cache[name].dir = dir;
 
         results[name] = obj;
       }
@@ -249,6 +260,12 @@ class Cache {
    */
   async delete(dir, hash) {
     const record = this.#cache[hash];
+
+    if (!record) {
+      const errorMessage = `Attempted to delete a record that does not exist ${hash}`;
+      debug(errorMessage);
+      throw new Error(errorMessage);
+    }
 
     await this.revert(record.request);
 
@@ -267,12 +284,25 @@ class Cache {
         payload: { id: hash },
       });
     } catch (e) {
-      debug(`Attempted to delete hash: ${hash}, but it's not on disk`);
+      const errorMessage = `Attempted to delete hash: ${hash}, but it's not on disk`;
+      debug(errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
-  // TODO
-  async update(/* id, { response, request } */) {}
+  async update({ id, response }) {
+    const newResponse = await updateResponse(
+      this.#cache[id].response,
+      response
+    );
+
+    this.#cache[id].response = newResponse;
+    this.#observer.next({
+      type: events.update,
+      payload: this.#cache[id],
+    });
+    await this.write(this.#cache[id].dir, id);
+  }
 
   clear() {
     this.#staged = {};

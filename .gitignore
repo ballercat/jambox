@@ -2,6 +2,7 @@
 node_modules
 coverage
 coverage-cypress
+cypress/screenshots
 cypress/videos
 .DS_Store
 *.log

@@ -1,19 +1,24 @@
 <script>
+  import { Router, Route } from 'svelte-routing';
+  import {
+    createHistory,
+    createMemorySource,
+  } from 'svelte-routing/src/history';
   import { store, reducer } from './store.js';
   import Cache from './Cache';
   import Checkbox from './Checkbox.svelte';
   import Waterfall from './Waterfall.svelte';
   import SideNav from './SideNav.svelte';
   import RequestInfo from './RequestInfo';
-  import Modal from './Modal.svelte';
+  import CacheEntry from './CacheEntry.svelte';
 
   export let api;
 
+  const history = createHistory(createMemorySource());
   const chrome = window.chrome;
   let pauseChecked = false;
   let cleanup;
-  let path = '/Waterfall';
-  let selection = null;
+  let url = '/';
 
   api.getConfig().then((payload) => {
     store.update((state) => reducer(state, { type: 'config', payload }));
@@ -50,53 +55,48 @@
 </script>
 
 <main class="Container">
-  <SideNav
-    onNavigation={(selection) => {
-      path = selection;
-    }}
-    {path}
-  />
-  <div class="Box">
-    <div class="TopBar">
-      <Checkbox
-        checked={$store.config.paused}
-        inline
-        id="pause-proxy"
-        name="pause-proxy"
-        label="Pause Proxy"
-        onClick={() => {
-          api.pause(!$store.config.paused);
-        }}
-      />
-      <Checkbox
-        inline
-        id="block-network"
-        name="block-network"
-        checked={$store.config.blockNetworkRequests}
-        label="Block Network"
-        onClick={() => {
-          api.blockNetworkRequests(!$store.config.blockNetworkRequests);
-        }}
-      />
+  <Router {url} {history}>
+    <SideNav />
+    <div class="Box">
+      <div class="TopBar">
+        <Checkbox
+          checked={$store.config.paused}
+          inline
+          id="pause-proxy"
+          name="pause-proxy"
+          label="Pause Proxy"
+          onClick={() => {
+            api.pause(!$store.config.paused);
+          }}
+        />
+        <Checkbox
+          inline
+          id="block-network"
+          name="block-network"
+          checked={$store.config.blockNetworkRequests}
+          label="Block Network"
+          onClick={() => {
+            api.blockNetworkRequests(!$store.config.blockNetworkRequests);
+          }}
+        />
+      </div>
+      <Route path="/">
+        <Waterfall data={$store} {history} />
+      </Route>
+      <Route path="/cache">
+        <Cache cache={$store.cache} />
+      </Route>
+      <Route path="/cache/entry/:id" let:params>
+        <CacheEntry cacheEntry={$store.cache[params.id]} {api} {history} />
+      </Route>
+      <Route path="/request/:id" let:params>
+        <RequestInfo
+          response={$store.http[params.id].response}
+          request={$store.http[params.id].request}
+        />
+      </Route>
     </div>
-    {#if path === '/Waterfall'}
-      <Waterfall data={$store} onSelection={(value) => (selection = value)} />
-    {/if}
-    {#if path === '/Cache'}
-      <Cache
-        cache={$store.cache}
-        {api}
-        onSelection={(row) => {
-          selection = row;
-        }}
-      />
-    {/if}
-  </div>
-  {#if selection}
-    <Modal on:close={() => (selection = null)}>
-      <RequestInfo {...selection} />
-    </Modal>
-  {/if}
+  </Router>
 </main>
 
 <style>

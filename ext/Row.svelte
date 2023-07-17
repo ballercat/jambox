@@ -2,15 +2,11 @@
   export let id;
   export let contentType;
   export let index;
-  export let start;
   export let url;
   export let response;
   export let request;
-  export let received;
-  export let duration;
   export let title;
   export let scaleFactor;
-  export let statusCode;
   export let rowHeight;
   export let rowPadding;
   export let barOffset;
@@ -18,17 +14,27 @@
   export let onClick;
   export let aborted;
 
+  let statusCode, start, received, duration;
   let hover = false;
 
   const CONTENT_COLOR_MAP = {
     js: '#2cb',
     fetch: '#9d5',
     html: '#36b',
+    css: '#09c',
   };
 
   let font, fill, sizeText, cacheColor;
 
   $: {
+    statusCode = response?.statusCode || null;
+    start = Math.ceil(request.startTimestamp);
+    received = Math.ceil(
+      request.bodyReceivedTimestamp - request.startTimestamp
+    );
+    duration = response?.responseSentTimestamp
+      ? Math.ceil(response.responseSentTimestamp - request.startTimestamp)
+      : null;
     font = `${statusCode ? '' : 'italic '} 1rem sans-serif`;
     fill = statusCode && statusCode >= 400 ? '#a35' : 'black';
 

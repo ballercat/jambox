@@ -1,48 +1,19 @@
 <script>
+  import { store, reducer } from '../store.js';
   import SvelteTable from 'svelte-table';
-  import Breadcrumb from './Breadcrumb.svelte';
-  import Detail from './Detail.svelte';
-  import Modal from '../Modal.svelte';
   import Cell from './Cell.svelte';
 
-  export let api;
   export let cache;
 
-  let search;
-  let cacheEntry = null;
+  let search = $store.filters.cache;
   let data;
   $: {
-    data = Object.values(cache).reduce((acc, { id, request, response }) => {
-      const url = new URL(request.url);
-      const include =
-        typeof search === 'string' && search.length
-          ? JSON.stringify(response.body || '').includes(search)
-          : true;
-      if (!include) {
-        return acc;
-      }
-
-      acc.push({
-        id,
-        host: url.hostname,
-        path: request.path,
-        method: request.method,
-        statusCode: response?.statusCode,
-        request,
-        response,
-      });
-
-      return acc;
-    }, []);
+    data = Object.values(cache).filter(({ response }) => {
+      return typeof search === 'string' && search.length
+        ? JSON.stringify(response.body || '').includes(search)
+        : true;
+    });
   }
-
-  const onEdit = (id) => {
-    cacheEntry = data.find((entry) => entry.id === id);
-  };
-  const onDelete = (id) => {
-    cacheEntry = null;
-    api.delete([id]);
-  };
 
   const COLUMNS = [
     {
@@ -51,9 +22,6 @@
       value: () => true,
       renderComponent: {
         component: Cell,
-        props: {
-          onEdit,
-        },
       },
     },
     {
@@ -62,9 +30,6 @@
       value: (v) => v.host,
       renderComponent: {
         component: Cell,
-        props: {
-          onEdit,
-        },
       },
       searchValue: (row, searchTerm) => {
         return row.host.toLowerCase().includes(searchTerm);
@@ -76,9 +41,6 @@
       value: (v) => v.path,
       renderComponent: {
         component: Cell,
-        props: {
-          onEdit,
-        },
       },
       searchValue: (row, searchTerm) => {
         return row.path.toLowerCase().includes(searchTerm);
@@ -90,9 +52,6 @@
       value: (v) => v.statusCode,
       renderComponent: {
         component: Cell,
-        props: {
-          onEdit,
-        },
       },
       searchValue: (row, searchTerm) => {
         return `${row.statusCode}`.includes(searchTerm);
@@ -103,30 +62,28 @@
 
 <div class="Box">
   <div>
-    <Breadcrumb {cacheEntry} onCacheClick={() => (cacheEntry = null)} />
-  </div>
-  <div>
     Search by response body: <input
       bind:value={search}
+      on:change={() =>
+        store.update((state) =>
+          reducer(state, { type: 'search.cache', payload: search })
+        )}
       placeholder="search json content"
     />
-    <button disabled={!search} on:click={() => (search = '')}>Clear</button>
+    <button
+      disabled={!search}
+      on:click={() => {
+        search = '';
+        store.update((state) =>
+          reducer(state, { type: 'search.cache', payload: search })
+        );
+      }}>Clear</button
+    >
   </div>
   <div>
     Cache entries: {data.length}
   </div>
   <SvelteTable columns={COLUMNS} rows={data} classNameRow="Row" />
-  {#if cacheEntry != null}
-    <Modal on:close={() => (cacheEntry = null)}>
-      <Detail
-        {cacheEntry}
-        {onDelete}
-        onUpdateResponse={(response) => {
-          api.updateCache(cacheEntry.id, { response });
-        }}
-      />
-    </Modal>
-  {/if}
 </div>
 
 <style>

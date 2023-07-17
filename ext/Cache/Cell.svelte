@@ -1,7 +1,7 @@
 <script>
+  import { Link } from 'svelte-routing';
   export let row;
   export let col;
-  export let onEdit;
 
   const shorten = (str) => {
     if (str.length > 30) {
@@ -10,7 +10,6 @@
 
     return str;
   };
-
   let value, cyID;
   $: value =
     col.key === 'host' || col.key === 'path'
@@ -21,12 +20,8 @@
 
 <div class="Cell">
   {#if col.key === 'edit'}
-    <button
-      inline
-      data-cy-id="cache-cell-{cyID}"
-      on:click={() => {
-        onEdit(row.id);
-      }}>Edit</button
+    <Link to="/cache/entry/{row.id}" data-cy-id="cache-cell-{cyID}"
+      >{row.id}</Link
     >
   {:else}
     <span data-cy-id="cache-cell-{cyID}">{value}</span>

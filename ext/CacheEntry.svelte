@@ -1,20 +1,33 @@
 <script>
+  import { without } from './nodash';
   import { JSONEditor } from 'svelte-jsoneditor';
+  import { Link } from 'svelte-routing';
 
+  export let api;
+  export let history;
   export let cacheEntry;
-  export let onDelete;
-  export let onUpdateResponse;
   let changes = null;
   let currentTab = 'details';
 
-  const { response, request, ...details } = cacheEntry;
+  let response, request, details;
+  $: {
+    response = cacheEntry.response;
+    request = cacheEntry.request;
+    details = without(['request', 'response'], cacheEntry);
+  }
 
-  function onChange(prev, curr) {
-    changes = curr.json;
+  function onChange(curr) {
+    try {
+      changes = curr.json || JSON.parse(curr.text);
+    } catch (e) {
+      // it's not guaranteed that if the user inputs text it's actually valid json
+      changes = null;
+    }
   }
 </script>
 
 <div data-cy-id="cache-detail" class="Wrapper">
+  <Link data-cy-id="back-to-cache" to="/cache">Back</Link>
   <div class="Box">
     <button
       data-cy-id="select-details-tab"
@@ -37,29 +50,34 @@
   </div>
   {#if currentTab === 'details'}
     <JSONEditor content={{ json: details }} />
-    <button data-cy-id="cache-delete" on:click={() => onDelete(cacheEntry.id)}
-      >Delete</button
+    <button
+      data-cy-id="cache-delete"
+      on:click={() => {
+        history.navigate('/cache');
+        api.delete([cacheEntry.id]);
+      }}>Delete</button
     >
   {/if}
   {#if currentTab === 'request'}
     <div class="Request">
       <div>Request</div>
-      <JSONEditor content={{ json: cacheEntry.request }} />
+      <JSONEditor content={{ json: request }} />
     </div>
   {/if}
   {#if currentTab === 'response'}
-    <div class="Box">
+    <div class="Box" data-cy-id="cache-response-edit">
       Response
       <button
         class="inline"
         disabled={changes === null}
+        data-cy-id="update-response-btn"
         on:click={() => {
-          onUpdateResponse(changes);
+          api.updateCache(cacheEntry.id, { response: changes });
           changes = null;
-        }}>Update (not yet implemented)</button
+        }}>Update</button
       >
     </div>
-    <JSONEditor content={{ json: cacheEntry.response }} {onChange} />
+    <JSONEditor content={{ json: response }} {onChange} />
   {/if}
 </div>
 
