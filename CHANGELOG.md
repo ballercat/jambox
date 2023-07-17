@@ -3,6 +3,8 @@
 - fix: unnecessary re-renders
 - feat: stop rendering waterfall after document loads
 - feat: clearing waterfall continues rendering incoming requests
+- breaking change: rename `auto` option to `stub`
+- feat: let stubs define a `body` directly
 
 ## 0.0.22 - Implement cached response update flow
 
