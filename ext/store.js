@@ -18,6 +18,7 @@ const getContentType = (url, response) => {
 };
 
 export const initialState = {
+  complete: false,
   config: {},
   http: {},
   abortedRequestById: {},
@@ -46,6 +47,7 @@ export const reducer = (state, action) => {
     case 'clear': {
       return {
         ...state,
+        complete: false,
         http: {},
       };
     }
@@ -58,10 +60,18 @@ export const reducer = (state, action) => {
     case 'refresh': {
       return {
         ...state,
+        complete: false,
         http: {},
       };
     }
+    case 'complete': {
+      return {
+        ...state,
+        complete: true,
+      };
+    }
     case 'abort': {
+      if (state.complete) return state;
       return {
         ...state,
         http: {
@@ -74,6 +84,7 @@ export const reducer = (state, action) => {
       };
     }
     case 'request': {
+      if (state.complete) return state;
       const url = new URL(payload.url);
       return {
         ...state,
@@ -88,6 +99,7 @@ export const reducer = (state, action) => {
       };
     }
     case 'response': {
+      if (state.complete) return state;
       // Extension refresh in the middle of a request -> response cycle
       if (!state.http[payload.id]) {
         return state;

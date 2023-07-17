@@ -34,6 +34,12 @@
     }
   });
 
+  chrome.webNavigation?.onCompleted.addListener((details) => {
+    if (details.tabId === chrome.devtools.inspectedWindow.tabId) {
+      store.update((state) => reducer(state, { type: 'complete' }));
+    }
+  });
+
   $: {
     cleanup?.();
     pauseChecked = $store.config.pause;

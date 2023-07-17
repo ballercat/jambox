@@ -108,6 +108,10 @@
   {/each}
 </div>
 
+<i
+  >Requests only shown until document and it's resources finish loading. Clear
+  waterfall to view network requests after document finished loading.</i
+>
 <div class="Content" use:watchResize={handleContentResize}>
   <svg
     {width}
