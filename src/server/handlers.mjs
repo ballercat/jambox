@@ -190,9 +190,10 @@ export const stub = (svc, config) => {
       let response = null;
       if (options.file) {
         response = fs.readFileSync(options.file);
-      } else if (options.body) {
-        response = options.body;
+      } else if (options.body && typeof options.body === 'object') {
+        response = Buffer.from(JSON.stringify(options.body));
       }
+
       return svc.proxy.addRequestRule({
         priority: 99,
         matchers: [new GlobMatcher('*', { paths: [path] })],
@@ -319,7 +320,7 @@ export default async function handlers(svc, config) {
     await forward(svc, config);
   }
 
-  if (config.value.auto) {
+  if (config.value.stub) {
     await stub(svc, config);
   }
 }
