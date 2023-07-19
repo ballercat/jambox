@@ -144,7 +144,7 @@ test.serial('auto mocks', async (t) => {
   await supertest(t.context.server)
     .post('/api/config')
     .send({
-      auto: {
+      stub: {
         '**/path.html': { status: 204 },
         '**/*.jpg': { status: 204, preferNetwork: true },
       },
@@ -228,7 +228,7 @@ test.serial('pause', async (t) => {
   await supertest(t.context.server)
     .post('/api/config')
     .send({
-      auto: {
+      stub: {
         '**/**/*.jpg': { status: 204 },
       },
     })
@@ -240,7 +240,7 @@ test.serial('pause', async (t) => {
   // Baseline, get's a 204 auto-mock response
   let res = await doRequest();
   t.is(res.status, 204);
-  t.is(res.statusText, 'jambox auto-mock');
+  t.is(res.statusText, 'jambox stub');
 
   await supertest(t.context.server)
     .post('/api/pause')
@@ -260,7 +260,7 @@ test.serial('pause', async (t) => {
   // Unpaused, back to baseline
   res = await doRequest();
   t.is(res.status, 204);
-  t.is(res.statusText, 'jambox auto-mock');
+  t.is(res.statusText, 'jambox stub');
 });
 
 // NOTE: This does work but needs a better cache mock
