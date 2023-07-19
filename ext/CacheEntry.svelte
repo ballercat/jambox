@@ -2,14 +2,17 @@
   import { without } from './nodash';
   import { JSONEditor } from 'svelte-jsoneditor';
   import { Link } from 'svelte-routing';
+  import { store } from './store';
 
   export let api;
   export let history;
-  export let cacheEntry;
+  export let id;
   let changes = null;
   let currentTab = 'details';
 
+  const cacheEntry = $store.cache[id];
   let response, request, details;
+
   $: {
     response = cacheEntry.response;
     request = cacheEntry.request;

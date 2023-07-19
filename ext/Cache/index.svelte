@@ -3,12 +3,12 @@
   import SvelteTable from 'svelte-table';
   import Cell from './Cell.svelte';
 
-  export let cache;
+  // export let cache;
 
   let search = $store.filters.cache;
-  let data;
+  let data = [];
   $: {
-    data = Object.values(cache).filter(({ response }) => {
+    data = Object.values($store.cache).filter(({ response }) => {
       return typeof search === 'string' && search.length
         ? JSON.stringify(response.body || '').includes(search)
         : true;

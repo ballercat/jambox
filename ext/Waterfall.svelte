@@ -5,7 +5,6 @@
   import Checkbox from './Checkbox.svelte';
 
   export let history;
-  export let data;
 
   const chrome = window.chrome;
 
@@ -40,7 +39,7 @@
   }
 
   $: {
-    rows = Object.values(data.http).filter(({ contentType }) => {
+    rows = Object.values($store.http).filter(({ contentType }) => {
       return checked.includes(contentType);
     });
 
@@ -109,6 +108,10 @@
   {/each}
 </div>
 
+<i
+  >Requests only shown until document and it's resources finish loading. Clear
+  waterfall to view network requests after document finished loading.</i
+>
 <div class="Content" use:watchResize={handleContentResize}>
   <svg
     {width}

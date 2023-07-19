@@ -11,6 +11,13 @@ before(async () => {
         paths: ['**'],
       },
     },
+    stub: {
+      '**/pathC': {
+        status: 200,
+        statusMessage: 'OK',
+        body: { data: 'test-stub' },
+      },
+    },
     cache: {
       dir: '.jambox',
       write: 'auto',
@@ -24,6 +31,7 @@ describe('Web Extension', () => {
   it('can display seen requests', () => {
     // Jambox should generate a static hash for the URL below
     const HASH = '2be35430d93be811753ecfd6ba828878';
+    const STUB_HASH = 'cd4482b36a608021cd943786ecb54c5d';
     const testURL = 'http://jambox-test.com/returnThisAsJson';
     cy.mount(App, { props: { api } });
 
@@ -77,6 +85,11 @@ describe('Web Extension', () => {
     cy.get('@test-edit').click();
     cy.get('[data-cy-id="cache-delete"]').click();
     cy.get('[data-cy-id="cache-detail"]').should('not.exist');
+
+    cy.get(`[data-cy-id="cache-cell-edit-${STUB_HASH}"]`).as('stub');
+    cy.get('@stub').click();
+    cy.get('[data-cy-id="select-response-tab"]').click();
+    cy.get('[data-cy-id="cache-detail"]').contains('test-stub');
 
     cy.get('@test-edit')
       .should('not.exist')

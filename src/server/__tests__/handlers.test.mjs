@@ -1,5 +1,5 @@
 import test from 'ava';
-import { forward, record, auto } from '../handlers.mjs';
+import { forward, record, stub } from '../handlers.mjs';
 
 test.beforeEach((t) => {
   const rules = [];
@@ -79,23 +79,23 @@ test('cache', async (t) => {
   ]);
 });
 
-test('auto', async (t) => {
+test('stub', async (t) => {
   const config = {
     value: {
       // NOTE: Might be better to invert this setting
-      auto: {
+      stub: {
         '**.jpg': 204,
         '**/api': { status: 200 },
       },
     },
   };
 
-  await auto({ proxy: t.context.proxy }, config);
+  await stub({ proxy: t.context.proxy }, config);
 
   t.deepEqual(t.context.explainRules(), [
     'GlobMatcher {"target":"*","paths":["**.jpg"]}',
-    'respond with status 204 (jambox auto-mock)',
+    'respond with status 204 (jambox stub)',
     'GlobMatcher {"target":"*","paths":["**/api"]}',
-    'respond with status 200 (jambox auto-mock)',
+    'respond with status 200 (jambox stub)',
   ]);
 });
