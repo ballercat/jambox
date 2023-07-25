@@ -1,3 +1,7 @@
+## 0.0.24 - Fix broken cache file reads
+
+- fix: catch unhandled json parse during reset
+
 ## 0.0.23 - Fix re-renders
 
 - fix: unnecessary re-renders

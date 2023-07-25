@@ -234,18 +234,24 @@ class Cache {
       const { ext, name } = path.parse(filename);
 
       if (ext === '.json') {
+        const fullPath = path.join(dir, filename);
         debug(`read ${filename}`);
-        const json = JSON.parse(
-          fs.readFileSync(path.join(dir, filename), 'utf-8')
-        );
-        const obj = deserialize(json);
+        try {
+          const json = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
+          const obj = deserialize(json);
 
-        this.add(obj.request);
-        await this.commit(obj.response);
-        this.#cache[name].filename = filename;
-        this.#cache[name].dir = dir;
+          this.add(obj.request);
+          await this.commit(obj.response);
+          this.#cache[name].filename = filename;
+          this.#cache[name].dir = dir;
 
-        results[name] = obj;
+          results[name] = obj;
+        } catch (e) {
+          debug(
+            `failed to read ${filename}. The file will be deleted! ERROR: ${e}`
+          );
+          await unlink(fullPath);
+        }
       }
     }
 
