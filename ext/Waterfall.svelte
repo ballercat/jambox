@@ -4,6 +4,7 @@
   import Row from './Row.svelte';
   import Checkbox from './Checkbox.svelte';
 
+  export let search;
   export let history;
 
   const chrome = window.chrome;
@@ -39,9 +40,20 @@
   }
 
   $: {
-    rows = Object.values($store.http).filter(({ contentType }) => {
-      return checked.includes(contentType);
-    });
+    rows = Object.values($store.http).filter(
+      ({ request, response, contentType }) => {
+        if (!checked.includes(contentType)) {
+          return false;
+        }
+
+        if (!search) {
+          return true;
+        }
+
+        const string = JSON.stringify({ request, response });
+        return string.includes(search);
+      }
+    );
 
     if (rows.length) {
       minTime = rows[0].request.bodyReceivedTimestamp;

@@ -1,5 +1,5 @@
 <script>
-  import { Router, Route } from 'svelte-routing';
+  import { Router, Route, Link } from 'svelte-routing';
   import {
     createHistory,
     createMemorySource,
@@ -8,12 +8,12 @@
   import Cache from './Cache';
   import Checkbox from './Checkbox.svelte';
   import Waterfall from './Waterfall.svelte';
-  import SideNav from './SideNav.svelte';
   import RequestInfo from './RequestInfo';
   import CacheEntry from './CacheEntry.svelte';
 
   export let api;
 
+  let search = $store.search;
   const history = createHistory(createMemorySource());
   const chrome = window.chrome;
   let pauseChecked = false;
@@ -62,7 +62,6 @@
 
 <main class="Container">
   <Router {url} {history}>
-    <SideNav />
     <div class="Box">
       <div class="TopBar">
         <Checkbox
@@ -85,12 +84,24 @@
             api.blockNetworkRequests(!$store.config.blockNetworkRequests);
           }}
         />
+        <Link to="/" data-cy-id="waterfall-link" class="SideNav-Link"
+          >Waterfall</Link
+        >
+        <Link data-cy-id="cache-link" to="/cache" class="SideNav-Link"
+          >Cache</Link
+        >
+        <input
+          type="search"
+          bind:value={search}
+          autocomplete
+          placeholder="search"
+        />
       </div>
       <Route path="/">
-        <Waterfall {history} />
+        <Waterfall {history} {search} />
       </Route>
       <Route path="/cache">
-        <Cache />
+        <Cache {search} />
       </Route>
       <Route path="/cache/entry/:id" let:params>
         <CacheEntry id={params.id} {api} {history} />

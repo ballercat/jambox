@@ -1,16 +1,15 @@
 <script>
-  import { store, reducer } from '../store.js';
+  import { store } from '../store.js';
   import SvelteTable from 'svelte-table';
   import Cell from './Cell.svelte';
 
-  // export let cache;
+  export let search;
 
-  let search = $store.filters.cache;
   let data = [];
   $: {
-    data = Object.values($store.cache).filter(({ response }) => {
+    data = Object.values($store.cache).filter(({ request, response }) => {
       return typeof search === 'string' && search.length
-        ? JSON.stringify(response.body || '').includes(search)
+        ? JSON.stringify({ response, request }).includes(search)
         : true;
     });
   }
@@ -31,19 +30,13 @@
       renderComponent: {
         component: Cell,
       },
-      searchValue: (row, searchTerm) => {
-        return row.host.toLowerCase().includes(searchTerm);
-      },
     },
     {
-      key: 'path',
+      key: 'pathname',
       title: 'Path',
-      value: (v) => v.path,
+      value: (v) => v.pathname,
       renderComponent: {
         component: Cell,
-      },
-      searchValue: (row, searchTerm) => {
-        return row.path.toLowerCase().includes(searchTerm);
       },
     },
     {
@@ -53,33 +46,12 @@
       renderComponent: {
         component: Cell,
       },
-      searchValue: (row, searchTerm) => {
-        return `${row.statusCode}`.includes(searchTerm);
-      },
     },
   ];
 </script>
 
 <div class="Box">
-  <div>
-    Search by response body: <input
-      bind:value={search}
-      on:change={() =>
-        store.update((state) =>
-          reducer(state, { type: 'search.cache', payload: search })
-        )}
-      placeholder="search json content"
-    />
-    <button
-      disabled={!search}
-      on:click={() => {
-        search = '';
-        store.update((state) =>
-          reducer(state, { type: 'search.cache', payload: search })
-        );
-      }}>Clear</button
-    >
-  </div>
+  <div />
   <div>
     Cache entries: {data.length}
   </div>

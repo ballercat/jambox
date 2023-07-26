@@ -1,3 +1,10 @@
+## 0.0.25 - Remove SideNav, Add global search
+
+- fix: Waterfall highlight
+- remove: SideNav
+- add: global search
+- fix: display pathname without query in cache table
+
 ## 0.0.24 - Fix broken cache file reads
 
 - fix: catch unhandled json parse during reset

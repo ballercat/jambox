@@ -87,12 +87,24 @@
   opacity={statusCode ? 1 : 0.5}
   data-cy-id={url.toString()}
 >
+  <title>
+    {JSON.stringify(
+      {
+        url: url.toString(),
+        start,
+        received,
+        duration: duration ?? 'pending',
+      },
+      null,
+      2
+    )}
+  </title>
   <rect
     width="100%"
     strokeWidth={1}
     style={`height: calc(100% + ${rowPadding - 1}px); fill: ${
       index % 2 ? 'var(--stripeA)' : 'var(--stripeB)'
-    }; stroke: ${hover ? 'var(---backgroundColor)' : 'var(---textColor)'};`}
+    }; stroke: ${hover ? 'var(--backGroundColor)' : 'var(---textColor)'};`}
   />
   <rect width={2} height="100%" fill={cacheColor} />
   <text
@@ -149,14 +161,6 @@
     {sizeText}
   </text>
   <g transform={`translate(${barOffset}, 0)`}>
-    <title>
-      {JSON.stringify({
-        url: url.toString(),
-        start,
-        received,
-        duration: duration ?? 'pending',
-      })}
-    </title>
     <rect
       x={`${(start - minTime) / scaleFactor + 435}`}
       y={6}
