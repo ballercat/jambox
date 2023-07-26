@@ -1,5 +1,6 @@
-## 0.0.25 - Remove SideNav, Add global search
+## 0.0.25 - Cache select all, Remove SideNav, Add global search
 
+- feat: cache select all/multi-select & delete
 - fix: Waterfall highlight
 - remove: SideNav
 - add: global search

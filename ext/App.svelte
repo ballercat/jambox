@@ -101,7 +101,7 @@
         <Waterfall {history} {search} />
       </Route>
       <Route path="/cache">
-        <Cache {search} />
+        <Cache {search} {api} />
       </Route>
       <Route path="/cache/entry/:id" let:params>
         <CacheEntry id={params.id} {api} {history} />
