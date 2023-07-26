@@ -1,27 +1,65 @@
 <script>
-  import { store, reducer } from '../store.js';
+  import { store } from '../store.js';
   import SvelteTable from 'svelte-table';
+  import Checkbox from '../Checkbox.svelte';
   import Cell from './Cell.svelte';
 
-  // export let cache;
+  export let api;
+  export let search;
 
-  let search = $store.filters.cache;
+  let checked = [];
   let data = [];
   $: {
-    data = Object.values($store.cache).filter(({ response }) => {
-      return typeof search === 'string' && search.length
-        ? JSON.stringify(response.body || '').includes(search)
-        : true;
-    });
+    data = Object.values($store.cache).reduce((acc, value) => {
+      if (typeof search === 'string' && search.length) {
+        if (
+          !JSON.stringify({
+            response: value.response,
+            request: value.request,
+          }).includes(search)
+        ) {
+          return acc;
+        }
+      }
+
+      acc.push({
+        ...value,
+        checked: checked.includes(value.id),
+      });
+
+      return acc;
+    }, []);
   }
 
+  const onSelect = (id, toggle) => {
+    if (toggle) {
+      checked = [...checked, id];
+    } else {
+      checked = checked.filter((checkedID) => checkedID !== id);
+    }
+  };
+
   const COLUMNS = [
+    {
+      key: 'select',
+      title: 'Select',
+      value: ({ id }) => checked.includes(id),
+      renderComponent: {
+        component: Cell,
+        props: {
+          onSelect,
+        },
+      },
+    },
     {
       key: 'edit',
       title: 'Edit',
       value: () => true,
       renderComponent: {
         component: Cell,
+        props: {
+          onSelect,
+        },
       },
     },
     {
@@ -30,20 +68,20 @@
       value: (v) => v.host,
       renderComponent: {
         component: Cell,
-      },
-      searchValue: (row, searchTerm) => {
-        return row.host.toLowerCase().includes(searchTerm);
+        props: {
+          onSelect,
+        },
       },
     },
     {
-      key: 'path',
+      key: 'pathname',
       title: 'Path',
-      value: (v) => v.path,
+      value: (v) => v.pathname,
       renderComponent: {
         component: Cell,
-      },
-      searchValue: (row, searchTerm) => {
-        return row.path.toLowerCase().includes(searchTerm);
+        props: {
+          onSelect,
+        },
       },
     },
     {
@@ -52,38 +90,51 @@
       value: (v) => v.statusCode,
       renderComponent: {
         component: Cell,
-      },
-      searchValue: (row, searchTerm) => {
-        return `${row.statusCode}`.includes(searchTerm);
+        props: {
+          onSelect,
+        },
       },
     },
   ];
 </script>
 
 <div class="Box">
-  <div>
-    Search by response body: <input
-      bind:value={search}
-      on:change={() =>
-        store.update((state) =>
-          reducer(state, { type: 'search.cache', payload: search })
-        )}
-      placeholder="search json content"
-    />
-    <button
-      disabled={!search}
-      on:click={() => {
-        search = '';
-        store.update((state) =>
-          reducer(state, { type: 'search.cache', payload: search })
-        );
-      }}>Clear</button
-    >
-  </div>
+  <div />
   <div>
     Cache entries: {data.length}
   </div>
-  <SvelteTable columns={COLUMNS} rows={data} classNameRow="Row" />
+  <button
+    disabled={checked.length === 0}
+    on:click={() => {
+      api.delete(checked);
+      checked = [];
+    }}>Delete Selected</button
+  >
+  <SvelteTable columns={COLUMNS} rows={data} classNameRow="Row">
+    <tr slot="header">
+      <th
+        ><Checkbox
+          label=""
+          checked={checked.length > 0}
+          id="select-all"
+          name="select-all"
+          onClick={() => {
+            if (checked.length) {
+              checked = [];
+              return;
+            }
+            checked = data.map(({ id }) => {
+              return id;
+            });
+          }}
+        />
+      </th>
+      <th>Edit</th>
+      <th>Host</th>
+      <th>Path</th>
+      <th>Status</th>
+    </tr>
+  </SvelteTable>
 </div>
 
 <style>
