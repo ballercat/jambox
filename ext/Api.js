@@ -86,6 +86,18 @@ export default class API {
     }
   }
 
+  /**
+   * @param path {string}
+   * @param data {object}
+   */
+  post(path, data) {
+    return fetch(`${this.apiURL.toString()}${path}`, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   onMessage(action) {
     for (const callback of this.callbacks) {
       callback(action);
@@ -111,7 +123,7 @@ export default class API {
   }
 
   /**
-   * @param id {string}
+   * @param ids {Array<string>}
    */
   delete(ids) {
     return fetch(`${this.apiURL.toString()}/cache`, {
@@ -128,17 +140,23 @@ export default class API {
     });
   }
 
+  /**
+   * @param id {string}
+   */
   updateCache(id, { response }) {
-    return fetch(`${this.apiURL.toString()}/cache`, {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'POST',
-      body: JSON.stringify({
-        action: {
-          type: 'update',
-          payload: { id, response },
-        },
-      }),
+    return this.post('/cache', {
+      action: {
+        type: 'update',
+        payload: { id, response },
+      },
     });
+  }
+
+  /**
+   * @param ids {Array<string>}
+   */
+  persist(ids) {
+    return this.post('/cache', { action: { type: 'persist', payload: ids } });
   }
 
   /**

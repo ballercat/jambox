@@ -41,8 +41,8 @@ const backend = async (svc, config) => {
     await setupHandlers(svc, config);
     svc.cache.clear();
 
-    if (config.value.cache?.dir) {
-      await svc.cache.read(path.join(config.value.cache.dir, 'main.zip'));
+    if (config.value.cache) {
+      await svc.cache.read('tape.zip', config.value.cache?.dir);
     }
   };
 
@@ -94,21 +94,19 @@ const backend = async (svc, config) => {
   svc.app.post('/api/cache', async (req, res) => {
     try {
       const { action } = req.body;
+
       if (action.type === 'delete') {
-        const ids = action.payload || [];
-        const errors = [];
-        for (const id of ids) {
-          try {
-            await svc.cache.delete(config.value.cache?.dir, id);
-          } catch (e) {
-            errors.push(e.toString());
-          }
-        }
+        const errors = await svc.cache.delete(action.payload || []);
 
         res.status(200).send({ errors });
       } else if (action.type === 'update') {
         await svc.cache.update(action.payload);
         res.sendStatus(200);
+      } else if (action.type === 'persist') {
+        await svc.cache.persist(action.payload);
+        res.sendStatus(200);
+      } else {
+        res.status(400).send('unknown action');
       }
     } catch (e) {
       res.status(500).send(e.stack);

@@ -102,14 +102,24 @@
   <div />
   <div>
     Cache entries: {data.length}
+    <button
+      disabled={checked.length === 0}
+      class="inline"
+      on:click={() => {
+        api.delete(checked);
+        checked = [];
+      }}>Delete Selected</button
+    >
+    <button
+      data-cy-id="cache-persist"
+      disabled={checked.length === 0}
+      class="inline"
+      on:click={() => {
+        api.persist(checked);
+        checked = [];
+      }}>Persist Selected</button
+    >
   </div>
-  <button
-    disabled={checked.length === 0}
-    on:click={() => {
-      api.delete(checked);
-      checked = [];
-    }}>Delete Selected</button
-  >
   <SvelteTable columns={COLUMNS} rows={data} classNameRow="Row">
     <tr slot="header">
       <th
@@ -138,6 +148,9 @@
 </div>
 
 <style>
+  .inline {
+    display: inline;
+  }
   .Box {
     display: flex;
     flex-direction: column;

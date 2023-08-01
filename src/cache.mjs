@@ -1,13 +1,12 @@
 // @ts-check
-// import fs from 'fs';
-// import { readdir, writeFile } from 'fs/promises';
-import { unlink } from 'fs/promises';
+import { unlink, access } from 'fs/promises';
 import path from 'path';
 import Observable from 'zen-observable';
 import crypto from 'crypto';
 import deserialize from './utils/deserialize.mjs';
 import _debug from 'debug';
 import { updateResponse } from './utils/serialize.mjs';
+import { PortablePath, npath, ppath } from '@yarnpkg/fslib';
 import { ZipFS } from '@yarnpkg/libzip';
 
 const debug = _debug('jambox.cache');
@@ -202,35 +201,55 @@ class Cache {
     return Object.values(this.#cache).find((pair) => pair.request.id === id);
   }
 
-  async write(dir, hash) {
-    const record = this.#cache[hash];
-    if (!record) {
-      debug(`Attempted to write ${hash} but it's not found`);
-      return;
-    }
-    debug(`Writing ${hash} to disk`);
-    const filepath = path.join(dir, `${hash}.json`);
-    await writeFile(filepath, JSON.stringify(record));
+  /**
+   * @param ids {Array<string>}
+   */
+  async persist(ids) {
+    const zipfs = new ZipFS(this.source, { create: true });
 
-    this.#cache[hash] = {
-      ...this.#cache[hash],
-      dir,
-      filepath,
-    };
+    for (const hash of ids) {
+      debug(`persist ${hash}`);
+      const record = this.#cache[hash];
+      if (!record) {
+        debug(`Attempted to write ${hash} but it's not found`);
+        return;
+      }
+      debug(`Writing ${hash} to archive`);
+      const filepath = ppath.join(PortablePath.root, `${hash}.json`);
+      await zipfs.writeFilePromise(filepath, JSON.stringify(record, null, 2));
+
+      this.#cache[hash] = {
+        ...this.#cache[hash],
+        filepath,
+      };
+    }
+
+    zipfs.saveAndClose();
   }
 
   /**
-   * @param source {string} Cache archive
+   * @param archive {string}
+   * @param dir {string}
    */
-  async read(source) {
-    const zipfs = new ZipFS(source, { readOnly: true });
-
+  async read(archive, dir = '.jambox') {
     const results = {};
+    // @ts-ignore
+    const source = ppath.join(dir, archive);
+    let create = false;
+    try {
+      await access(source);
+    } catch (e) {
+      create = true;
+    }
 
-    const files = await zipfs.readdirPromise('.');
+    this.source = source;
+
+    const zipfs = new ZipFS(this.source, { create });
+    const files = zipfs.getAllFiles();
+
+    debug(`Cache archive ready with ${files.length} cache files`);
 
     for (const filename of files) {
-      console.log(filename);
       const { ext, name } = path.parse(filename);
 
       if (ext === '.json') {
@@ -240,71 +259,65 @@ class Cache {
           const content = await zipfs.readFilePromise(filename, 'utf-8');
           const json = JSON.parse(content);
           const obj = deserialize(json);
-          // const json = JSON.parse(
-          //   fs.readFileSync(path.join(dir, filename), 'utf-8')
-          // );
 
           this.add(obj.request);
           await this.commit(obj.response);
-          this.#cache[name].filename = filename;
-          this.#cache[name].source = source;
+          this.#cache[name].persisted = true;
 
           results[name] = obj;
         } catch (e) {
           debug(
             `failed to read ${filename}. The file will be deleted! ERROR: ${e}`
           );
+          await zipfs.unlinkPromise(filename);
         }
       }
     }
+
+    zipfs.discardAndClose();
 
     return results;
   }
 
   /**
-   * @param source {string} Zip file to open
-   */
-  // async openZip(source) {
-  //   new ZipFS(source);
-
-  // }
-
-  /**
-   * @param dir  {string} Cache directory
-   * @param hash {string} Entry hash
+   * @param ids  {Array<string>}
    *
    * @return {Promise}
    */
-  async delete(dir, hash) {
-    const record = this.#cache[hash];
+  async delete(ids) {
+    const zipfs = new ZipFS(this.source);
+    const errors = [];
+    for (const hash of ids) {
+      try {
+        const record = this.#cache[hash];
 
-    if (!record) {
-      const errorMessage = `Attempted to delete a record that does not exist ${hash}`;
-      debug(errorMessage);
-      throw new Error(errorMessage);
+        if (!record) {
+          const errorMessage = `Attempted to delete a record that does not exist ${hash}`;
+          debug(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        await this.revert(record.request);
+
+        if (record.persisted) {
+          debug(`Delete ${hash}`);
+
+          await zipfs.unlinkPromise(
+            ppath.join(PortablePath.root, `${hash}.json`)
+          );
+
+          this.#observer.next({
+            type: events.delete,
+            payload: { id: hash },
+          });
+        }
+      } catch (e) {
+        debug(e.message);
+        errors.push(e);
+      }
     }
-
-    await this.revert(record.request);
-
-    if (dir == null) {
-      debug(`Attempted to delete hash: ${hash}, but cache directory isn't set`);
-      return;
-    }
-
-    try {
-      debug(`Delete ${hash}`);
-
-      await unlink(path.join(dir, `${hash}.json`));
-
-      this.#observer.next({
-        type: events.delete,
-        payload: { id: hash },
-      });
-    } catch (e) {
-      const errorMessage = `Attempted to delete hash: ${hash}, but it's not on disk`;
-      debug(errorMessage);
-      throw new Error(errorMessage);
-    }
+    zipfs.saveAndClose();
+    return errors;
   }
 
   async update({ id, response }) {
