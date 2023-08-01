@@ -33,8 +33,10 @@ describe('Cache UI', () => {
     cy.get(
       '[data-cy-id="cache-cell-edit-f4c55ab257c689845921746061bfeb73"]'
     ).as('test-edit');
-
-    cy.get('@test-edit').click();
+    cy
+      .get('[data-cy-id="cache-cell-edit-ba20ccbb470042f3200692cad1926c1c"]')
+      .as('test-write'),
+      cy.get('@test-edit').click();
     cy.get('[data-cy-id="select-response-tab"]').click();
 
     // Edit body

@@ -36,7 +36,12 @@ export default function config(overrides = {}, cwd = process.cwd()) {
     overrides
   );
 
-  config.cache = deepmerge(config.cache || {}, { dir: cacheDir });
+  if (config.cache) {
+    config.cache = {
+      dir: cacheDir,
+      ...config.cache,
+    };
+  }
 
   return config;
 }

@@ -257,10 +257,7 @@ const events = (svc, config) => {
   const onResponse = async (response) => {
     try {
       if (!svc.cache.bypass() && svc.cache.hasStaged(response)) {
-        const hash = await svc.cache.commit(response);
-        if (config.value.cache.write === 'auto') {
-          svc.cache.write(config.value.cache.dir, hash);
-        }
+        await svc.cache.commit(response);
       }
 
       const payload = await serializeResponse(response);

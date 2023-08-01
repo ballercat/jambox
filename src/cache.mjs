@@ -1,6 +1,6 @@
 // @ts-check
-import fs from 'fs';
-import { readdir, writeFile } from 'fs/promises';
+// import fs from 'fs';
+// import { readdir, writeFile } from 'fs/promises';
 import { unlink } from 'fs/promises';
 import path from 'path';
 import Observable from 'zen-observable';
@@ -8,6 +8,7 @@ import crypto from 'crypto';
 import deserialize from './utils/deserialize.mjs';
 import _debug from 'debug';
 import { updateResponse } from './utils/serialize.mjs';
+import { ZipFS } from '@yarnpkg/libzip';
 
 const debug = _debug('jambox.cache');
 
@@ -219,31 +220,32 @@ class Cache {
   }
 
   /**
-   * @param dir {string} Cache directory
+   * @param source {string} Cache archive
    */
-  async read(dir) {
-    if (!fs.existsSync(dir)) {
-      return [];
-    }
+  async read(source) {
+    const zipfs = new ZipFS(source, { readOnly: true });
 
     const results = {};
 
-    const files = await readdir(dir);
+    const files = await zipfs.readdirPromise('.');
 
     for (const filename of files) {
+      console.log(filename);
       const { ext, name } = path.parse(filename);
 
       if (ext === '.json') {
         debug(`read ${filename}`);
-        const json = JSON.parse(
-          fs.readFileSync(path.join(dir, filename), 'utf-8')
-        );
+        const content = await zipfs.readFilePromise(filename, 'utf-8');
+        const json = JSON.parse(content);
         const obj = deserialize(json);
+        // const json = JSON.parse(
+        //   fs.readFileSync(path.join(dir, filename), 'utf-8')
+        // );
 
         this.add(obj.request);
         await this.commit(obj.response);
         this.#cache[name].filename = filename;
-        this.#cache[name].dir = dir;
+        this.#cache[name].source = source;
 
         results[name] = obj;
       }
@@ -251,6 +253,14 @@ class Cache {
 
     return results;
   }
+
+  /**
+   * @param source {string} Zip file to open
+   */
+  // async openZip(source) {
+  //   new ZipFS(source);
+
+  // }
 
   /**
    * @param dir  {string} Cache directory
@@ -301,7 +311,6 @@ class Cache {
       type: events.update,
       payload: this.#cache[id],
     });
-    await this.write(this.#cache[id].dir, id);
   }
 
   clear() {

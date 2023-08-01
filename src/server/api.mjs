@@ -42,7 +42,7 @@ const backend = async (svc, config) => {
     svc.cache.clear();
 
     if (config.value.cache?.dir) {
-      await svc.cache.read(config.value.cache.dir);
+      await svc.cache.read(path.join(config.value.cache.dir, 'main.zip'));
     }
   };
 

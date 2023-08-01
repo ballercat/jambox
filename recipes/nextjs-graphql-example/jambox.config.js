@@ -14,7 +14,6 @@ module.exports = {
     '**/*.jpg': { status: 200, file: path.join(__dirname, '200x200.jpg') },
   },
   cache: {
-    write: 'auto',
     // GraphQL request
     stage: ['graphql-pokemon2.vercel.app/'],
   },
