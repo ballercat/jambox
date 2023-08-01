@@ -24,9 +24,6 @@ export const initialState = {
   abortedRequestById: {},
   blockNetwork: false,
   cache: {},
-  filters: {
-    cache: '',
-  },
 };
 
 const mapCacheEntry = (entry) => {
@@ -35,7 +32,7 @@ const mapCacheEntry = (entry) => {
     ...entry,
     url,
     host: url.hostname,
-    path: entry.request.path,
+    pathname: url.pathname,
     method: entry.request.method,
     statusCode: entry.response?.statusCode,
   };
@@ -145,14 +142,6 @@ export const reducer = (state, action) => {
       return {
         ...state,
         cache,
-      };
-    }
-    case 'search.cache': {
-      return {
-        ...state,
-        filters: {
-          cache: payload,
-        },
       };
     }
     default:

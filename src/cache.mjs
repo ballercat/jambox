@@ -235,19 +235,26 @@ class Cache {
 
       if (ext === '.json') {
         debug(`read ${filename}`);
-        const content = await zipfs.readFilePromise(filename, 'utf-8');
-        const json = JSON.parse(content);
-        const obj = deserialize(json);
-        // const json = JSON.parse(
-        //   fs.readFileSync(path.join(dir, filename), 'utf-8')
-        // );
 
-        this.add(obj.request);
-        await this.commit(obj.response);
-        this.#cache[name].filename = filename;
-        this.#cache[name].source = source;
+        try {
+          const content = await zipfs.readFilePromise(filename, 'utf-8');
+          const json = JSON.parse(content);
+          const obj = deserialize(json);
+          // const json = JSON.parse(
+          //   fs.readFileSync(path.join(dir, filename), 'utf-8')
+          // );
 
-        results[name] = obj;
+          this.add(obj.request);
+          await this.commit(obj.response);
+          this.#cache[name].filename = filename;
+          this.#cache[name].source = source;
+
+          results[name] = obj;
+        } catch (e) {
+          debug(
+            `failed to read ${filename}. The file will be deleted! ERROR: ${e}`
+          );
+        }
       }
     }
 
