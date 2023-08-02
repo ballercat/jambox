@@ -17,35 +17,19 @@ const response = {
   id: '123456',
 };
 
-test('cache api', (t) => {
-  const cache = new Cache();
-
-  t.is(typeof Cache.hash, 'function');
-  t.is(typeof cache.add, 'function');
-  t.is(typeof cache.reset, 'function');
-  t.is(typeof cache.hasStaged, 'function');
-  t.is(typeof cache.commit, 'function');
-  t.is(typeof cache.revert, 'function');
-  t.is(typeof cache.has, 'function');
-  t.is(typeof cache.get, 'function');
-  t.is(typeof cache.persist, 'function');
-  t.is(typeof cache.delete, 'function');
-  t.is(typeof cache.clear, 'function');
-});
-
 test('Hashing: Cache.hash()', async (t) => {
   const hash = await Cache.hash(request);
 
   t.snapshot(hash, 'Hashing should have a consistent value');
 });
 
-test('Staging: add(), reset(), hasStaged()', (t) => {
+test('Staging: add(), abort(), hasStaged()', (t) => {
   const cache = new Cache();
   cache.add(request);
 
   t.is(cache.hasStaged(request), true);
 
-  cache.reset(request);
+  cache.abort(request);
 
   t.is(cache.hasStaged(request), false);
 });

@@ -2,7 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import deepmerge from 'deepmerge';
 import getUserConfigFile from './read-user-config.js';
-import { CONFIG_FILE_NAME, CACHE_DIR_NAME } from './constants.mjs';
+import {
+  CONFIG_FILE_NAME,
+  CACHE_DIR_NAME,
+  DEFAULT_TAPE_NAME,
+} from './constants.mjs';
 
 const prepCacheDir = (cwd) => {
   const cacheDir = path.join(cwd, CACHE_DIR_NAME);
@@ -38,7 +42,7 @@ export default function config(overrides = {}, cwd = process.cwd()) {
 
   if (config.cache) {
     config.cache = {
-      dir: cacheDir,
+      tape: path.join(cacheDir, DEFAULT_TAPE_NAME),
       ...config.cache,
     };
   }

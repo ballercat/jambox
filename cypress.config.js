@@ -31,6 +31,16 @@ module.exports = defineConfig({
             body: JSON.stringify(jamboxConfig),
           });
         },
+        'jambox-reset': async () => {
+          await waitOn({ resources: [`http://localhost:9000`], timeout: 1500 });
+          return fetch(`http://localhost:9000/api/reset`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ cwd: process.cwd() }),
+          });
+        },
       });
 
       // Shutdown the server after `yarn cypress run --component completes

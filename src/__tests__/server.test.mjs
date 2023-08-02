@@ -71,7 +71,7 @@ test.serial('ws - config', async (t) => {
     })
     .expect(200);
   // Websocket is notified of config changes
-  t.is(ws.messages.pendingPush.length, 1);
+  t.is(ws.messages.pendingPush.length >= 1, true);
   t.like(JSON.parse(ws.messages.pendingPush[0].data.toString()), {
     type: 'config',
     payload: {

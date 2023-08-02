@@ -1,18 +1,20 @@
 .vscode
-coverage
 .DS_Store
 *.log
-dist
-public
-recipes
 .idea
 test-report.xml
 .github
-cypress
 *.cy.js
 *.test.mjs
-ext
 .git
+
+# misc folders
+coverage
+dist
+public
+recipes
+cypress
+ext
 
 # ???
 http:/*

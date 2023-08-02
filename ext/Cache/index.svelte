@@ -103,6 +103,7 @@
   <div>
     Cache entries: {data.length}
     <button
+      data-cy-id="cache-delete"
       disabled={checked.length === 0}
       class="inline"
       on:click={() => {

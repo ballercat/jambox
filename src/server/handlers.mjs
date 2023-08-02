@@ -273,7 +273,7 @@ const events = (svc, config) => {
 
   const onAbort = async (abortedRequest) => {
     if (svc.cache.hasStaged(abortedRequest)) {
-      svc.cache.reset(abortedRequest);
+      svc.cache.abort(abortedRequest);
     }
 
     const message = JSON.stringify({

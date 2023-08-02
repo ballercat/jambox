@@ -21,29 +21,23 @@ const getInfo = (svc, config) => {
 };
 
 const backend = async (svc, config) => {
-  const sendAll = (event) =>
-    svc.ws.getWss('/').clients.forEach((client) => {
-      client.send(JSON.stringify(event));
-    });
-  const sendConfig = () =>
-    sendAll({
-      type: 'config',
-      payload: config.value,
-    });
+  const sendAll = (event) => {
+    const json = JSON.stringify(event);
+    svc.ws.getWss('/').clients.forEach((client) => client.send(json));
+  };
 
   let configWatcher = null;
 
   const reset = async () => {
     debug(`Reset`);
 
-    sendConfig();
+    sendAll({ type: 'config', payload: config.value });
     await svc.proxy.reset();
     await setupHandlers(svc, config);
-    svc.cache.clear();
 
-    if (config.value.cache) {
-      await svc.cache.read('tape.zip', config.value.cache?.dir);
-    }
+    await svc.cache.reset({
+      ...config.value?.cache,
+    });
   };
 
   svc.app.get('/', async (_, res) => res.send('OK'));
@@ -81,11 +75,11 @@ const backend = async (svc, config) => {
     const raw = svc.cache.all();
     const all = {};
     for (const id in raw) {
-      const entry = raw[id];
+      const { request, response, ...rest } = raw[id];
       all[id] = {
-        id,
-        request: await serializeRequest(entry.request),
-        response: await serializeResponse(entry.response),
+        ...rest,
+        request: await serializeRequest(request),
+        response: await serializeResponse(response),
       };
     }
     res.send(all);
@@ -140,42 +134,23 @@ const backend = async (svc, config) => {
     }
   });
 
-  svc.app.ws('/', (ws) => {
-    ws.on('message', async (msg) => {
-      try {
-        const { type, payload } = JSON.parse(msg);
-
-        switch (type) {
-          case 'write': {
-            const { hash } = payload;
-            if (config.value.cache?.dir) {
-              debug(`Cannot write ${hash} no cache directory set`);
-              return;
-            }
-            svc.cache.write(svc.config.value.cacheDir, hash);
-            break;
-          }
-        }
-      } catch (error) {
-        debug(error);
-      }
-    });
-  });
-
+  // enable websocket connects
+  svc.app.ws('/', () => {});
   svc.cache.subscribe({
     async next(event) {
+      const { request, response, ...rest } = event.payload || {};
       const data = {
         type: event.type,
         payload: {
-          id: event.payload.id,
+          ...rest,
         },
       };
 
-      if (event.payload?.request) {
-        data.payload.request = await serializeRequest(event.payload.request);
+      if (request) {
+        data.payload.request = await serializeRequest(request);
       }
-      if (event.payload?.response) {
-        data.payload.response = await serializeResponse(event.payload.response);
+      if (response) {
+        data.payload.response = await serializeResponse(response);
       }
 
       svc.ws.getWss('/').clients.forEach((client) => {

@@ -3,25 +3,18 @@ import App from './App.svelte';
 
 let api;
 before(async () => {
-  await cy.task('set-jambox-config', {
-    blockNetworkRequests: false,
-    forward: {
-      'http://jambox-test.com': {
-        target: 'http://localhost:7777',
-        paths: ['**'],
-      },
-    },
-    cache: {
-      dir: '.jambox',
-      write: 'auto',
-      stage: ['jambox-test.com/**'],
-    },
-  });
   api = await API.create();
 });
 
+// static hashes for requests used below
+const A = 'ba20ccbb470042f3200692cad1926c1c';
+const B = 'f4c55ab257c689845921746061bfeb73';
+// const C = 'cd4482b36a608021cd943786ecb54c5d';
+
 describe('Cache UI', () => {
   it('can edit response objects', () => {
+    // load jambox config from cwd
+    cy.task('jambox-reset');
     cy.mount(App, { props: { api } });
 
     // Additional requests to fill up the cache
@@ -30,13 +23,8 @@ describe('Cache UI', () => {
     cy.request('http://jambox-test.com/pathC');
 
     cy.get('[data-cy-id="cache-link"]').click();
-    cy.get(
-      '[data-cy-id="cache-cell-edit-f4c55ab257c689845921746061bfeb73"]'
-    ).as('test-edit');
-    cy
-      .get('[data-cy-id="cache-cell-edit-ba20ccbb470042f3200692cad1926c1c"]')
-      .as('test-write'),
-      cy.get('@test-edit').click();
+    cy.get(`[data-cy-id="cache-cell-edit-${A}"]`).as('test-edit');
+    cy.get('@test-edit').click();
     cy.get('[data-cy-id="select-response-tab"]').click();
 
     // Edit body
@@ -60,14 +48,26 @@ describe('Cache UI', () => {
     cy.get('[data-cy-id="select-details-tab"]').click();
     cy.get('[data-cy-id="cache-delete"]').click();
     cy.get('[data-cy-id="cache-detail"]').should('not.exist');
+  });
 
-    cy.wait(1).then(() => {
-      // cleanup
-      return api.delete([
-        'ba20ccbb470042f3200692cad1926c1c',
-        'f4c55ab257c689845921746061bfeb73',
-        'cd4482b36a608021cd943786ecb54c5d',
-      ]);
-    });
+  it('can persist records and delete them after', () => {
+    // load jambox config from cwd
+    cy.task('jambox-reset');
+    cy.mount(App, { props: { api } });
+
+    cy.request('http://jambox-test.com/pathB');
+
+    cy.get('[data-cy-id="cache-link"]').click();
+    cy.get(`[data-cy-id="select-row-${B}"]`).as('test-persist-select');
+    cy.get(`[data-cy-id="cache-cell-edit-${B}"]`).as('test-persist');
+
+    cy.get('@test-persist-select').click();
+    // Persist should be click-able
+    cy.get('[data-cy-id="cache-persist"]').click();
+
+    cy.get('@test-persist-select').click();
+    cy.get('[data-cy-id="cache-delete"]').click();
+
+    cy.get('@test-persist').should('not.exist');
   });
 });

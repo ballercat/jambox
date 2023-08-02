@@ -1,5 +1,5 @@
 // @ts-check
-import { unlink, access } from 'fs/promises';
+import { access } from 'fs/promises';
 import path from 'path';
 import Observable from 'zen-observable';
 import crypto from 'crypto';
@@ -42,11 +42,13 @@ export const serializeResponse = async (response) => {
 
 export const events = {
   commit: 'cache.commit',
+  abort: 'cache.abort',
   reset: 'cache.reset',
   revert: 'cache.revert',
   stage: 'cache.stage',
   delete: 'cache.delete',
   update: 'cache.update',
+  clear: 'cache.clear',
 };
 
 class Cache {
@@ -55,6 +57,10 @@ class Cache {
   #observer;
   #observable;
   #bypass = false;
+  /**
+   * @member {PortablePath}
+   */
+  tape;
 
   constructor() {
     let pendingEvents = [];
@@ -71,7 +77,7 @@ class Cache {
   }
 
   /**
-   *
+   * @type request {Request}
    */
   static async hash(request) {
     const body = await request.body.getText();
@@ -120,13 +126,13 @@ class Cache {
   /**
    * Un-stage a request
    */
-  reset(request) {
+  abort(request) {
     if (request == null || request.id == null) {
       return;
     }
 
     this.#observer.next({
-      type: events.reset,
+      type: events.abort,
       payload: { request: { ...request } },
     });
     delete this.#staged[request.id];
@@ -205,22 +211,23 @@ class Cache {
    * @param ids {Array<string>}
    */
   async persist(ids) {
-    const zipfs = new ZipFS(this.source, { create: true });
+    const zipfs = new ZipFS(this.tape, { create: true });
 
     for (const hash of ids) {
-      debug(`persist ${hash}`);
       const record = this.#cache[hash];
       if (!record) {
-        debug(`Attempted to write ${hash} but it's not found`);
+        debug(`Attempted to record ${hash} but it's not found`);
         return;
       }
-      debug(`Writing ${hash} to archive`);
-      const filepath = ppath.join(PortablePath.root, `${hash}.json`);
-      await zipfs.writeFilePromise(filepath, JSON.stringify(record, null, 2));
+      const filename = ppath.join(PortablePath.root, `${hash}.json`);
+      debug(`Record ${filename} into tape ${this.tape}`);
+      // 'pretty-print' json since it'll be compressed anyway
+      await zipfs.writeFilePromise(filename, JSON.stringify(record, null, 2));
 
       this.#cache[hash] = {
         ...this.#cache[hash],
-        filepath,
+        tape: this.tape,
+        filename,
       };
     }
 
@@ -228,26 +235,26 @@ class Cache {
   }
 
   /**
-   * @param archive {string}
-   * @param dir {string}
+   * - Reset the cache
+   * - Read a cache tape to bootstrap in-memory cache
+   *
+   * @param options {object}
    */
-  async read(archive, dir = '.jambox') {
-    const results = {};
-    // @ts-ignore
-    const source = ppath.join(dir, archive);
+  async reset(options) {
+    this.clear();
+
+    this.tape = npath.toPortablePath(options.tape);
     let create = false;
     try {
-      await access(source);
+      await access(this.tape);
     } catch (e) {
       create = true;
     }
 
-    this.source = source;
-
-    const zipfs = new ZipFS(this.source, { create });
+    const zipfs = new ZipFS(this.tape, { create });
     const files = zipfs.getAllFiles();
 
-    debug(`Cache archive ready with ${files.length} cache files`);
+    debug(`Tape ready with ${files.length} records`);
 
     for (const filename of files) {
       const { ext, name } = path.parse(filename);
@@ -262,9 +269,8 @@ class Cache {
 
           this.add(obj.request);
           await this.commit(obj.response);
-          this.#cache[name].persisted = true;
-
-          results[name] = obj;
+          this.#cache[name].tape = this.tape;
+          this.#cache[name].filename = filename;
         } catch (e) {
           debug(
             `failed to read ${filename}. The file will be deleted! ERROR: ${e}`
@@ -275,8 +281,7 @@ class Cache {
     }
 
     zipfs.discardAndClose();
-
-    return results;
+    this.#observer.next({ type: events.reset });
   }
 
   /**
@@ -285,8 +290,18 @@ class Cache {
    * @return {Promise}
    */
   async delete(ids) {
-    const zipfs = new ZipFS(this.source);
     const errors = [];
+    const zips = {};
+    /* @param tape {PortablePath} */
+    const getZip = (tape) => {
+      if (zips[tape]) {
+        return zips[tape];
+      }
+
+      zips[tape] = new ZipFS(tape);
+      return zips[tape];
+    };
+
     for (const hash of ids) {
       try {
         const record = this.#cache[hash];
@@ -299,12 +314,10 @@ class Cache {
 
         await this.revert(record.request);
 
-        if (record.persisted) {
-          debug(`Delete ${hash}`);
+        if (record.tape) {
+          debug(`Delete record ${record.filename} from tape ${record.tape}`);
 
-          await zipfs.unlinkPromise(
-            ppath.join(PortablePath.root, `${hash}.json`)
-          );
+          await getZip(record.tape).unlinkPromise(record.filename);
 
           this.#observer.next({
             type: events.delete,
@@ -312,11 +325,15 @@ class Cache {
           });
         }
       } catch (e) {
-        debug(e.message);
-        errors.push(e);
+        debug(e);
+        errors.push(e.message);
       }
     }
-    zipfs.saveAndClose();
+
+    for (const key in zips) {
+      zips[key].saveAndClose();
+    }
+
     return errors;
   }
 
@@ -336,6 +353,7 @@ class Cache {
   clear() {
     this.#staged = {};
     this.#cache = {};
+    this.#observer.next({ type: events.clear });
   }
 
   subscribe(options) {
