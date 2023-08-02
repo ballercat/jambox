@@ -71,14 +71,20 @@ test('observing cache changes', async (t) => {
   t.snapshot(events);
 });
 
-test.skip('reading cache', async (t) => {
+test('reading cache', async (t) => {
   const hash = '16068043c24805b3a5ab193fa4a23b8c';
   const cache = new Cache();
-  const results = await cache.read(
-    path.join(PROJECT_ROOT, 'src', '__mocks__', 'cache-dir')
-  );
+  await cache.reset({
+    tape: path.join(
+      PROJECT_ROOT,
+      'src',
+      '__mocks__',
+      'basic',
+      '.jambox',
+      'default.tape.zip'
+    ),
+  });
 
   // Check that hashing is working post deserialization
   t.is(cache.has(hash), true);
-  t.snapshot(results[hash]);
 });
