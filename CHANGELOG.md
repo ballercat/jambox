@@ -1,3 +1,12 @@
+## 0.0.26 - Introduce zip archives as tapes
+
+- feature: introduce tapes as `.jambox/*.tape.zip` files
+- feature: re-implement cache files as zip archives
+- feature: `/api/reset` now properly resets cache from an archive
+- feature: mass select and persist records into tapes in the Cache UI
+- chore: refactor integration tests
+- chore: use a real jambox.config.js for e2e tests
+
 ## 0.0.25 - Cache select all, Remove SideNav, Add global search
 
 - feat: cache select all/multi-select & delete
