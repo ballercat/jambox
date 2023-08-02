@@ -1,6 +1,6 @@
 // import mock from 'mock-fs';
 import path from 'path';
-import { PROJECT_ROOT } from '../constants.mjs';
+import { PROJECT_ROOT, DEFAULT_TAPE_NAME } from '../constants.mjs';
 import test from 'ava';
 import Cache from '../cache.mjs';
 
@@ -81,7 +81,7 @@ test('reading cache', async (t) => {
       '__mocks__',
       'basic',
       '.jambox',
-      'default.tape.zip'
+      DEFAULT_TAPE_NAME
     ),
   });
 
