@@ -35,6 +35,7 @@ const mapCacheEntry = (entry) => {
     pathname: url.pathname,
     method: entry.request.method,
     statusCode: entry.response?.statusCode,
+    persisted: Boolean(entry.tape),
   };
 };
 
@@ -142,6 +143,19 @@ export const reducer = (state, action) => {
       return {
         ...state,
         cache,
+      };
+    }
+    case 'cache.persist': {
+      const { id } = payload;
+      return {
+        ...state,
+        cache: {
+          ...state.cache,
+          [id]: {
+            ...state.cache[id],
+            persisted: true,
+          },
+        },
       };
     }
     default:

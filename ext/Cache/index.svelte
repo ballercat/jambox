@@ -52,6 +52,14 @@
       },
     },
     {
+      key: 'persisted',
+      title: 'Persisted',
+      value: () => true,
+      renderComponent: {
+        component: Cell,
+      },
+    },
+    {
       key: 'edit',
       title: 'Edit',
       value: () => true,
@@ -140,6 +148,7 @@
           }}
         />
       </th>
+      <th>Persisted</th>
       <th>Edit</th>
       <th>Host</th>
       <th>Path</th>

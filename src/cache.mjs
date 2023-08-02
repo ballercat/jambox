@@ -45,6 +45,7 @@ export const events = {
   abort: 'cache.abort',
   reset: 'cache.reset',
   revert: 'cache.revert',
+  persist: 'cache.persist',
   stage: 'cache.stage',
   delete: 'cache.delete',
   update: 'cache.update',
@@ -229,6 +230,15 @@ class Cache {
         tape: this.tape,
         filename,
       };
+
+      this.#observer.next({
+        type: events.persist,
+        payload: {
+          id: hash,
+          tape: this.tape,
+          filename,
+        },
+      });
     }
 
     zipfs.saveAndClose();

@@ -62,8 +62,10 @@ describe('Cache UI', () => {
     cy.get(`[data-cy-id="cache-cell-edit-${B}"]`).as('test-persist');
 
     cy.get('@test-persist-select').click();
+
     // Persist should be click-able
     cy.get('[data-cy-id="cache-persist"]').click();
+    cy.get(`[data-cy-id="cache-cell-persisted-true-${B}"]`).should('exist');
 
     cy.get('@test-persist-select').click();
     cy.get('[data-cy-id="cache-delete"]').click();

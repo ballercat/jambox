@@ -16,7 +16,7 @@
   };
   let value, cyID;
   $: {
-    const raw = row[col.key] || row.id;
+    const raw = row[col.key] ?? row.id;
     value = shortenKeys.includes(col.key) ? shorten(raw) : raw;
   }
   $: cyID = col.key === 'edit' ? `edit-${row.id}` : col.key;
@@ -35,6 +35,10 @@
       checked={row.checked}
       onClick={(e) => onSelect(row.id, e.target.checked)}
     />
+  {:else if col.key === 'persisted'}
+    <span data-cy-id="cache-cell-persisted-{value}-{row.id}"
+      >{value ? 'yes' : 'no'}</span
+    >
   {:else}
     <span data-cy-id="cache-cell-{cyID}">{value}</span>
   {/if}
