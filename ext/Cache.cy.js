@@ -14,7 +14,7 @@ const C = 'cd4482b36a608021cd943786ecb54c5d';
 describe('Cache UI', () => {
   it('can edit response objects', () => {
     // load jambox config from cwd
-    cy.task('jambox-reset');
+    cy.task('jambox.reset');
     cy.mount(App, { props: { api } });
 
     // Additional requests to fill up the cache
@@ -52,7 +52,7 @@ describe('Cache UI', () => {
 
   it('can persist records and delete them after', () => {
     // load jambox config from cwd
-    cy.task('jambox-reset');
+    cy.task('jambox.reset');
     cy.mount(App, { props: { api } });
 
     cy.request('http://jambox-test.com/pathB');
@@ -87,7 +87,7 @@ describe('Cache UI', () => {
     cy.get('[data-cy-id="waterfall-link"]').click();
 
     // Reset jambox. This deletes in-memory cache
-    cy.task('jambox-reset');
+    cy.task('jambox.reset');
 
     // Back to cache
     cy.get('[data-cy-id="cache-link"]').click();

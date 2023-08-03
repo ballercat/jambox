@@ -8,7 +8,7 @@ before(async () => {
 
 describe('Web Extension', () => {
   it('can display seen requests', () => {
-    cy.task('jambox-reset');
+    cy.task('jambox.reset');
     // Jambox should generate a static hash for the URL below
     const HASH = '2be35430d93be811753ecfd6ba828878';
     const STUB_HASH = 'cd4482b36a608021cd943786ecb54c5d';

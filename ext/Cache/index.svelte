@@ -148,8 +148,8 @@
           }}
         />
       </th>
-      <th>Persisted</th>
       <th>Edit</th>
+      <th>Persisted</th>
       <th>Host</th>
       <th>Path</th>
       <th>Status</th>

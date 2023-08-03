@@ -4,6 +4,7 @@
 - feature: re-implement cache files as zip archives
 - feature: `/api/reset` now properly resets cache from an archive
 - feature: mass select and persist records into tapes in the Cache UI
+- feature: publish a `cypress-node-events` helper
 - chore: refactor integration tests
 - chore: use a real jambox.config.js for e2e tests
 

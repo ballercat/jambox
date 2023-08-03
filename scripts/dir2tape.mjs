@@ -15,12 +15,14 @@ async function dir2tape(dir) {
 
   const files = await readdir(dir);
   for (const filename of files) {
-    const file = path.join(dir, filename);
-    const content = await readFile(file);
-    await zipfs.writeFilePromise(
-      ppath.join(PortablePath.root, filename),
-      content
-    );
+    if (filename.endsWith('.json')) {
+      const file = path.join(dir, filename);
+      const content = JSON.parse(await readFile(file, 'utf-8'));
+      await zipfs.writeFilePromise(
+        ppath.join(PortablePath.root, filename),
+        JSON.stringify(content, null, 2)
+      );
+    }
   }
 
   zipfs.saveAndClose();
