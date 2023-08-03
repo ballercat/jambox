@@ -50,7 +50,7 @@ describe('Cache UI', () => {
     cy.get('[data-cy-id="cache-detail"]').should('not.exist');
   });
 
-  it.only('can persist records and delete them after', () => {
+  it('can persist records and delete them after', () => {
     // load jambox config from cwd
     cy.task('jambox.reset');
     cy.mount(App, { props: { api } });
