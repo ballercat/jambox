@@ -253,6 +253,10 @@ class Cache {
   async reset(options) {
     this.clear();
 
+    if (!options.tape) {
+      return;
+    }
+
     this.tape = npath.toPortablePath(options.tape);
     let create = false;
     try {
