@@ -1,4 +1,3 @@
-const path = require('path');
 const debug = require('debug')('jambox.config');
 
 module.exports = (filepath) => {

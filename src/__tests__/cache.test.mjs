@@ -1,6 +1,6 @@
 // import mock from 'mock-fs';
 import path from 'path';
-import { PROJECT_ROOT } from '../constants.mjs';
+import { PROJECT_ROOT, DEFAULT_TAPE_NAME } from '../constants.mjs';
 import test from 'ava';
 import Cache from '../cache.mjs';
 
@@ -17,35 +17,19 @@ const response = {
   id: '123456',
 };
 
-test('cache api', (t) => {
-  const cache = new Cache();
-
-  t.is(typeof Cache.hash, 'function');
-  t.is(typeof cache.add, 'function');
-  t.is(typeof cache.reset, 'function');
-  t.is(typeof cache.hasStaged, 'function');
-  t.is(typeof cache.commit, 'function');
-  t.is(typeof cache.revert, 'function');
-  t.is(typeof cache.has, 'function');
-  t.is(typeof cache.get, 'function');
-  t.is(typeof cache.write, 'function');
-  t.is(typeof cache.delete, 'function');
-  t.is(typeof cache.clear, 'function');
-});
-
 test('Hashing: Cache.hash()', async (t) => {
   const hash = await Cache.hash(request);
 
   t.snapshot(hash, 'Hashing should have a consistent value');
 });
 
-test('Staging: add(), reset(), hasStaged()', (t) => {
+test('Staging: add(), abort(), hasStaged()', (t) => {
   const cache = new Cache();
   cache.add(request);
 
   t.is(cache.hasStaged(request), true);
 
-  cache.reset(request);
+  cache.abort(request);
 
   t.is(cache.hasStaged(request), false);
 });
@@ -90,11 +74,17 @@ test('observing cache changes', async (t) => {
 test('reading cache', async (t) => {
   const hash = '16068043c24805b3a5ab193fa4a23b8c';
   const cache = new Cache();
-  const results = await cache.read(
-    path.join(PROJECT_ROOT, 'src', '__mocks__', 'cache-dir')
-  );
+  await cache.reset({
+    tape: path.join(
+      PROJECT_ROOT,
+      'src',
+      '__mocks__',
+      'basic',
+      '.jambox',
+      DEFAULT_TAPE_NAME
+    ),
+  });
 
   // Check that hashing is working post deserialization
   t.is(cache.has(hash), true);
-  t.snapshot(results[hash]);
 });

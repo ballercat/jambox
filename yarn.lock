@@ -1865,6 +1865,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/emscripten@npm:^1.39.6":
+  version: 1.39.6
+  resolution: "@types/emscripten@npm:1.39.6"
+  checksum: 437f2f9cdfd9057255662508fa9a415fe704ba484c6198f3549c5b05feebcdcd612b1ec7b10026d2566935d05d3c36f9366087cb42bc90bd25772a88fcfc9343
+  languageName: node
+  linkType: hard
+
 "@types/eslint-scope@npm:^3.7.3":
   version: 3.7.4
   resolution: "@types/eslint-scope@npm:3.7.4"
@@ -2217,6 +2224,28 @@ __metadata:
   version: 4.2.2
   resolution: "@xtuc/long@npm:4.2.2"
   checksum: 8ed0d477ce3bc9c6fe2bf6a6a2cc316bb9c4127c5a7827bae947fa8ec34c7092395c5a283cc300c05b5fa01cbbfa1f938f410a7bf75db7c7846fea41949989ec
+  languageName: node
+  linkType: hard
+
+"@yarnpkg/fslib@npm:^3.0.0-rc.48":
+  version: 3.0.0-rc.48
+  resolution: "@yarnpkg/fslib@npm:3.0.0-rc.48"
+  dependencies:
+    tslib: ^2.4.0
+  checksum: 658b8c1b688d875de06adf1a4be167641b3082445e310b9a1312deb71a7ef816f829675a571acad10725aed3ee5d0791d6c370a6565af05e1f4f38f470d457d2
+  languageName: node
+  linkType: hard
+
+"@yarnpkg/libzip@npm:^3.0.0-rc.48":
+  version: 3.0.0-rc.48
+  resolution: "@yarnpkg/libzip@npm:3.0.0-rc.48"
+  dependencies:
+    "@types/emscripten": ^1.39.6
+    "@yarnpkg/fslib": ^3.0.0-rc.48
+    tslib: ^2.4.0
+  peerDependencies:
+    "@yarnpkg/fslib": ^3.0.0-rc.48
+  checksum: 9e699e4315a92693de303d0c447a0b104e6171e5c4a583761f0a690bcc9917ba3c7cd051737eac94e1a52e7012fcad294db345ffd31261a5e74d2aad10ec35f6
   languageName: node
   linkType: hard
 
@@ -5992,6 +6021,8 @@ __metadata:
     "@httptoolkit/browser-launcher": ^2.0.2
     "@types/chrome": ^0.0.237
     "@types/zen-observable": ^0.8.3
+    "@yarnpkg/fslib": ^3.0.0-rc.48
+    "@yarnpkg/libzip": ^3.0.0-rc.48
     arg: ^5.0.2
     ava: ^5.0.1
     babel-loader: ^9.1.0

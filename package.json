@@ -1,6 +1,6 @@
 {
   "name": "jambox",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "Tool for recording and playing back HTTP requests.",
   "bin": {
     "jam": "./jam.mjs",
@@ -28,6 +28,8 @@
   },
   "dependencies": {
     "@httptoolkit/browser-launcher": "^2.0.2",
+    "@yarnpkg/fslib": "^3.0.0-rc.48",
+    "@yarnpkg/libzip": "^3.0.0-rc.48",
     "arg": "^5.0.2",
     "body-parser": "^1.20.1",
     "debug": "^4.3.4",

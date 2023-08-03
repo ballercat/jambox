@@ -1,13 +1,13 @@
 // @ts-check
-import fs from 'fs';
-import { readdir, writeFile } from 'fs/promises';
-import { unlink } from 'fs/promises';
+import { access } from 'fs/promises';
 import path from 'path';
 import Observable from 'zen-observable';
 import crypto from 'crypto';
 import deserialize from './utils/deserialize.mjs';
 import _debug from 'debug';
 import { updateResponse } from './utils/serialize.mjs';
+import { PortablePath, npath, ppath } from '@yarnpkg/fslib';
+import { ZipFS } from '@yarnpkg/libzip';
 
 const debug = _debug('jambox.cache');
 
@@ -42,11 +42,14 @@ export const serializeResponse = async (response) => {
 
 export const events = {
   commit: 'cache.commit',
+  abort: 'cache.abort',
   reset: 'cache.reset',
   revert: 'cache.revert',
+  persist: 'cache.persist',
   stage: 'cache.stage',
   delete: 'cache.delete',
   update: 'cache.update',
+  clear: 'cache.clear',
 };
 
 class Cache {
@@ -55,6 +58,10 @@ class Cache {
   #observer;
   #observable;
   #bypass = false;
+  /**
+   * @member {PortablePath}
+   */
+  tape;
 
   constructor() {
     let pendingEvents = [];
@@ -71,7 +78,7 @@ class Cache {
   }
 
   /**
-   *
+   * @type request {Request}
    */
   static async hash(request) {
     const body = await request.body.getText();
@@ -120,13 +127,13 @@ class Cache {
   /**
    * Un-stage a request
    */
-  reset(request) {
+  abort(request) {
     if (request == null || request.id == null) {
       return;
     }
 
     this.#observer.next({
-      type: events.reset,
+      type: events.abort,
       payload: { request: { ...request } },
     });
     delete this.#staged[request.id];
@@ -201,99 +208,151 @@ class Cache {
     return Object.values(this.#cache).find((pair) => pair.request.id === id);
   }
 
-  async write(dir, hash) {
-    const record = this.#cache[hash];
-    if (!record) {
-      debug(`Attempted to write ${hash} but it's not found`);
-      return;
-    }
-    debug(`Writing ${hash} to disk`);
-    const filepath = path.join(dir, `${hash}.json`);
-    await writeFile(filepath, JSON.stringify(record));
+  /**
+   * @param ids {Array<string>}
+   */
+  async persist(ids) {
+    const zipfs = new ZipFS(this.tape, { create: true });
 
-    this.#cache[hash] = {
-      ...this.#cache[hash],
-      dir,
-      filepath,
-    };
+    for (const hash of ids) {
+      const record = this.#cache[hash];
+      if (!record) {
+        debug(`Attempted to record ${hash} but it's not found`);
+        return;
+      }
+      const filename = ppath.join(PortablePath.root, `${hash}.json`);
+      debug(`Record ${filename} into tape ${this.tape}`);
+      // 'pretty-print' json since it'll be compressed anyway
+      await zipfs.writeFilePromise(filename, JSON.stringify(record, null, 2));
+
+      this.#cache[hash] = {
+        ...this.#cache[hash],
+        tape: this.tape,
+        filename,
+      };
+
+      this.#observer.next({
+        type: events.persist,
+        payload: {
+          id: hash,
+          tape: this.tape,
+          filename,
+        },
+      });
+    }
+
+    zipfs.saveAndClose();
   }
 
   /**
-   * @param dir {string} Cache directory
+   * - Reset the cache
+   * - Read a cache tape to bootstrap in-memory cache
+   *
+   * @param options {object}
    */
-  async read(dir) {
-    if (!fs.existsSync(dir)) {
-      return [];
+  async reset(options) {
+    this.clear();
+
+    if (!options.tape) {
+      return;
     }
 
-    const results = {};
+    this.tape = npath.toPortablePath(options.tape);
+    let create = false;
+    try {
+      await access(this.tape);
+    } catch (e) {
+      create = true;
+    }
 
-    const files = await readdir(dir);
+    const zipfs = new ZipFS(this.tape, { create });
+    const files = zipfs.getAllFiles();
+
+    debug(
+      `Tape ${path.parse(this.tape).base} ready with ${files.length} records`
+    );
 
     for (const filename of files) {
       const { ext, name } = path.parse(filename);
 
       if (ext === '.json') {
-        const fullPath = path.join(dir, filename);
         debug(`read ${filename}`);
+
         try {
-          const json = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
+          const content = await zipfs.readFilePromise(filename, 'utf-8');
+          const json = JSON.parse(content);
           const obj = deserialize(json);
 
           this.add(obj.request);
           await this.commit(obj.response);
+          this.#cache[name].tape = this.tape;
           this.#cache[name].filename = filename;
-          this.#cache[name].dir = dir;
-
-          results[name] = obj;
         } catch (e) {
           debug(
             `failed to read ${filename}. The file will be deleted! ERROR: ${e}`
           );
-          await unlink(fullPath);
+          await zipfs.unlinkPromise(filename);
         }
       }
     }
 
-    return results;
+    zipfs.discardAndClose();
+    this.#observer.next({ type: events.reset });
   }
 
   /**
-   * @param dir  {string} Cache directory
-   * @param hash {string} Entry hash
+   * @param ids  {Array<string>}
    *
    * @return {Promise}
    */
-  async delete(dir, hash) {
-    const record = this.#cache[hash];
+  async delete(ids) {
+    const errors = [];
+    const zips = {};
+    /**
+     * @param tape {PortablePath}
+     */
+    const getZip = (tape) => {
+      if (zips[tape]) {
+        return zips[tape];
+      }
 
-    if (!record) {
-      const errorMessage = `Attempted to delete a record that does not exist ${hash}`;
-      debug(errorMessage);
-      throw new Error(errorMessage);
+      zips[tape] = new ZipFS(tape);
+      return zips[tape];
+    };
+
+    for (const hash of ids) {
+      try {
+        const record = this.#cache[hash];
+
+        if (!record) {
+          const errorMessage = `Attempted to delete a record that does not exist ${hash}`;
+          debug(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        await this.revert(record.request);
+
+        if (record.tape) {
+          debug(`Delete record ${record.filename} from tape ${record.tape}`);
+
+          await getZip(record.tape).unlinkPromise(record.filename);
+
+          this.#observer.next({
+            type: events.delete,
+            payload: { id: hash },
+          });
+        }
+      } catch (e) {
+        debug(e);
+        errors.push(e.message);
+      }
     }
 
-    await this.revert(record.request);
-
-    if (dir == null) {
-      debug(`Attempted to delete hash: ${hash}, but cache directory isn't set`);
-      return;
+    for (const key in zips) {
+      zips[key].saveAndClose();
     }
 
-    try {
-      debug(`Delete ${hash}`);
-
-      await unlink(path.join(dir, `${hash}.json`));
-
-      this.#observer.next({
-        type: events.delete,
-        payload: { id: hash },
-      });
-    } catch (e) {
-      const errorMessage = `Attempted to delete hash: ${hash}, but it's not on disk`;
-      debug(errorMessage);
-      throw new Error(errorMessage);
-    }
+    return errors;
   }
 
   async update({ id, response }) {
@@ -303,16 +362,21 @@ class Cache {
     );
 
     this.#cache[id].response = newResponse;
+    debug(`Update record ${id}`);
     this.#observer.next({
       type: events.update,
       payload: this.#cache[id],
     });
-    await this.write(this.#cache[id].dir, id);
+
+    if (this.#cache[id].tape) {
+      await this.persist([id]);
+    }
   }
 
   clear() {
     this.#staged = {};
     this.#cache = {};
+    this.#observer.next({ type: events.clear });
   }
 
   subscribe(options) {

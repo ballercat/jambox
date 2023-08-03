@@ -3,32 +3,12 @@ import App from './App.svelte';
 
 let api;
 before(async () => {
-  await cy.task('set-jambox-config', {
-    blockNetworkRequests: false,
-    forward: {
-      'http://jambox-test.com/path': {
-        target: 'http://localhost:7777',
-        paths: ['**'],
-      },
-    },
-    stub: {
-      '**/pathC': {
-        status: 200,
-        statusMessage: 'OK',
-        body: { data: 'test-stub' },
-      },
-    },
-    cache: {
-      dir: '.jambox',
-      write: 'auto',
-      stage: ['jambox-test.com/**'],
-    },
-  });
   api = await API.create();
 });
 
 describe('Web Extension', () => {
   it('can display seen requests', () => {
+    cy.task('jambox.reset');
     // Jambox should generate a static hash for the URL below
     const HASH = '2be35430d93be811753ecfd6ba828878';
     const STUB_HASH = 'cd4482b36a608021cd943786ecb54c5d';
@@ -91,15 +71,7 @@ describe('Web Extension', () => {
     cy.get('[data-cy-id="select-response-tab"]').click();
     cy.get('[data-cy-id="cache-detail"]').contains('test-stub');
 
-    cy.get('@test-edit')
-      .should('not.exist')
-      .then(() => {
-        // Delete the rest of the requests
-        return api.delete([
-          'ba20ccbb470042f3200692cad1926c1c',
-          'f4c55ab257c689845921746061bfeb73',
-          'cd4482b36a608021cd943786ecb54c5d',
-        ]);
-      });
+    // all of the seen requests will only persist in-memory
+    // next cy.task('jambox-reset') will clear them
   });
 });
