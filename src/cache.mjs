@@ -212,7 +212,13 @@ class Cache {
    * @param ids {Array<string>}
    */
   async persist(ids) {
-    const zipfs = new ZipFS(this.tape, { create: true });
+    let create = false;
+    try {
+      await access(this.tape);
+    } catch (e) {
+      create = true;
+    }
+    const zipfs = new ZipFS(this.tape, { create });
 
     for (const hash of ids) {
       const record = this.#cache[hash];

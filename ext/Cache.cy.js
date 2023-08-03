@@ -55,16 +55,20 @@ describe('Cache UI', () => {
     cy.task('jambox.reset');
     cy.mount(App, { props: { api } });
 
+    cy.request('http://jambox-test.com/pathA');
     cy.request('http://jambox-test.com/pathB');
     cy.request('http://jambox-test.com/pathC');
 
     cy.get('[data-cy-id="cache-link"]').click();
+    cy.get(`[data-cy-id="cache-cell-edit-${A}"]`).as('test-persist-A');
     cy.get(`[data-cy-id="cache-cell-edit-${B}"]`).as('test-persist');
     cy.get(`[data-cy-id="select-row-${B}"]`).as('test-persist-select');
+    cy.get(`[data-cy-id="select-row-${A}"]`).as('test-persist-select-A');
     cy.get(`[data-cy-id="cache-cell-edit-${C}"]`).as('test-in-memory-cache');
 
     // Persist should be click-able
     cy.get('@test-persist-select').click();
+    cy.get('@test-persist-select-A').click();
     cy.get('[data-cy-id="cache-persist"]').click();
     cy.get(`[data-cy-id="cache-cell-persisted-true-${B}"]`).should('exist');
 
@@ -104,8 +108,10 @@ describe('Cache UI', () => {
     cy.get('@test-in-memory-cache').should('not.exist');
 
     cy.get('@test-persist-select').click();
+    cy.get('@test-persist-select-A').click();
     cy.get('[data-cy-id="cache-delete"]').click();
 
     cy.get('@test-persist').should('not.exist');
+    cy.get('@test-persist-A').should('not.exist');
   });
 });
