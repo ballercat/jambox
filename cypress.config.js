@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 const { defineConfig } = require('cypress');
 const webpackConfig = require('./webpack.config.js');
 
