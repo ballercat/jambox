@@ -264,7 +264,9 @@ class Cache {
     const zipfs = new ZipFS(this.tape, { create });
     const files = zipfs.getAllFiles();
 
-    debug(`Tape ready with ${files.length} records`);
+    debug(
+      `Tape ${path.parse(this.tape).base} ready with ${files.length} records`
+    );
 
     for (const filename of files) {
       const { ext, name } = path.parse(filename);
@@ -302,7 +304,9 @@ class Cache {
   async delete(ids) {
     const errors = [];
     const zips = {};
-    /* @param tape {PortablePath} */
+    /**
+     * @param tape {PortablePath}
+     */
     const getZip = (tape) => {
       if (zips[tape]) {
         return zips[tape];
@@ -354,10 +358,15 @@ class Cache {
     );
 
     this.#cache[id].response = newResponse;
+    debug(`Update record ${id}`);
     this.#observer.next({
       type: events.update,
       payload: this.#cache[id],
     });
+
+    if (this.#cache[id].tape) {
+      await this.persist([id]);
+    }
   }
 
   clear() {

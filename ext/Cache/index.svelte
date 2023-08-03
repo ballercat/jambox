@@ -52,14 +52,6 @@
       },
     },
     {
-      key: 'persisted',
-      title: 'Persisted',
-      value: () => true,
-      renderComponent: {
-        component: Cell,
-      },
-    },
-    {
       key: 'edit',
       title: 'Edit',
       value: () => true,
@@ -68,6 +60,14 @@
         props: {
           onSelect,
         },
+      },
+    },
+    {
+      key: 'persisted',
+      title: 'Persisted',
+      value: () => true,
+      renderComponent: {
+        component: Cell,
       },
     },
     {

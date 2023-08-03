@@ -116,6 +116,9 @@ export const reducer = (state, action) => {
         },
       };
     }
+    case 'cache.clear': {
+      return { ...state, cache: {} };
+    }
     case 'cache.commit':
     case 'cache.update': {
       return {
