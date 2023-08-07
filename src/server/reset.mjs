@@ -193,7 +193,7 @@ const events = (svc, config) => {
   svc.proxy.on('response', onResponse);
 };
 
-export default async function handlers(svc, config) {
+export default async function reset(svc, config) {
   if (!config.value.blockNetworkRequests) {
     await svc.proxy
       .forAnyRequest()
