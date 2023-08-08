@@ -1,24 +1,16 @@
 import _debug from 'debug';
 import fs from 'fs';
-import deepmerge from 'deepmerge';
+import noop from '../noop.mjs';
 import getConfig from '../config.mjs';
-import setupHandlers from './handlers.mjs';
+import resetServer from './reset.mjs';
 import debounce from '../utils/debounce.mjs';
 import { serializeRequest, serializeResponse } from '../cache.mjs';
-const debug = _debug('jambox.backend');
+import { enter } from './store.mjs';
+import cacheRouter from './routes/cache.route.mjs';
+import resetRouter from './routes/reset.route.mjs';
+import configRouter from './routes/config.route.mjs';
 
-const getInfo = (svc, config) => {
-  const url = new URL(svc.proxy.url);
-  const proxy = {
-    http: `http://${url.host}`,
-    https: `https://${url.host}`,
-    env: svc.proxy.proxyEnv,
-  };
-  return {
-    ...config.value,
-    proxy,
-  };
-};
+const debug = _debug('jambox.backend');
 
 const backend = async (svc, config) => {
   const sendAll = (event) => {
@@ -27,115 +19,55 @@ const backend = async (svc, config) => {
   };
 
   let configWatcher = null;
+  const watchConfig = () => {
+    configWatcher?.removeAllListeners();
+    configWatcher = null;
+
+    configWatcher = fs.watch(
+      config.value.filepath,
+      debounce(() => {
+        config.value = getConfig({}, config.value.cwd);
+        reset();
+      })
+    );
+  };
 
   const reset = async () => {
     debug(`Reset`);
 
     sendAll({ type: 'config', payload: config.value });
     await svc.proxy.reset();
-    await setupHandlers(svc, config);
+    await resetServer(svc, config);
 
     await svc.cache.reset({
       ...config.value?.cache,
     });
   };
 
-  svc.app.get('/', async (_, res) => res.send('OK'));
-  svc.app.get('/api/config', async (_, res) => res.send(getInfo(svc, config)));
-  // Bandaid solution (mostly) for testing purposes (does not persist to disk)
-  svc.app.post('/api/config', async (req, res) => {
-    try {
-      config.value = deepmerge(config.value, req.body);
-      await reset();
+  const setConfig = (value) => (config.value = value);
 
-      res.sendStatus(200);
-    } catch (e) {
-      res.status(500).send(e.stack);
-    }
+  svc.app.use((req, res, next) => {
+    enter(
+      { services: svc, sendAll, reset, watchConfig, config, setConfig },
+      next
+    );
   });
 
-  // Maybe a tad bit unnecessary if /api/config can do the same thing, but it's
-  // nice to have a specific endpoint for a specific action also :shrug:
-  svc.app.post('/api/pause', async (req, res) => {
-    try {
-      const { paused } = req.body;
-      config.value = {
-        ...config.value,
-        paused,
-      };
-      await reset();
+  svc.app.get('/', (_, res) => res.send('OK'));
 
-      res.sendStatus(200);
-    } catch (e) {
-      res.status(500).send(e.stack);
-    }
-  });
-
-  svc.app.get('/api/cache', async (_, res) => {
-    const raw = svc.cache.all();
-    const all = {};
-    for (const id in raw) {
-      const { request, response, ...rest } = raw[id];
-      all[id] = {
-        ...rest,
-        request: await serializeRequest(request),
-        response: await serializeResponse(response),
-      };
-    }
-    res.send(all);
-  });
-
-  svc.app.post('/api/cache', async (req, res) => {
-    try {
-      const { action } = req.body;
-
-      if (action.type === 'delete') {
-        const errors = await svc.cache.delete(action.payload || []);
-
-        res.status(200).send({ errors });
-      } else if (action.type === 'update') {
-        await svc.cache.update(action.payload);
-        res.sendStatus(200);
-      } else if (action.type === 'persist') {
-        await svc.cache.persist(action.payload);
-        res.sendStatus(200);
-      } else {
-        res.status(400).send('unknown action');
-      }
-    } catch (e) {
-      res.status(500).send(e.stack);
-    }
-  });
-
-  svc.app.post('/api/reset', async (req, res) => {
-    try {
-      const setupWatcher = req.body.cwd !== config.value.cwd;
-      config.value = getConfig({}, req.body.cwd);
-
-      // Read a config from cwd
-      await reset();
-
-      if (setupWatcher) {
-        configWatcher?.removeAllListeners();
-        configWatcher = null;
-
-        configWatcher = fs.watch(
-          config.value.filepath,
-          debounce(() => {
-            config.value = getConfig({}, config.value.cwd);
-            reset();
-          })
-        );
-      }
-
-      res.status(200).send(getInfo(svc, config));
-    } catch (e) {
-      res.status(500).send({ error: e.stack });
-    }
-  });
-
+  svc.app.use('/api', configRouter);
+  svc.app.use('/api', cacheRouter);
+  svc.app.use('/api', resetRouter);
   // enable websocket connects
-  svc.app.ws('/', () => {});
+  svc.app.ws('/', noop);
+
+  // eslint-disable-next-line
+  svc.app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    debug(err.message, err.stack);
+    res.status(statusCode).json({ error: err.message });
+  });
+
   svc.cache.subscribe({
     async next(event) {
       const { request, response, ...rest } = event.payload || {};
