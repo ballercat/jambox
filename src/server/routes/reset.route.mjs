@@ -1,6 +1,6 @@
 // @ts-check
 import { Router } from 'express';
-import { store } from '../store.mjs';
+import { store } from '../../store.mjs';
 import getConfig from '../../config.mjs';
 import getInfo from '../get-info.mjs';
 

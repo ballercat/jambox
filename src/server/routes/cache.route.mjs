@@ -1,6 +1,6 @@
 // @ts-check
 import { Router } from 'express';
-import { services } from '../store.mjs';
+import { services } from '../../store.mjs';
 import { serializeRequest, serializeResponse } from '../../cache.mjs';
 
 const router = Router();

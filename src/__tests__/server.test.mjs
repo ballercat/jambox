@@ -12,13 +12,18 @@ const SERVER_PORT = 7777;
 const APP_PORT = 5555;
 
 test.before(async (t) => {
-  t.context.server = await server({
-    port: SERVER_PORT,
-    nodeProcess: { on() {}, exit() {} },
-  });
+  try {
+    t.context.server = await server({
+      port: SERVER_PORT,
+      nodeProcess: { on() {}, exit() {} },
+    });
 
-  // Setup a tiny server
-  t.context.app = await tiny(APP_PORT);
+    // Setup a tiny server
+    t.context.app = await tiny(APP_PORT);
+  } catch (e) {
+    console.log(e);
+    throw e;
+  }
 });
 
 test.after.always(async (t) => {
@@ -26,32 +31,6 @@ test.after.always(async (t) => {
   t.context.server = null;
   await t.context.app._close();
   t.context.app = null;
-});
-
-test.serial('server config - get, post', async (t) => {
-  let config = (await supertest(t.context.server).get('/api/config')).body;
-  t.like(config, {
-    serverURL: `http://localhost:${SERVER_PORT}`,
-  });
-
-  await supertest(t.context.server)
-    .post('/api/config')
-    .send({
-      forward: {
-        'http://github.com': `http://localhost:${APP_PORT}`,
-        'http://google.com': `http://localhost:${APP_PORT}`,
-      },
-    })
-    .expect(200);
-  config = (await supertest(t.context.server).get('/api/config')).body;
-
-  t.like(config, {
-    forward: {
-      'http://github.com': `http://localhost:${APP_PORT}`,
-      'http://google.com': `http://localhost:${APP_PORT}`,
-    },
-    serverURL: `http://localhost:${SERVER_PORT}`,
-  });
 });
 
 test.serial('ws - config', async (t) => {

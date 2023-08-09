@@ -13,14 +13,14 @@ const debug = _debug('jambox.handlers');
 export const record = (svc, config) => {
   return svc.proxy.addRequestRule({
     priority: 100,
-    matchers: [new CacheMatcher(svc, config.value.cache)],
+    matchers: [new CacheMatcher(svc, config.cache)],
     handler: new CacheHandler(svc),
   });
 };
 
 export const forward = (svc, config) => {
   return Promise.all(
-    Object.entries(config.value.forward).map(async ([original, ...rest]) => {
+    Object.entries(config.forward).map(async ([original, ...rest]) => {
       const options =
         typeof rest[0] === 'object'
           ? rest[0]
@@ -80,9 +80,9 @@ export const forward = (svc, config) => {
 
 export const stub = (svc, config) => {
   return Promise.all(
-    Object.entries(config.value.stub).map(([path, value]) => {
+    Object.entries(config.stub).map(([path, value]) => {
       const options = typeof value === 'object' ? value : { status: value };
-      if (options.preferNetwork && !config.value.blockNetworkRequests) {
+      if (options.preferNetwork && !config.blockNetworkRequests) {
         return;
       }
 
@@ -110,12 +110,12 @@ export const stub = (svc, config) => {
 // does not change behavior of seen requests
 const events = (svc, config) => {
   const shouldStage = (url) => {
-    if (svc.cache.bypass() || config.value.blockNetworkRequests) {
+    if (svc.cache.bypass() || config.blockNetworkRequests) {
       return false;
     }
 
-    const ignoreList = config.value.cache?.ignore || [];
-    const stageList = config.value.cache?.stage || [];
+    const ignoreList = config.cache?.ignore || [];
+    const stageList = config.cache?.stage || [];
 
     const matchValue = url.hostname + url.pathname;
     if (ignoreList.some((glob) => minimatch(matchValue, glob))) {
@@ -194,17 +194,17 @@ const events = (svc, config) => {
 };
 
 export default async function handlers(svc, config) {
-  if (!config.value.blockNetworkRequests) {
+  if (!config.blockNetworkRequests) {
     await svc.proxy
       .forAnyRequest()
       .asPriority(98)
       .thenPassThrough({
         // Trust any hosts specified.
-        ignoreHostHttpsErrors: [...(config.value.trust || [])],
+        ignoreHostHttpsErrors: [...(config.trust || [])],
       });
   }
 
-  if (config.value.paused) {
+  if (config.paused) {
     return;
   }
 
@@ -212,11 +212,11 @@ export default async function handlers(svc, config) {
 
   await record(svc, config);
 
-  if (config.value.forward) {
+  if (config.forward) {
     await forward(svc, config);
   }
 
-  if (config.value.stub) {
+  if (config.stub) {
     await stub(svc, config);
   }
 }

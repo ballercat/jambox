@@ -10,6 +10,7 @@ import Cache from '../cache.mjs';
 import setupAPI from './api.mjs';
 import setupHandlers from './handlers.mjs';
 import { PROJECT_ROOT } from '../constants.mjs';
+import { Config } from '../config.mjs';
 
 const debug = _debug('jambox');
 
@@ -47,9 +48,10 @@ const shutdown = (nodeProcess, svc) => async (req, res) => {
 
 async function start({ port, nodeProcess = process, filesystem = fs }) {
   const svc = getServices(filesystem);
-  const config = {
-    value: { serverURL: `http://localhost:${port}` },
-  };
+  const config = new Config(port);
+  // const config = {
+  //   value: { serverURL: `http://localhost:${port}` },
+  // };
 
   await svc.proxy.start();
   await setupHandlers(svc, config);
@@ -58,7 +60,7 @@ async function start({ port, nodeProcess = process, filesystem = fs }) {
 
   svc.app.get('/shutdown', shutdown(nodeProcess, svc));
   svc.app.listen(port, () =>
-    debug(`Jambox ${config.value.serverURL}. Proxy ${svc.proxy.url}`)
+    debug(`Jambox ${config.serverURL}. Proxy ${svc.proxy.url}`)
   );
 
   nodeProcess.on('exit', (code) => {

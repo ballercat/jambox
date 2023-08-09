@@ -1,5 +1,5 @@
 // @ts-check
-import { store, services } from './store.mjs';
+import { store, services } from '../store.mjs';
 
 export default function getInfo() {
   const { proxy } = services();

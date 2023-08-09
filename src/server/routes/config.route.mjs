@@ -1,17 +1,16 @@
 // @ts-check
 import { Router } from 'express';
-import { store } from '../store.mjs';
-import getInfo from '../get-info.mjs';
-import deepmerge from 'deepmerge';
+import { store } from '../../store.mjs';
 
 const router = Router();
 
-router.get('/config', async (_, res) => res.send(getInfo()));
+router.get('/config', async (_, res) => res.send(store().config.serialize()));
 // Bandaid solution (mostly) for testing purposes (does not persist to disk)
 router.post('/config', async (req, res, next) => {
-  const { setConfig, reset, config } = store();
+  const { reset, config } = store();
+
   try {
-    setConfig(deepmerge(config.value, req.body));
+    config.update(req.body);
     await reset();
 
     res.sendStatus(200);
@@ -24,12 +23,9 @@ router.post('/config', async (req, res, next) => {
 // nice to have a specific endpoint for a specific action also :shrug:
 router.post('/pause', async (req, res, next) => {
   try {
-    const { setConfig, reset, config } = store();
+    const { reset, config } = store();
     const { paused } = req.body;
-    setConfig({
-      ...config.value,
-      paused,
-    });
+    config.update({ paused });
     await reset();
 
     res.sendStatus(200);
