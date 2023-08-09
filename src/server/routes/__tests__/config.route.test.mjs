@@ -3,7 +3,7 @@ import supertest from 'supertest';
 import express from 'express';
 import bodyParser from 'body-parser';
 import router from '../config.route.mjs';
-import { Config } from '../../../config.mjs';
+import Config from '../../../config.mjs';
 import { enter } from '../../../store.mjs';
 
 const SERVER_PORT = 7777;

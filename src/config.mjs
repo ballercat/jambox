@@ -3,7 +3,6 @@ import _debug from 'debug';
 import fs from 'fs';
 import path from 'path';
 import Observable from 'zen-observable';
-import deepmerge from 'deepmerge';
 import getUserConfigFile from './read-user-config.js';
 import {
   CONFIG_FILE_NAME,
@@ -15,7 +14,7 @@ import debounce from './utils/debounce.mjs';
 
 const debug = _debug('jambox.config');
 
-export class Config {
+export default class Config {
   serverURL = '';
   cwd = '';
   dir = '';
@@ -70,7 +69,7 @@ export class Config {
   /**
    * @param {object} options
    */
-  update({ forward, stub, trust, cache, ...options }) {
+  update({ proxy, forward, stub, trust, cache, ...options }) {
     if (forward) {
       this.forward = { ...this.forward, ...forward };
     }
@@ -90,6 +89,10 @@ export class Config {
       };
     }
 
+    if (proxy) {
+      this.proxy = { ...this.proxy, ...proxy };
+    }
+
     if ('blockNetworkRequests' in options) {
       this.blockNetworkRequests = options.blockNetworkRequests;
     }
@@ -106,6 +109,7 @@ export class Config {
    */
   load(cwd) {
     if (!cwd) {
+      debug(`Update existing config ${this.filepath}`);
       this.update(getUserConfigFile(this.filepath));
       return;
     }
@@ -117,6 +121,8 @@ export class Config {
       this.dir,
       `server.${new Date().toISOString().split('T')[0]}.log`
     );
+
+    debug(`Load new config at ${this.filepath}`);
 
     Config.prepCacheDir(this.cwd);
 
@@ -139,16 +145,6 @@ export class Config {
       this.filepath,
       debounce(() => this.load())
     );
-  }
-
-  /**
-   * @param {object} options
-   * @param {string} options.http
-   * @param {string} options.https
-   * @param {object} options.proxyEnv
-   */
-  setProxy(options) {
-    this.proxy = options;
   }
 
   /**
@@ -176,36 +172,4 @@ export class Config {
       proxy: this.proxy,
     };
   }
-}
-
-export default function config(overrides = {}, cwd = process.cwd()) {
-  const filepath = path.join(cwd, CONFIG_FILE_NAME);
-  // Works with .json & .js
-  const userConfig = getUserConfigFile(filepath);
-  const cacheDir = path.join(cwd, CACHE_DIR_NAME);
-
-  const logName = `server.${new Date().toISOString().split('T')[0]}.log`;
-
-  Config.prepCacheDir(cwd);
-
-  const config = deepmerge(
-    {
-      cwd,
-      filepath,
-      logLocation: path.join(cacheDir, logName),
-      forward: {},
-      noProxy: ['<-loopback->'],
-      ...userConfig,
-    },
-    overrides
-  );
-
-  if (config.cache) {
-    config.cache = {
-      tape: path.join(cacheDir, DEFAULT_TAPE_NAME),
-      ...config.cache,
-    };
-  }
-
-  return config;
 }

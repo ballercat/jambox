@@ -10,7 +10,7 @@ import Cache from '../cache.mjs';
 import setupAPI from './api.mjs';
 import setupHandlers from './reset.mjs';
 import { PROJECT_ROOT } from '../constants.mjs';
-import { Config } from '../config.mjs';
+import Config from '../config.mjs';
 
 const debug = _debug('jambox');
 
@@ -51,6 +51,15 @@ async function start({ port, nodeProcess = process, filesystem = fs }) {
   const config = new Config(port);
 
   await svc.proxy.start();
+  const proxyURL = new URL(svc.proxy.url);
+  config.update({
+    proxy: {
+      http: `http://${proxyURL.host}`,
+      https: `https://${proxyURL.host}`,
+      env: svc.proxy.proxyEnv,
+    },
+  });
+
   await setupHandlers(svc, config);
 
   setupAPI(svc, config);
