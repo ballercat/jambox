@@ -46,12 +46,11 @@ const backend = async (svc, config) => {
     res.status(statusCode).json({ error: err.message, stack: err.stack });
   });
 
-  await config.subscribe({
+  config.subscribe({
     next() {
       reset();
     },
   });
-
   svc.cache.subscribe({
     async next(event) {
       const { request, response, ...rest } = event.payload || {};

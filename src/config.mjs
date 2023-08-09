@@ -31,14 +31,23 @@ export class Config {
   paused = false;
 
   #observer;
+  #observable;
 
   /**
    * @param {string} port
    */
   constructor(port) {
     this.serverURL = `http://localhost:${port}`;
-    this.#observer = new Promise((resolve) => {
-      new Observable(resolve);
+    let pendingEvents = [];
+    this.#observer = {
+      next(event) {
+        pendingEvents.push(event);
+      },
+    };
+    this.#observable = new Observable((observer) => {
+      this.#observer = observer;
+      pendingEvents.forEach((event) => this.#observer.next(event));
+      pendingEvents = [];
     });
   }
 
@@ -146,14 +155,12 @@ export class Config {
    * @param {object}   options
    * @param {function} options.next
    */
-  async subscribe(options) {
-    const observer = await this.#observer;
-    observer.subscribe(options);
+  subscribe(options) {
+    this.#observable.subscribe(options);
   }
 
-  async notify() {
-    const observer = await this.#observer;
-    observer.next({ type: 'update', payload: this.serialize() });
+  notify() {
+    this.#observer.next({ type: 'update', payload: this.serialize() });
   }
 
   serialize() {
