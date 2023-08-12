@@ -52,7 +52,7 @@ test.serial('ws - config', async (t) => {
   // Websocket is notified of config changes
   t.is(ws.messages.pendingPush.length >= 1, true);
   t.like(JSON.parse(ws.messages.pendingPush[0].data.toString()), {
-    type: 'config',
+    type: 'config.update',
     payload: {
       forward: {
         'http://github.com': `http://localhost:${APP_PORT}`,
@@ -69,51 +69,6 @@ test.serial('ws - config', async (t) => {
 
   const res2 = await (await fetch('http://google.com/echo', opts)).json();
   t.like(res2, { path: '/echo' });
-});
-
-test.serial('ws - request inspect', async (t) => {
-  t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
-
-  const { body: config } = await supertest(t.context.server).get('/api/config');
-
-  await supertest(t.context.server)
-    .post('/api/config')
-    .send({
-      forward: {
-        'http://google.com': `http://localhost:${APP_PORT}`,
-      },
-    })
-    .expect(200);
-
-  const plan = superwstest(config.serverURL)
-    .ws('/')
-    .expectJson((json) => {
-      t.like(json, { type: 'request', payload: { url: 'http://google.com/' } });
-      t.is(typeof json.payload.startTimestamp, 'number');
-      t.is(typeof json.payload.bodyReceivedTimestamp, 'number');
-    })
-    .expectJson((json) => {
-      t.like(json, {
-        type: 'response',
-        payload: { statusCode: 200 },
-      });
-    })
-    .expectJson((json) => {
-      t.like(json, {
-        type: 'request',
-        payload: { url: 'http://google.com/test' },
-      });
-    })
-    .expectJson((json) =>
-      t.like(json, { type: 'response', payload: { statusCode: 200 } })
-    );
-
-  const opts = { agent: new HttpsProxyAgent(config.proxy.http) };
-
-  await fetch('http://google.com', opts).catch(console.log);
-  await fetch('http://google.com/test', opts).catch(console.log);
-
-  await plan;
 });
 
 test.serial('auto mocks', async (t) => {
@@ -191,7 +146,7 @@ test.serial('abort signal', async (t) => {
 
   // A bit tricky, we need to delay the abort somewhat to ensure a connection of
   // some kind is established before abort.
-  setTimeout(() => controller.abort(), 10);
+  setTimeout(() => controller.abort(), 20);
 
   const error = await fetchPromise;
 

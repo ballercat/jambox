@@ -2,19 +2,19 @@
 import _debug from 'debug';
 import fs from 'fs';
 import path from 'path';
-import Observable from 'zen-observable';
 import getUserConfigFile from './read-user-config.js';
 import {
   CONFIG_FILE_NAME,
   CACHE_DIR_NAME,
   DEFAULT_TAPE_NAME,
 } from './constants.mjs';
+import Emitter from './Emitter.mjs';
 import { store } from './store.mjs';
 import debounce from './utils/debounce.mjs';
 
 const debug = _debug('jambox.config');
 
-export default class Config {
+export default class Config extends Emitter {
   serverURL = '';
   cwd = '';
   dir = '';
@@ -22,32 +22,21 @@ export default class Config {
   logLocation = '';
   noProxy = ['<-loopback->'];
   trust = new Set();
-  forward = {};
-  cache = {};
-  stub = {};
+  forward;
+  cache;
+  stub;
   proxy = {};
   blockNetworkRequests = false;
   paused = false;
 
-  #observer;
-  #observable;
-
   /**
-   * @param {string} port
+   * @param {object} init
    */
-  constructor(port) {
-    this.serverURL = `http://localhost:${port}`;
-    let pendingEvents = [];
-    this.#observer = {
-      next(event) {
-        pendingEvents.push(event);
-      },
-    };
-    this.#observable = new Observable((observer) => {
-      this.#observer = observer;
-      pendingEvents.forEach((event) => this.#observer.next(event));
-      pendingEvents = [];
-    });
+  constructor({ serverURL, proxy, ...rest }) {
+    super('config');
+    this.serverURL = serverURL;
+    this.proxy = proxy;
+    this.update(rest);
   }
 
   static current() {
@@ -69,7 +58,7 @@ export default class Config {
   /**
    * @param {object} options
    */
-  update({ proxy, forward, stub, trust, cache, ...options }) {
+  update({ forward, stub, trust, cache, ...options }) {
     if (forward) {
       this.forward = { ...this.forward, ...forward };
     }
@@ -89,10 +78,6 @@ export default class Config {
       };
     }
 
-    if (proxy) {
-      this.proxy = { ...this.proxy, ...proxy };
-    }
-
     if ('blockNetworkRequests' in options) {
       this.blockNetworkRequests = options.blockNetworkRequests;
     }
@@ -101,7 +86,7 @@ export default class Config {
       this.paused = options.paused;
     }
 
-    this.notify();
+    this.dispatch('update', this.serialize());
   }
 
   /**
@@ -145,18 +130,6 @@ export default class Config {
       this.filepath,
       debounce(() => this.load())
     );
-  }
-
-  /**
-   * @param {object}   options
-   * @param {function} options.next
-   */
-  subscribe(options) {
-    this.#observable.subscribe(options);
-  }
-
-  notify() {
-    this.#observer.next({ type: 'update', payload: this.serialize() });
   }
 
   serialize() {

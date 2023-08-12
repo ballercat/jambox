@@ -7,12 +7,10 @@ const router = Router();
 router.get('/config', async (_, res) => res.send(store().config.serialize()));
 // Bandaid solution (mostly) for testing purposes (does not persist to disk)
 router.post('/config', async (req, res, next) => {
-  const { reset, config } = store();
+  const { config } = store();
 
   try {
     config.update(req.body);
-    await reset();
-
     res.sendStatus(200);
   } catch (error) {
     next(error);
@@ -23,11 +21,9 @@ router.post('/config', async (req, res, next) => {
 // nice to have a specific endpoint for a specific action also :shrug:
 router.post('/pause', async (req, res, next) => {
   try {
-    const { reset, config } = store();
+    const { config } = store();
     const { paused } = req.body;
     config.update({ paused });
-    await reset();
-
     res.sendStatus(200);
   } catch (error) {
     next(error);

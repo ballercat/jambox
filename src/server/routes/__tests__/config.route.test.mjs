@@ -10,7 +10,9 @@ const SERVER_PORT = 7777;
 const APP_PORT = 5555;
 
 test('get & post api', async (t) => {
-  const config = new Config(SERVER_PORT);
+  const config = new Config({
+    serverURL: `http://localhost:${SERVER_PORT}`,
+  });
 
   const app = express();
   app.use(bodyParser.json());

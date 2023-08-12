@@ -48,11 +48,11 @@ const shutdown = (nodeProcess, svc) => async (req, res) => {
 
 async function start({ port, nodeProcess = process, filesystem = fs }) {
   const svc = getServices(filesystem);
-  const config = new Config(port);
 
   await svc.proxy.start();
   const proxyURL = new URL(svc.proxy.url);
-  config.update({
+  const config = new Config({
+    serverURL: `http://localhost:${port}`,
     proxy: {
       http: `http://${proxyURL.host}`,
       https: `https://${proxyURL.host}`,

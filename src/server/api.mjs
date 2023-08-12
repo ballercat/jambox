@@ -1,8 +1,8 @@
 import _debug from 'debug';
 import noop from '../noop.mjs';
 import resetServer from './reset.mjs';
-import { serializeRequest, serializeResponse } from '../cache.mjs';
 import { enter } from '../store.mjs';
+import Broadcaster from './Broadcaster.mjs';
 import cacheRouter from './routes/cache.route.mjs';
 import resetRouter from './routes/reset.route.mjs';
 import configRouter from './routes/config.route.mjs';
@@ -10,6 +10,7 @@ import configRouter from './routes/config.route.mjs';
 const debug = _debug('jambox.backend');
 
 const backend = async (svc, config) => {
+  const broadcaster = new Broadcaster(() => svc.ws.getWss().clients);
   const sendAll = (event) => {
     const json = JSON.stringify(event);
     svc.ws.getWss('/').clients.forEach((client) => client.send(json));
@@ -17,8 +18,6 @@ const backend = async (svc, config) => {
 
   const reset = async () => {
     debug(`Reset`);
-
-    sendAll({ type: 'config', payload: config.serialize() });
     await svc.proxy.reset();
     await resetServer(svc, config);
 
@@ -46,33 +45,10 @@ const backend = async (svc, config) => {
     res.status(statusCode).json({ error: err.message, stack: err.stack });
   });
 
-  config.subscribe({
-    next() {
-      reset();
-    },
-  });
-  svc.cache.subscribe({
-    async next(event) {
-      const { request, response, ...rest } = event.payload || {};
-      const data = {
-        type: event.type,
-        payload: {
-          ...rest,
-        },
-      };
+  config.subscribe(reset);
 
-      if (request) {
-        data.payload.request = await serializeRequest(request);
-      }
-      if (response) {
-        data.payload.response = await serializeResponse(response);
-      }
-
-      svc.ws.getWss('/').clients.forEach((client) => {
-        client.send(JSON.stringify(data));
-      });
-    },
-  });
+  broadcaster.broadcast(svc.cache);
+  broadcaster.broadcast(config);
 };
 
 export default backend;

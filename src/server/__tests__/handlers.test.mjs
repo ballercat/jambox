@@ -1,5 +1,6 @@
 import test from 'ava';
-import { forward, record, stub } from '../handlers.mjs';
+import Config from '../../config.mjs';
+import { forward, record, stub } from '../reset.mjs';
 
 test.beforeEach((t) => {
   const rules = [];
@@ -18,13 +19,11 @@ test.beforeEach((t) => {
 });
 
 test('localhost: basic forwarding', async (t) => {
-  const config = {
-    value: {
-      forward: {
-        'http://google.com': 'http://localhost:3000',
-      },
+  const config = new Config({
+    forward: {
+      'http://google.com': 'http://localhost:3000',
     },
-  };
+  });
 
   await forward(
     {
@@ -40,17 +39,15 @@ test('localhost: basic forwarding', async (t) => {
 });
 
 test('localhost: glob matching', async (t) => {
-  const config = {
-    value: {
-      forward: {
-        'http://google.com': {
-          target: 'http://localhost:3000',
-          paths: ['/**/*', '!/**/graphql'],
-          websocket: true,
-        },
+  const config = new Config({
+    forward: {
+      'http://google.com': {
+        target: 'http://localhost:3000',
+        paths: ['/**/*', '!/**/graphql'],
+        websocket: true,
       },
     },
-  };
+  });
 
   await forward(
     {
@@ -70,25 +67,23 @@ test('localhost: glob matching', async (t) => {
 test('cache', async (t) => {
   await record(
     { proxy: t.context.proxy },
-    { value: { cache: { stage: ['**'] } } }
+    new Config({ cache: { stage: ['**'] } })
   );
 
   t.deepEqual(t.context.explainRules(), [
-    'CacheMatcher {"stage":["**"]}',
+    'CacheMatcher {"tape":"default.tape.zip","stage":["**"]}',
     'CacheHandler return a response from cache',
   ]);
 });
 
 test('stub', async (t) => {
-  const config = {
-    value: {
-      // NOTE: Might be better to invert this setting
-      stub: {
-        '**.jpg': 204,
-        '**/api': { status: 200 },
-      },
+  const config = new Config({
+    // NOTE: Might be better to invert this setting
+    stub: {
+      '**.jpg': 204,
+      '**/api': { status: 200 },
     },
-  };
+  });
 
   await stub({ proxy: t.context.proxy }, config);
 
