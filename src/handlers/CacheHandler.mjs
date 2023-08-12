@@ -1,6 +1,6 @@
 // @ts-check
 import mockttp from 'mockttp';
-import Cache from '../cache.mjs';
+import Cache from '../Cache.mjs';
 
 export default class CacheHandler extends mockttp.requestHandlers
   .CallbackHandler {

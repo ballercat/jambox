@@ -1,5 +1,5 @@
 import test from 'ava';
-import Cache from '../../cache.mjs';
+import Cache from '../../Cache.mjs';
 import Broadcaster from '../Broadcaster.mjs';
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));

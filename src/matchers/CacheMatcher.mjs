@@ -1,7 +1,7 @@
 // @ts-check
 import mockttp from 'mockttp';
 import minimatch from 'minimatch';
-import Cache from '../cache.mjs';
+import Cache from '../Cache.mjs';
 
 export default class CacheMatcher extends mockttp.matchers.CallbackMatcher {
   #options;

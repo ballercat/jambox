@@ -49,7 +49,7 @@ export const reducer = (state, action) => {
         http: {},
       };
     }
-    case 'config': {
+    case 'config.update': {
       return {
         ...state,
         config: payload,
@@ -68,7 +68,7 @@ export const reducer = (state, action) => {
         complete: true,
       };
     }
-    case 'abort': {
+    case 'jambox.abort': {
       if (state.complete) return state;
       return {
         ...state,
@@ -81,7 +81,7 @@ export const reducer = (state, action) => {
         },
       };
     }
-    case 'request': {
+    case 'jambox.request': {
       if (state.complete) return state;
       const url = new URL(payload.url);
       return {
@@ -96,7 +96,7 @@ export const reducer = (state, action) => {
         },
       };
     }
-    case 'response': {
+    case 'jambox.response': {
       if (state.complete) return state;
       // Extension refresh in the middle of a request -> response cycle
       if (!state.http[payload.id]) {

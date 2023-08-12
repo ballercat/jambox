@@ -1,21 +1,20 @@
 // @ts-check
 import { Router } from 'express';
-import { store } from '../../store.mjs';
+import { jambox } from '../../store.mjs';
 
 const router = Router();
 
 router.post('/reset', async (req, res, next) => {
   try {
-    const { reset, config } = store();
-
-    if (req.body.cwd !== config.cwd) {
-      config.load(req.body.cwd);
+    if (req.body.cwd !== jambox().config.cwd) {
+      // changing a config should reset jambox
+      jambox().config.load(req.body.cwd);
+    } else {
+      // Read a config from cwd
+      await jambox().reset();
     }
 
-    // Read a config from cwd
-    await reset();
-
-    res.status(200).send(config.serialize());
+    res.status(200).send(jambox().config.serialize());
   } catch (error) {
     next(error);
   }

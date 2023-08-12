@@ -1,5 +1,5 @@
 // @ts-check
-import { serializeRequest, serializeResponse } from '../cache.mjs';
+import { serializeRequest, serializeResponse } from '../Cache.mjs';
 
 /**
  * @typedef Client
@@ -11,7 +11,7 @@ import { serializeRequest, serializeResponse } from '../cache.mjs';
  */
 export default class Broadcaster {
   /**
-   * @param {() => Array<Client>} clients
+   * @param {() => Set<Client>} clients
    */
   constructor(clients) {
     this.clients = clients;
@@ -56,7 +56,7 @@ export default class Broadcaster {
   }
 
   /**
-   * @param {import('zen-observable')} observable
+   * @param {import('../Emitter.mjs').default} observable
    */
   broadcast(observable) {
     observable.subscribe(this.next);

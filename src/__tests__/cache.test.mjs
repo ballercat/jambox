@@ -1,8 +1,7 @@
-// import mock from 'mock-fs';
 import path from 'path';
 import { PROJECT_ROOT, DEFAULT_TAPE_NAME } from '../constants.mjs';
 import test from 'ava';
-import Cache from '../cache.mjs';
+import Cache from '../Cache.mjs';
 
 const request = {
   id: '123456',

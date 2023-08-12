@@ -3,7 +3,7 @@ import supertest from 'supertest';
 import express from 'express';
 import bodyParser from 'body-parser';
 import router from '../config.route.mjs';
-import Config from '../../../config.mjs';
+import Config from '../../../Config.mjs';
 import { enter } from '../../../store.mjs';
 
 const SERVER_PORT = 7777;
@@ -16,7 +16,7 @@ test('get & post api', async (t) => {
 
   const app = express();
   app.use(bodyParser.json());
-  app.use((req, res, next) => enter({ config, reset() {} }, next));
+  app.use((req, res, next) => enter({ jambox: { config, reset() {} } }, next));
   app.use('/api', router);
 
   await supertest(app)

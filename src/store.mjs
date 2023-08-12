@@ -4,4 +4,4 @@ const storage = new AsyncLocalStorage();
 
 export const enter = (store, fn) => storage.run(store, fn);
 export const store = () => storage.getStore();
-export const services = () => storage.getStore().services;
+export const jambox = () => storage.getStore().jambox;

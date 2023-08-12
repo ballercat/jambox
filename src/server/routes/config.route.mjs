@@ -1,16 +1,14 @@
 // @ts-check
 import { Router } from 'express';
-import { store } from '../../store.mjs';
+import { jambox } from '../../store.mjs';
 
 const router = Router();
 
-router.get('/config', async (_, res) => res.send(store().config.serialize()));
+router.get('/config', async (_, res) => res.send(jambox().config.serialize()));
 // Bandaid solution (mostly) for testing purposes (does not persist to disk)
 router.post('/config', async (req, res, next) => {
-  const { config } = store();
-
   try {
-    config.update(req.body);
+    jambox().config.update(req.body);
     res.sendStatus(200);
   } catch (error) {
     next(error);
@@ -21,9 +19,8 @@ router.post('/config', async (req, res, next) => {
 // nice to have a specific endpoint for a specific action also :shrug:
 router.post('/pause', async (req, res, next) => {
   try {
-    const { config } = store();
     const { paused } = req.body;
-    config.update({ paused });
+    jambox().config.update({ paused });
     res.sendStatus(200);
   } catch (error) {
     next(error);

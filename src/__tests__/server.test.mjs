@@ -89,12 +89,12 @@ test.serial('auto mocks', async (t) => {
     .ws('/')
     .expectJson((json) => {
       t.like(json, {
-        type: 'request',
+        type: 'jambox.request',
         payload: { url: 'http://random-domain.com/path.html' },
       });
     })
     .expectJson((json) => {
-      t.like(json, { type: 'response', payload: { statusCode: 204 } });
+      t.like(json, { type: 'jambox.response', payload: { statusCode: 204 } });
     });
 
   const opts = { agent: new HttpsProxyAgent(config.proxy.http) };
@@ -121,13 +121,13 @@ test.serial('abort signal', async (t) => {
     .ws('/')
     .expectJson((json) => {
       t.like(json, {
-        type: 'request',
+        type: 'jambox.request',
         payload: { url: 'http://random-domain.com/delay' },
       });
     })
     .expectJson((json) => {
       t.like(json, {
-        type: 'abort',
+        type: 'jambox.abort',
         payload: { url: 'http://random-domain.com/delay' },
       });
     });
