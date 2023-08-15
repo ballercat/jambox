@@ -1,6 +1,6 @@
 // @ts-check
-import _debug from 'debug';
-import fs from 'fs';
+import { createDebug } from './diagnostics.js';
+import NodeFS from 'fs';
 import path from 'path';
 import getUserConfigFile from './read-user-config.js';
 import {
@@ -9,10 +9,9 @@ import {
   DEFAULT_TAPE_NAME,
 } from './constants.mjs';
 import Emitter from './Emitter.mjs';
-import { store } from './store.mjs';
 import debounce from './utils/debounce.mjs';
 
-const debug = _debug('jambox.config');
+const debug = createDebug('config');
 
 export default class Config extends Emitter {
   serverURL = '';
@@ -20,61 +19,79 @@ export default class Config extends Emitter {
   dir = '';
   filepath = '';
   logLocation = '';
+  proxy = {};
   noProxy = ['<-loopback->'];
   trust = new Set();
-  forward;
-  cache;
-  stub;
-  proxy = {};
+  forward = null;
+  cache = null;
+  stub = null;
   blockNetworkRequests = false;
   paused = false;
+  /**
+   * @member {import('node:fs')}
+   */
+  fs;
+  /**
+   * @member {(f: string) => object}
+   */
+  loadConfigModule;
 
   /**
-   * @param {object} init
+   * @param {object}                init
+   * @param {object}                options
+   * @param {import('node:fs')}     options.fs
+   * @param {(f: string) => object} options.loadConfigModule
    */
-  constructor({ serverURL, proxy, ...rest }) {
+  constructor(
+    { serverURL, proxy, ...rest },
+    { fs, loadConfigModule } = {
+      fs: NodeFS,
+      loadConfigModule: getUserConfigFile,
+    }
+  ) {
     super('config');
+    this.loadConfigModule = loadConfigModule;
+    this.fs = fs;
     this.serverURL = serverURL;
     this.proxy = proxy;
     this.update(rest);
   }
 
-  static current() {
-    return store().config;
-  }
-
-  /**
-   * @param {string} dir
-   */
-  static prepCacheDir(dir) {
-    if (fs.existsSync(dir)) {
+  prepCacheDir() {
+    if (this.fs.existsSync(this.dir)) {
       return;
     }
 
-    console.log(`Couldn't locale ${CACHE_DIR_NAME}/, creating one.`);
-    fs.mkdirSync(dir);
+    debug(`Couldn't locale ${this.dir}/, creating one.`);
+    this.fs.mkdirSync(this.dir);
   }
 
   /**
-   * @param {object} options
+   * @param {object}        options
+   * @param {object}        options.forward
+   * @param {object}        options.stub
+   * @param {Array<string>} options.trust
+   * @param {object}        options.cache
+   * @param {boolean}       options.blockNetworkRequests
+   * @param {boolean}       options.paused
    */
-  update({ forward, stub, trust, cache, ...options }) {
-    if (forward) {
-      this.forward = { ...this.forward, ...forward };
+  update(options) {
+    if ('forward' in options) {
+      this.forward = options.forward;
     }
 
-    if (stub) {
-      this.stub = { ...this.stub, ...stub };
+    if ('stub' in options) {
+      this.stub = options.stub;
     }
 
-    if (trust) {
-      this.trust = new Set([...this.trust, ...trust]);
+    if ('trust' in options) {
+      this.trust = new Set([...this.trust, ...options.trust]);
     }
 
-    if (cache) {
+    if ('cache' in options) {
       this.cache = {
         tape: path.join(this.dir, DEFAULT_TAPE_NAME),
-        ...cache,
+        ...options.cache,
       };
     }
 
@@ -89,13 +106,24 @@ export default class Config extends Emitter {
     this.dispatch('update', this.serialize());
   }
 
+  clear() {
+    this.forward = null;
+    this.stub = null;
+    this.trust.clear();
+    this.cache = null;
+    this.blockNetworkRequests = false;
+    this.paused = false;
+  }
+
   /**
    * @param {string=} cwd
    */
   load(cwd) {
+    this.clear();
+
     if (!cwd) {
       debug(`Update existing config ${this.filepath}`);
-      this.update(getUserConfigFile(this.filepath));
+      this.update(this.loadConfigModule(this.filepath));
       return;
     }
 
@@ -109,10 +137,10 @@ export default class Config extends Emitter {
 
     debug(`Load new config at ${this.filepath}`);
 
-    Config.prepCacheDir(this.cwd);
+    this.prepCacheDir();
 
     // Works with .json & .js
-    this.update(getUserConfigFile(this.filepath));
+    this.update(this.loadConfigModule(this.filepath));
 
     this.watch();
   }
@@ -126,7 +154,8 @@ export default class Config extends Emitter {
       this.watcher = null;
     }
 
-    this.watcher = fs.watch(
+    debug(`Watching ${this.filepath} for changes`);
+    this.watcher = this.fs.watch(
       this.filepath,
       debounce(() => this.load())
     );

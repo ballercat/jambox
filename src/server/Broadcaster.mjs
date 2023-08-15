@@ -26,33 +26,29 @@ export default class Broadcaster {
   async next(event) {
     let json;
     const namespace = event.type.split('.')[0];
-    switch (namespace) {
-      case 'cache': {
-        const { request, response, ...rest } = event.payload || {};
-        const data = {
-          type: event.type,
-          payload: {
-            ...rest,
-          },
-        };
 
-        if (request) {
-          data.payload.request = await serializeRequest(request);
-        }
-        if (response) {
-          data.payload.response = await serializeResponse(response);
-        }
+    if (namespace === 'cache') {
+      const { request, response, ...rest } = event.payload || {};
+      const data = {
+        type: event.type,
+        payload: {
+          ...rest,
+        },
+      };
 
-        json = JSON.stringify(data);
-        break;
+      if (request) {
+        data.payload.request = await serializeRequest(request);
       }
-      default:
-        json = JSON.stringify(event);
+      if (response) {
+        data.payload.response = await serializeResponse(response);
+      }
+
+      json = JSON.stringify(data);
+    } else {
+      json = JSON.stringify(event);
     }
 
-    if (json) {
-      this.clients().forEach((client) => client.send(json));
-    }
+    this.clients().forEach((client) => client.send(json));
   }
 
   /**

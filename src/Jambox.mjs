@@ -71,28 +71,30 @@ export default class Jambox extends Emitter {
       return;
     }
 
-    await this.#record();
+    if (this.config.cache) {
+      await this.#record(this.config.cache);
+    }
 
     if (this.config.forward) {
-      await this.#forward();
+      await this.#forward(this.config.forward);
     }
 
     if (this.config.stub) {
-      await this.#stub();
+      await this.#stub(this.config.stub);
     }
   }
 
-  #record() {
+  #record(setting) {
     return this.proxy.addRequestRule({
       priority: 100,
-      matchers: [new CacheMatcher(this, this.config.cache)],
+      matchers: [new CacheMatcher(this, setting)],
       handler: new CacheHandler(this),
     });
   }
 
-  #forward() {
+  #forward(setting) {
     return Promise.all(
-      Object.entries(this.config.forward).map(async ([original, ...rest]) => {
+      Object.entries(setting).map(async ([original, ...rest]) => {
         const options =
           typeof rest[0] === 'object'
             ? rest[0]
@@ -150,9 +152,9 @@ export default class Jambox extends Emitter {
     );
   }
 
-  #stub() {
+  #stub(setting) {
     return Promise.all(
-      Object.entries(this.config.stub).map(([path, value]) => {
+      Object.entries(setting).map(([path, value]) => {
         const options = typeof value === 'object' ? value : { status: value };
         if (options.preferNetwork && !this.config.blockNetworkRequests) {
           return;

@@ -11,6 +11,8 @@ export default class Emitter {
     this.namespace = namespace;
     this.#observer = new Observable((observer) => {
       this.#observers.add(observer);
+
+      return () => this.#observers.delete(observer);
     });
     this.subscribe = this.#observer.subscribe.bind(this.#observer);
   }
@@ -27,5 +29,21 @@ export default class Emitter {
     for (const observer of this.#observers) {
       observer.next(event);
     }
+  }
+
+  /**
+   * @param {string} eventName
+   *
+   * @return {Promise<void>}
+   */
+  once(eventName) {
+    return new Promise((resolve) => {
+      const observable = this.subscribe((event) => {
+        if (event.type === eventName) {
+          observable.unsubscribe();
+          resolve();
+        }
+      });
+    });
   }
 }
