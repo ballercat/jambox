@@ -1,5 +1,4 @@
 // @ts-check
-import _debug from 'debug';
 import fs from 'fs';
 import minimatch from 'minimatch';
 import mockttp from 'mockttp';
@@ -10,8 +9,9 @@ import CacheMatcher from './matchers/CacheMatcher.mjs';
 import GlobMatcher from './matchers/GlobMatcher.mjs';
 import CacheHandler from './handlers/CacheHandler.mjs';
 import ProxyHandler from './handlers/ProxyHandler.mjs';
+import { createDebug } from './diagnostics.js';
 
-const debug = _debug('jambox.server');
+const debug = createDebug('core');
 
 export default class Jambox extends Emitter {
   /**
@@ -33,7 +33,7 @@ export default class Jambox extends Emitter {
 
     const proxyURL = new URL(proxy.url);
     const config = new Config({
-      serverURL: `http://localhost:${port}`,
+      port,
       proxy: {
         http: `http://${proxyURL.host}`,
         https: `https://${proxyURL.host}`,

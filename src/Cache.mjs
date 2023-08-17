@@ -4,12 +4,12 @@ import path from 'path';
 import Emitter from './Emitter.mjs';
 import crypto from 'crypto';
 import deserialize from './utils/deserialize.mjs';
-import _debug from 'debug';
 import { updateResponse } from './utils/serialize.mjs';
 import { PortablePath, npath, ppath } from '@yarnpkg/fslib';
 import { ZipFS } from '@yarnpkg/libzip';
+import { createDebug } from './diagnostics.js';
 
-const debug = _debug('jambox.cache');
+const debug = createDebug('cache');
 
 export const serializeRequest = async (request) => {
   return {

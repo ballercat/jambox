@@ -1,7 +1,6 @@
 // @ts-check
 import fs from 'fs';
 import path from 'path';
-import _debug from 'debug';
 import express from 'express';
 import expessWS from 'express-ws';
 import bodyParser from 'body-parser';
@@ -14,8 +13,9 @@ import Broadcaster from './Broadcaster.mjs';
 import cacheRouter from './routes/cache.route.mjs';
 import resetRouter from './routes/reset.route.mjs';
 import configRouter from './routes/config.route.mjs';
+import { createDebug } from '../diagnostics.js';
 
-const debug = _debug('jambox');
+const debug = createDebug('server');
 
 async function start({ port, nodeProcess = process, filesystem = fs }) {
   nodeProcess.on('exit', (code) => {

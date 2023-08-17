@@ -13,8 +13,21 @@ import debounce from './utils/debounce.mjs';
 
 const debug = createDebug('config');
 
+/**
+ * @typedef  {object} ConfigUpdate
+ * @property {object=}        forward
+ * @property {object=}        stub
+ * @property {Array<string>=} trust
+ * @property {object=}        cache
+ * @property {boolean=}       blockNetworkRequests
+ * @property {boolean=}       paused
+ * @property {string=}        port
+ */
 export default class Config extends Emitter {
-  serverURL = '';
+  /**
+   * @member {URL}
+   */
+  serverURL;
   cwd = '';
   dir = '';
   filepath = '';
@@ -38,12 +51,14 @@ export default class Config extends Emitter {
 
   /**
    * @param {object}                init
+   * @param {string=}               init.port
+   * @param {object=}               init.proxy
    * @param {object}                options
    * @param {import('node:fs')}     options.fs
    * @param {(f: string) => object} options.loadConfigModule
    */
   constructor(
-    { serverURL, proxy, ...rest },
+    { port, proxy, ...rest } = {},
     { fs, loadConfigModule } = {
       fs: NodeFS,
       loadConfigModule: getUserConfigFile,
@@ -52,7 +67,8 @@ export default class Config extends Emitter {
     super('config');
     this.loadConfigModule = loadConfigModule;
     this.fs = fs;
-    this.serverURL = serverURL;
+    this.serverURL = new URL('http://localhost');
+    this.serverURL.port = port || '9000';
     this.proxy = proxy;
     this.update(rest);
   }
@@ -67,13 +83,7 @@ export default class Config extends Emitter {
   }
 
   /**
-   * @param {object}        options
-   * @param {object}        options.forward
-   * @param {object}        options.stub
-   * @param {Array<string>} options.trust
-   * @param {object}        options.cache
-   * @param {boolean}       options.blockNetworkRequests
-   * @param {boolean}       options.paused
+   * @param {ConfigUpdate} options
    */
   update(options) {
     if ('forward' in options) {
@@ -84,7 +94,7 @@ export default class Config extends Emitter {
       this.stub = options.stub;
     }
 
-    if ('trust' in options) {
+    if (Array.isArray(options.trust)) {
       this.trust = new Set([...this.trust, ...options.trust]);
     }
 
@@ -96,11 +106,18 @@ export default class Config extends Emitter {
     }
 
     if ('blockNetworkRequests' in options) {
-      this.blockNetworkRequests = options.blockNetworkRequests;
+      this.blockNetworkRequests = Boolean(options.blockNetworkRequests);
     }
 
     if ('paused' in options) {
-      this.paused = options.paused;
+      this.paused = Boolean(options.paused);
+    }
+
+    if (
+      typeof options.port === 'string' &&
+      options.port !== this.serverURL.port
+    ) {
+      this.serverURL.port = options.port;
     }
 
     this.dispatch('update', this.serialize());

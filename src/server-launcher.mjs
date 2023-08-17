@@ -1,15 +1,16 @@
-import _debug from 'debug';
+// @ts-check
 import waitOn from 'wait-on';
 import path from 'path';
 import fs from 'fs';
 import { spawn } from 'child_process';
 import { PROJECT_ROOT } from './constants.mjs';
+import { createDebug } from './diagnostics.js';
 
-const debug = _debug('jambox');
+const debug = createDebug();
 
-const ping = async (port) => {
+const ping = async (href) => {
   try {
-    await waitOn({ resources: [`http://localhost:${port}`], timeout: 500 });
+    await waitOn({ resources: [href], timeout: 500 });
     return true;
   } catch (error) {
     return false;
@@ -19,7 +20,7 @@ const ping = async (port) => {
 // Returns when a server instance is available
 const launcher = async ({ log, port, constants, config }) => {
   debug('Checking if a server instance is running.');
-  const isServerAvailable = await ping(port);
+  const isServerAvailable = await ping(config.serverURL.href);
   if (isServerAvailable) {
     return;
   }
@@ -37,7 +38,7 @@ const launcher = async ({ log, port, constants, config }) => {
       env: {
         ...process.env,
         DEBUG: 'jambox*',
-        DEBUG_COLORS: 0,
+        DEBUG_COLORS: '0',
         NODE_EXTRA_CA_CERTS: path.join(constants.PROJECT_ROOT, 'testCA.pem'),
       },
     }
@@ -47,7 +48,7 @@ const launcher = async ({ log, port, constants, config }) => {
 
   debug('Waiting on the server to become available');
   await waitOn({
-    resources: [`http://localhost:${port}`],
+    resources: [config.serverURL.href],
     timeout: 1000 * 10,
   });
 };

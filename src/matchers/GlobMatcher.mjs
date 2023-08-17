@@ -3,8 +3,8 @@ import minimatch from 'minimatch';
 import mockttp from 'mockttp';
 
 const checkGlobs = (url, globs) => {
-  for (let i = 0; i < globs.length; i++) {
-    if (!minimatch(url.pathname, globs[i])) {
+  for (const glob of globs) {
+    if (!minimatch(url.pathname, glob)) {
       return false;
     }
   }
