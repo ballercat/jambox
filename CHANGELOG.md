@@ -1,3 +1,7 @@
+## 0.0.28 - Fix cert expiration
+
+- fix: Updated the local cert to now expire in Dec 26, 2031
+
 ## 0.0.27 - Fix cache update bug
 
 - fix: updating a single persited record removes all other records
