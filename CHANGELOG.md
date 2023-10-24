@@ -1,3 +1,9 @@
+## 0.0.29 - Fix SKPI Fingerprint, minor improvements
+
+- Fix SKPI fingerprint
+- Relaunch Jambox server if there is a version mismatch
+- Update mockttp library
+
 ## 0.0.28 - Fix cert expiration
 
 - fix: Updated the local cert to now expire in Dec 26, 2031

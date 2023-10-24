@@ -5,6 +5,8 @@ import getConfig from '../config.mjs';
 import setupHandlers from './handlers.mjs';
 import debounce from '../utils/debounce.mjs';
 import { serializeRequest, serializeResponse } from '../cache.mjs';
+import { getVersion } from '../constants.mjs';
+
 const debug = _debug('jambox.backend');
 
 const getInfo = (svc, config) => {
@@ -40,7 +42,7 @@ const backend = async (svc, config) => {
     });
   };
 
-  svc.app.get('/', async (_, res) => res.send('OK'));
+  svc.app.get('/', async (_, res) => res.send(getVersion()));
   svc.app.get('/api/config', async (_, res) => res.send(getInfo(svc, config)));
   // Bandaid solution (mostly) for testing purposes (does not persist to disk)
   svc.app.post('/api/config', async (req, res) => {
