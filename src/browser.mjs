@@ -6,7 +6,7 @@ import { EXTENSION_PATH } from './constants.mjs';
 import launcher from '@httptoolkit/browser-launcher';
 
 // that's right
-const SPKI_FINGERPRINT = 'eqkW7XlzpdM4UC0xkQzKX6t415TM398j5H16Dwjr/Jk=';
+const SPKI_FINGERPRINT = 'ImPkfKy0ZYTFQr8oFYoEGm6FJOgHyRUkeMBTfHujwSQ=';
 
 const detect = () => {
   return new Promise((resolve) => {

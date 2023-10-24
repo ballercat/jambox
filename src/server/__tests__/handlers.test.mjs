@@ -35,7 +35,7 @@ test('localhost: basic forwarding', async (t) => {
 
   t.deepEqual(t.context.explainRules(), [
     'GlobMatcher {"target":"http://google.com/","paths":["**"]}',
-    `ProxyHandler {"ignoreHostHttpsErrors":["localhost:3000"],"forwarding":{"targetHost":"http://localhost:3000","updateHostHeader":"google.com"}}`,
+    `ProxyHandler {"ignoreHostHttpsErrors":true,"forwarding":{"targetHost":"http://localhost:3000","updateHostHeader":"google.com"}}`,
   ]);
 });
 
@@ -61,7 +61,7 @@ test('localhost: glob matching', async (t) => {
 
   t.deepEqual(t.context.explainRules(), [
     'GlobMatcher {"target":"http://google.com/","paths":["/**/*","!/**/graphql"]}',
-    'ProxyHandler {"ignoreHostHttpsErrors":["localhost:3000"],"forwarding":{"targetHost":"http://localhost:3000","updateHostHeader":"google.com"}}',
+    'ProxyHandler {"ignoreHostHttpsErrors":true,"forwarding":{"targetHost":"http://localhost:3000","updateHostHeader":"google.com"}}',
     'GlobMatcher {"target":"http://google.com/","paths":["/**/*","!/**/graphql"]}',
     'forward the websocket to ws://localhost:3000',
   ]);
