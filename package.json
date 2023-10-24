@@ -39,7 +39,7 @@
     "global-agent": "^3.0.0",
     "http-encoding": "^1.5.1",
     "minimatch": "^5.1.0",
-    "mockttp": "^3.4.0",
+    "mockttp": "^3.9.4",
     "nock": "^13.2.9",
     "node-fetch": "2.6.7",
     "osenv": "^0.1.5",
