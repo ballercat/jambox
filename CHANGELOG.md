@@ -1,3 +1,8 @@
+## 0.0.30 - Turn off cors mode
+
+- Turn off cors mode fix issue with multi headers
+- Fix #39
+
 ## 0.0.29 - Fix SKPI Fingerprint, minor improvements
 
 - Fix SKPI fingerprint

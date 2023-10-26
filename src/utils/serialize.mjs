@@ -37,9 +37,12 @@ export const updateResponse = async (prev, curr) => {
     ...rest,
   };
 
-  // Update the final buffer and content length
   result.body.buffer = buffer;
-  result.headers['content-length'] = buffer.length;
+
+  // Update the final buffer and content length
+  if ('content-length' in result.headers) {
+    result.headers['content-length'] = buffer.length;
+  }
 
   return result;
 };
