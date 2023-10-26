@@ -18,7 +18,6 @@ const getServices = (filesystem) => {
   const ews = expessWS(app);
   const cache = new Cache();
   const proxy = mockttp.getLocal({
-    cors: true,
     recordTraffic: false,
     suggestChanges: false,
     https: {
