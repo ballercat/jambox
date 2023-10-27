@@ -20,12 +20,16 @@
   let cleanup;
   let url = '/';
 
+  const loadCache = () => {
+    api.getCache().then((payload) => {
+      store.update((state) => reducer(state, { type: 'cache.load', payload }));
+    });
+  };
+
   api.getConfig().then((payload) => {
-    store.update((state) => reducer(state, { type: 'config', payload }));
+    store.update((state) => reducer(state, { type: 'config.update', payload }));
   });
-  api.getCache().then((payload) => {
-    store.update((state) => reducer(state, { type: 'cache.load', payload }));
-  });
+  loadCache();
 
   // Refresh when the page reloads
   chrome.webNavigation?.onBeforeNavigate.addListener((details) => {
@@ -45,6 +49,10 @@
     pauseChecked = $store.config.pause;
 
     cleanup = api.subscribe((action) => {
+      if (action.type === 'cache.reset') {
+        loadCache();
+        return;
+      }
       if (action.type === 'config') {
         chrome.notifications?.create('', {
           title: 'Jambox Config Updated!',

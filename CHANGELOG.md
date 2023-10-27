@@ -1,6 +1,7 @@
 ## 0.1.0 - Refactor
 
 - Rework internal logic, bump to `0.1.0`
+- Fix persited flags breaking after cache reset
 
 ## 0.0.30 - Turn off cors mode
 

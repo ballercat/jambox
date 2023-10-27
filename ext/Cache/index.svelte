@@ -68,6 +68,7 @@
       value: () => true,
       renderComponent: {
         component: Cell,
+        onSelect,
       },
     },
     {

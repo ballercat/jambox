@@ -262,10 +262,13 @@ class Cache extends Emitter {
           const json = JSON.parse(content);
           const obj = deserialize(json);
 
-          this.add(obj.request);
-          await this.commit(obj.response);
-          this.#cache[name].tape = this.tape;
-          this.#cache[name].filename = filename;
+          this.#cache[name] = {
+            id: name,
+            request: obj.request,
+            response: obj.response,
+            tape: this.tape,
+            filename,
+          };
         } catch (e) {
           debug(
             `failed to read ${filename}. The file will be deleted! ERROR: ${e}`
