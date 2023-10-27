@@ -1,7 +1,7 @@
 // @ts-check
+import * as NodeFS from 'node:fs';
+import * as path from 'node:path';
 import { createDebug } from './diagnostics.js';
-import NodeFS from 'fs';
-import path from 'path';
 import getUserConfigFile from './read-user-config.js';
 import {
   CONFIG_FILE_NAME,
@@ -186,9 +186,10 @@ export default class Config extends Emitter {
       cwd: this.cwd,
       forward: this.forward,
       cache: this.cache,
-      trust: [...this.trust],
+      trust: Array.from(this.trust),
       stub: this.stub,
       proxy: this.proxy,
+      noProxy: this.noProxy,
     };
   }
 }
