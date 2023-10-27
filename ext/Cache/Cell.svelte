@@ -4,7 +4,7 @@
 
   export let row;
   export let col;
-  export let onSelect;
+  export let onSelect = null;
 
   const shortenKeys = ['host', 'path'];
   const shorten = (str) => {
