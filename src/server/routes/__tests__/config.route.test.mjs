@@ -11,7 +11,7 @@ const APP_PORT = 5555;
 
 test('get & post api', async (t) => {
   const config = new Config({
-    serverURL: `http://localhost:${SERVER_PORT}`,
+    port: SERVER_PORT,
   });
 
   const app = express();

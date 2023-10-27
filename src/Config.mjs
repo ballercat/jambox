@@ -180,7 +180,7 @@ export default class Config extends Emitter {
 
   serialize() {
     return {
-      serverURL: this.serverURL,
+      serverURL: this.serverURL.origin,
       paused: this.paused,
       blockNetworkRequests: this.blockNetworkRequests,
       cwd: this.cwd,

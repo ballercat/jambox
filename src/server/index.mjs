@@ -1,10 +1,10 @@
 // @ts-check
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import express from 'express';
 import expessWS from 'express-ws';
 import bodyParser from 'body-parser';
-import mockttp from 'mockttp';
+import * as mockttp from 'mockttp';
 import { PROJECT_ROOT, getVersion } from '../constants.mjs';
 import Jambox from '../Jambox.mjs';
 import noop from '../noop.mjs';
@@ -69,7 +69,7 @@ async function start({ port, nodeProcess = process, filesystem = fs }) {
   // eslint-disable-next-line
   app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
-    debug(err.message, err.stack);
+    debug(`${err.message} ${err.stack}`);
     res.status(statusCode).json({ error: err.message, stack: err.stack });
   });
 
