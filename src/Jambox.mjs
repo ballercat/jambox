@@ -115,9 +115,7 @@ export default class Jambox extends Emitter {
         const changeHosts = originalURL.host !== targetURL.host;
 
         const httpOptions = {
-          ignoreHostHttpsErrors: [
-            changeHosts ? targetURL.host : originalURL.host,
-          ],
+          ignoreHostHttpsErrors: true,
           forwarding: {
             targetHost: `http${useSSL ? 's' : ''}://${targetURL.host}`,
             updateHostHeader: changeHosts ? originalURL.host : false,

@@ -5,7 +5,7 @@ import express from 'express';
 import expessWS from 'express-ws';
 import bodyParser from 'body-parser';
 import mockttp from 'mockttp';
-import { PROJECT_ROOT } from '../constants.mjs';
+import { PROJECT_ROOT, getVersion } from '../constants.mjs';
 import Jambox from '../Jambox.mjs';
 import noop from '../noop.mjs';
 import { enter } from '../store.mjs';
@@ -23,7 +23,6 @@ async function start({ port, nodeProcess = process, filesystem = fs }) {
   });
 
   const proxy = mockttp.getLocal({
-    cors: true,
     recordTraffic: false,
     suggestChanges: false,
     https: {
@@ -58,7 +57,7 @@ async function start({ port, nodeProcess = process, filesystem = fs }) {
     nodeProcess.exit(0);
   });
   app.use((req, res, next) => enter({ jambox }, next));
-  app.get('/', (_, res) => res.send('OK'));
+  app.get('/', (_, res) => res.send(getVersion()));
 
   app.use('/api', configRouter);
   app.use('/api', cacheRouter);

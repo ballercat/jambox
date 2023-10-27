@@ -1,13 +1,17 @@
 // @ts-check
-import waitOn from 'wait-on';
-import path from 'path';
-import fs from 'fs';
+import * as waitOn from 'wait-on';
+import * as path from 'path';
+import * as fs from 'node:fs';
+import fetch from 'node-fetch';
 import { spawn } from 'child_process';
-import { PROJECT_ROOT } from './constants.mjs';
+import { PROJECT_ROOT, getVersion } from './constants.mjs';
 import { createDebug } from './diagnostics.js';
 
 const debug = createDebug();
 
+/**
+ * @param href {String}
+ */
 const ping = async (href) => {
   try {
     await waitOn({ resources: [href], timeout: 500 });
@@ -17,16 +21,7 @@ const ping = async (href) => {
   }
 };
 
-// Returns when a server instance is available
-const launcher = async ({ log, port, constants, config }) => {
-  debug('Checking if a server instance is running.');
-  const isServerAvailable = await ping(config.serverURL.href);
-  if (isServerAvailable) {
-    return;
-  }
-
-  log('Jambox server not currently running. Launching an instance');
-
+const spawnServerProcess = async ({ port, config, constants }) => {
   const out = fs.openSync(config.logLocation, 'a');
   const child = spawn(
     'node',
@@ -51,6 +46,35 @@ const launcher = async ({ log, port, constants, config }) => {
     resources: [config.serverURL.href],
     timeout: 1000 * 10,
   });
+};
+
+// Returns when a server instance is available
+const launcher = async ({ log, port, constants, config }) => {
+  debug('Checking if a server instance is running.');
+  const isServerAvailable = await ping(config.serverURL.href);
+  if (isServerAvailable) {
+    // Would be slightly nicer if waitOn could return the values from the pinged endpoints...
+    const apiVersion = await fetch(`http://localhost:${port}/`).then((res) =>
+      res.text()
+    );
+    const currentVersion = getVersion();
+    if (currentVersion !== null && apiVersion !== currentVersion) {
+      log(
+        `Installed version (${getVersion()}) is different from running version (${
+          apiVersion || '??'
+        }).`
+      );
+      log(`Killing old version.`);
+      await fetch(`http://localhost:${port}/shutdown`);
+      log(`Starting a new Jambox process.`);
+      await spawnServerProcess({ port, config, constants });
+    }
+    return;
+  }
+
+  log('Jambox server not currently running. Launching an instance');
+
+  await spawnServerProcess({ port, config, constants });
 };
 
 export default launcher;

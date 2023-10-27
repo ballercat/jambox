@@ -1,3 +1,18 @@
+## 0.0.30 - Turn off cors mode
+
+- Turn off cors mode fix issue with multi headers
+- Fix #39
+
+## 0.0.29 - Fix SKPI Fingerprint, minor improvements
+
+- Fix SKPI fingerprint
+- Relaunch Jambox server if there is a version mismatch
+- Update mockttp library
+
+## 0.0.28 - Fix cert expiration
+
+- fix: Updated the local cert to now expire in Dec 26, 2031
+
 ## 0.0.27 - Fix cache update bug
 
 - fix: updating a single persited record removes all other records
