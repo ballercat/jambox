@@ -33,6 +33,12 @@
         currentTab = 'response';
       }}>Response</button
     >
+    {#if response && 'x-jambox-hash' in response.headers}
+      <Link
+        to="/cache/entry/{response.headers['x-jambox-hash']}"
+        data-cy-id="cache-link-{id}">Cache Link</Link
+      >
+    {/if}
   </div>
   <div class="Content">
     {#if currentTab === 'headers'}

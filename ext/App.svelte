@@ -33,13 +33,19 @@
 
   // Refresh when the page reloads
   chrome.webNavigation?.onBeforeNavigate.addListener((details) => {
-    if (details.tabId === chrome.devtools.inspectedWindow.tabId) {
+    if (
+      details.frameId === 0 &&
+      details.tabId === chrome.devtools.inspectedWindow.tabId
+    ) {
       store.update((state) => reducer(state, { type: 'refresh' }));
     }
   });
 
   chrome.webNavigation?.onCompleted.addListener((details) => {
-    if (details.tabId === chrome.devtools.inspectedWindow.tabId) {
+    if (
+      details.frameId === 0 &&
+      details.tabId === chrome.devtools.inspectedWindow.tabId
+    ) {
       store.update((state) => reducer(state, { type: 'complete' }));
     }
   });

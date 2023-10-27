@@ -57,18 +57,14 @@
       value: () => true,
       renderComponent: {
         component: Cell,
-        props: {
-          onSelect,
-        },
       },
     },
     {
       key: 'persisted',
-      title: 'Persisted',
+      title: 'Cache',
       value: () => true,
       renderComponent: {
         component: Cell,
-        onSelect,
       },
     },
     {
@@ -77,9 +73,6 @@
       value: (v) => v.host,
       renderComponent: {
         component: Cell,
-        props: {
-          onSelect,
-        },
       },
     },
     {
@@ -88,9 +81,6 @@
       value: (v) => v.pathname,
       renderComponent: {
         component: Cell,
-        props: {
-          onSelect,
-        },
       },
     },
     {
@@ -99,9 +89,6 @@
       value: (v) => v.statusCode,
       renderComponent: {
         component: Cell,
-        props: {
-          onSelect,
-        },
       },
     },
   ];
@@ -127,7 +114,7 @@
       on:click={() => {
         api.persist(checked);
         checked = [];
-      }}>Persist Selected</button
+      }}>Write to Filesystem</button
     >
   </div>
   <SvelteTable columns={COLUMNS} rows={data} classNameRow="Row">
@@ -150,7 +137,7 @@
         />
       </th>
       <th>Edit</th>
-      <th>Persisted</th>
+      <th>Cache</th>
       <th>Host</th>
       <th>Path</th>
       <th>Status</th>

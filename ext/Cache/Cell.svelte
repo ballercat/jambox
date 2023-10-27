@@ -4,7 +4,7 @@
 
   export let row;
   export let col;
-  export let onSelect = null;
+  export let onSelect = () => {};
 
   const shortenKeys = ['host', 'path'];
   const shorten = (str) => {
@@ -37,7 +37,7 @@
     />
   {:else if col.key === 'persisted'}
     <span data-cy-id="cache-cell-persisted-{value}-{row.id}"
-      >{value ? 'yes' : 'no'}</span
+      >{value ? 'filesystem' : 'in-memory'}</span
     >
   {:else}
     <span data-cy-id="cache-cell-{cyID}">{value}</span>

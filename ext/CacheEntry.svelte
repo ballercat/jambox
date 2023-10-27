@@ -96,7 +96,6 @@
   }
   .Request {
     margin-bottom: 20px;
-    height: 50%;
   }
   .Box {
     margin: 10px 0;
