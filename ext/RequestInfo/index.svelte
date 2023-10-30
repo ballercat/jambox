@@ -35,8 +35,8 @@
     >
     {#if response && 'x-jambox-hash' in response.headers}
       <Link
-        to="/cache/entry/{response.headers['x-jambox-hash']}"
-        data-cy-id="cache-link-{id}">Cache Link</Link
+        to="/cache/entry/{response.headers['x-jambox-hash']}?from=/request/{id}"
+        data-cy-id="cache-link-{id}">View Cache</Link
       >
     {/if}
   </div>
