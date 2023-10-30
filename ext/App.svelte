@@ -20,15 +20,31 @@
   let cleanup;
   let url = '/';
 
-  const loadCache = () => {
-    api.getCache().then((payload) => {
+  const loadCache = async () => {
+    try {
+      const payload = await api.getCache();
       store.update((state) => reducer(state, { type: 'cache.load', payload }));
-    });
+    } catch (e) {
+      store.update((state) =>
+        reducer(state, { type: 'error', payload: [`${e.message} ${e.stack}`] })
+      );
+    }
   };
 
-  api.getConfig().then((payload) => {
-    store.update((state) => reducer(state, { type: 'config.update', payload }));
-  });
+  const loadConfig = async () => {
+    try {
+      const payload = await api.getConfig();
+      store.update((state) =>
+        reducer(state, { type: 'config.update', payload })
+      );
+    } catch (e) {
+      store.update((state) =>
+        reducer(state, { type: 'error', payload: [`${e.message} ${e.stack}`] })
+      );
+    }
+  };
+
+  loadConfig();
   loadCache();
 
   // Refresh when the page reloads
@@ -75,54 +91,76 @@
 </script>
 
 <main class="Container">
-  <Router {url} {history}>
+  {#if $store.errors.length}
     <div class="Box">
-      <div class="TopBar">
-        <Checkbox
-          checked={$store.config.paused}
-          inline
-          id="pause-proxy"
-          name="pause-proxy"
-          label="Pause Proxy"
-          onClick={() => {
-            api.pause(!$store.config.paused);
-          }}
-        />
-        <Checkbox
-          inline
-          id="block-network"
-          name="block-network"
-          checked={$store.config.blockNetworkRequests}
-          label="Block Network"
-          onClick={() => {
-            api.blockNetworkRequests(!$store.config.blockNetworkRequests);
-          }}
-        />
-        <Link to="/" data-cy-id="waterfall-link" class="SideNav-Link"
-          >Waterfall</Link
+      <button
+        on:click={() => {
+          loadConfig();
+          loadCache();
+        }}>Retry</button
+      >
+      <div>
+        <span
+          >Could not establish initial connection with the jambox api. You could
+          attempt to manually try again.</span
         >
-        <Link data-cy-id="cache-link" to="/cache" class="SideNav-Link"
-          >Cache</Link
-        >
-        <input
-          type="search"
-          bind:value={search}
-          autocomplete
-          placeholder="search"
-        />
+        {#each $store.errors as err}
+          <div class="Error">
+            <pre>{err}</pre>
+          </div>
+        {/each}
       </div>
-      <Route path="/">
-        <Waterfall {history} {search} />
-      </Route>
-      <Route path="/cache">
-        <Cache {search} {api} />
-      </Route>
-      <Route path="/cache/entry/:id" let:params>
-        <CacheEntry id={params.id} {api} {history} />
-      </Route>
-      <Route path="/request/:id" component={RequestInfo} />
     </div>
-  </Router>
+  {:else}
+    <Router {url} {history}>
+      <div class="Box">
+        <div class="TopBar">
+          <Checkbox
+            checked={$store.config.paused}
+            inline
+            id="pause-proxy"
+            name="pause-proxy"
+            label="Pause Proxy"
+            onClick={() => {
+              api.pause(!$store.config.paused);
+            }}
+          />
+          <Checkbox
+            inline
+            id="block-network"
+            name="block-network"
+            checked={$store.config.blockNetworkRequests}
+            label="Block Network"
+            onClick={() => {
+              api.blockNetworkRequests(!$store.config.blockNetworkRequests);
+            }}
+          />
+          <Link to="/" data-cy-id="waterfall-link" class="SideNav-Link"
+            >Waterfall</Link
+          >
+          <Link data-cy-id="cache-link" to="/cache" class="SideNav-Link"
+            >Cache</Link
+          >
+          <input
+            type="search"
+            bind:value={search}
+            autocomplete
+            placeholder="search"
+          />
+        </div>
+        <Route path="/">
+          <Waterfall {history} {search} />
+        </Route>
+        <Route path="/cache">
+          <Cache {search} {api} />
+        </Route>
+        <Route path="/cache/entry/:id" let:params>
+          <CacheEntry id={params.id} {api} {history} />
+        </Route>
+        <Route path="/request/:id" component={RequestInfo} />
+      </div>
+    </Router>
+  {/if}
 </main>
 
 <style>
@@ -212,5 +250,8 @@
     border-bottom: 2px solid;
     border-color: var(--stripeA);
     padding-bottom: 10px;
+  }
+  .Error {
+    color: var(--red);
   }
 </style>

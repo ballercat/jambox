@@ -49,14 +49,14 @@ async function start({ port, nodeProcess = process, filesystem = fs }) {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
-  app.get('/shutdown', async (req, res) => {
+  app.get('/shutdown', async (_req, res) => {
     await proxy.stop();
 
     res.send('Shutting down.');
 
     nodeProcess.exit(0);
   });
-  app.use((req, res, next) => enter({ jambox }, next));
+  app.use((_req, _res, next) => enter({ jambox }, next));
   app.get('/', (_, res) => res.send(getVersion()));
 
   app.use('/api', configRouter);
@@ -67,7 +67,7 @@ async function start({ port, nodeProcess = process, filesystem = fs }) {
   app.ws('/', noop);
 
   // eslint-disable-next-line
-  app.use((err, req, res, next) => {
+  app.use((err, _req, res, _next) => {
     const statusCode = err.statusCode || 500;
     debug(`${err.message} ${err.stack}`);
     res.status(statusCode).json({ error: err.message, stack: err.stack });

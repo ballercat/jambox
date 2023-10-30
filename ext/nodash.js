@@ -8,3 +8,18 @@ export const without = (skip, obj) => {
 
   return result;
 };
+
+export const debounce = (fn, ms) => {
+  let timeout;
+
+  return (...args) => {
+    if (timeout) {
+      return;
+    }
+
+    timeout = setTimeout(() => {
+      fn(...args);
+      timeout = null;
+    }, ms);
+  };
+};

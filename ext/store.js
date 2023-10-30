@@ -18,6 +18,8 @@ const getContentType = (url, response) => {
 };
 
 export const initialState = {
+  // these only track initial errors (for now)
+  errors: [],
   complete: false,
   config: {},
   http: {},
@@ -52,6 +54,7 @@ export const reducer = (state, action) => {
     case 'config.update': {
       return {
         ...state,
+        errors: [],
         config: payload,
       };
     }
@@ -135,6 +138,7 @@ export const reducer = (state, action) => {
       }
       return {
         ...state,
+        errors: [],
         cache: {
           ...state.cache,
           ...payload,
@@ -160,6 +164,9 @@ export const reducer = (state, action) => {
           },
         },
       };
+    }
+    case 'error': {
+      return { ...state, errors: [...state.errors, ...payload] };
     }
     default:
       return state;
