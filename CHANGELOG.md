@@ -1,3 +1,11 @@
+## 0.1.0 - Refactor
+
+- Rework internal logic, bump to `0.1.0`
+- Fix persited flags breaking after cache reset
+- Add error spash screen when api fails on load
+- Add retry button on-load
+- Rename `persisted` to `in-memory` or `filesystem`
+
 ## 0.0.30 - Turn off cors mode
 
 - Turn off cors mode fix issue with multi headers

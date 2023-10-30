@@ -1,15 +1,15 @@
 // @ts-check
 import { access } from 'fs/promises';
 import path from 'path';
-import Observable from 'zen-observable';
+import Emitter from './Emitter.mjs';
 import crypto from 'crypto';
 import deserialize from './utils/deserialize.mjs';
-import _debug from 'debug';
 import { updateResponse } from './utils/serialize.mjs';
 import { PortablePath, npath, ppath } from '@yarnpkg/fslib';
 import { ZipFS } from '@yarnpkg/libzip';
+import { createDebug } from './diagnostics.js';
 
-const debug = _debug('jambox.cache');
+const debug = createDebug('cache');
 
 export const serializeRequest = async (request) => {
   return {
@@ -41,22 +41,20 @@ export const serializeResponse = async (response) => {
 };
 
 export const events = {
-  commit: 'cache.commit',
-  abort: 'cache.abort',
-  reset: 'cache.reset',
-  revert: 'cache.revert',
-  persist: 'cache.persist',
-  stage: 'cache.stage',
-  delete: 'cache.delete',
-  update: 'cache.update',
-  clear: 'cache.clear',
+  commit: 'commit',
+  abort: 'abort',
+  reset: 'reset',
+  revert: 'revert',
+  persist: 'persist',
+  stage: 'stage',
+  delete: 'delete',
+  update: 'update',
+  clear: 'clear',
 };
 
-class Cache {
+class Cache extends Emitter {
   #staged = {};
   #cache = {};
-  #observer;
-  #observable;
   #bypass = false;
   /**
    * @member {PortablePath}
@@ -64,17 +62,7 @@ class Cache {
   tape;
 
   constructor() {
-    let pendingEvents = [];
-    this.#observer = {
-      next(event) {
-        pendingEvents.push(event);
-      },
-    };
-    this.#observable = new Observable((observer) => {
-      this.#observer = observer;
-      pendingEvents.forEach((event) => this.#observer.next(event));
-      pendingEvents = [];
-    });
+    super('cache');
   }
 
   /**
@@ -117,10 +105,7 @@ class Cache {
     }
 
     debug(`add()[stage] ${request.url}`);
-    this.#observer.next({
-      type: events.stage,
-      payload: { request: { ...request } },
-    });
+    this.dispatch(events.stage, { request: { ...request } });
     this.#staged[request.id] = request;
   }
 
@@ -132,10 +117,7 @@ class Cache {
       return;
     }
 
-    this.#observer.next({
-      type: events.abort,
-      payload: { request: { ...request } },
-    });
+    this.dispatch(events.abort, { request: { ...request } });
     delete this.#staged[request.id];
   }
 
@@ -164,10 +146,7 @@ class Cache {
       request,
       response,
     };
-    this.#observer.next({
-      type: events.commit,
-      payload: { ...this.#cache[hash] },
-    });
+    this.dispatch(events.commit, { ...this.#cache[hash] });
 
     delete this.#staged[request.id];
 
@@ -188,10 +167,7 @@ class Cache {
     }
 
     debug(`Revert ${hash}`);
-    this.#observer.next({
-      type: events.revert,
-      payload: { ...this.#cache[hash] },
-    });
+    this.dispatch(events.revert, { ...this.#cache[hash] });
     delete this.#cache[hash];
   }
 
@@ -237,13 +213,10 @@ class Cache {
         filename,
       };
 
-      this.#observer.next({
-        type: events.persist,
-        payload: {
-          id: hash,
-          tape: this.tape,
-          filename,
-        },
+      this.dispatch(events.persist, {
+        id: hash,
+        tape: this.tape,
+        filename,
       });
     }
 
@@ -289,10 +262,13 @@ class Cache {
           const json = JSON.parse(content);
           const obj = deserialize(json);
 
-          this.add(obj.request);
-          await this.commit(obj.response);
-          this.#cache[name].tape = this.tape;
-          this.#cache[name].filename = filename;
+          this.#cache[name] = {
+            id: name,
+            request: obj.request,
+            response: obj.response,
+            tape: this.tape,
+            filename,
+          };
         } catch (e) {
           debug(
             `failed to read ${filename}. The file will be deleted! ERROR: ${e}`
@@ -303,7 +279,7 @@ class Cache {
     }
 
     zipfs.discardAndClose();
-    this.#observer.next({ type: events.reset });
+    this.dispatch(events.reset);
   }
 
   /**
@@ -343,10 +319,7 @@ class Cache {
 
           await getZip(record.tape).unlinkPromise(record.filename);
 
-          this.#observer.next({
-            type: events.delete,
-            payload: { id: hash },
-          });
+          this.dispatch(events.delete, { id: hash });
         }
       } catch (e) {
         debug(e);
@@ -369,10 +342,7 @@ class Cache {
 
     this.#cache[id].response = newResponse;
     debug(`Update record ${id}`);
-    this.#observer.next({
-      type: events.update,
-      payload: this.#cache[id],
-    });
+    this.dispatch(events.update, this.#cache[id]);
 
     if (this.#cache[id].tape) {
       await this.persist([id]);
@@ -382,11 +352,7 @@ class Cache {
   clear() {
     this.#staged = {};
     this.#cache = {};
-    this.#observer.next({ type: events.clear });
-  }
-
-  subscribe(options) {
-    this.#observable.subscribe(options);
+    this.dispatch(events.clear);
   }
 }
 

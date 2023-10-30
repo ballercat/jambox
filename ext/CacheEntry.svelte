@@ -11,9 +11,14 @@
   let currentTab = 'details';
 
   const cacheEntry = $store.cache[id];
-  let response, request, details;
+  let response, request, details, previousPage;
 
   $: {
+    // there is no history.back in svelte-routing so we always push a new path
+    // by using Link. This is fine though since there is no back/forward buttons
+    // inside an extension either way
+    const search = new URLSearchParams(history.location.search);
+    previousPage = search.get('from') || '/cache';
     response = cacheEntry.response;
     request = cacheEntry.request;
     details = without(['request', 'response'], cacheEntry);
@@ -30,7 +35,9 @@
 </script>
 
 <div data-cy-id="cache-detail" class="Wrapper">
-  <Link data-cy-id="back-to-cache" to="/cache">Back</Link>
+  <Link data-cy-id="back-to-cache" to={previousPage}
+    >Back to {previousPage}</Link
+  >
   <div class="Box">
     <button
       data-cy-id="select-details-tab"
@@ -96,7 +103,6 @@
   }
   .Request {
     margin-bottom: 20px;
-    height: 50%;
   }
   .Box {
     margin: 10px 0;

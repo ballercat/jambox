@@ -1,4 +1,6 @@
-const debug = require('debug')('jambox.config');
+const { createDebug } = require('./diagnostics.js');
+
+const debug = createDebug('jambox.config');
 
 module.exports = (filepath) => {
   try {

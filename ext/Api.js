@@ -1,5 +1,6 @@
 // @ts-check
 import Observable from 'zen-observable';
+import { debounce } from './nodash';
 
 /**
  * @typedef {import('./types').Subscribtion} Subscribtion
@@ -36,9 +37,13 @@ export default class API {
     this.socketURL = new URL(`ws://${host}:${port}`);
     this.apiURL = new URL(`http://${host}:${port}/api`);
     this.callbacks = new Set();
+    this._listen = debounce(this._listen.bind(this), 10);
     this._listen();
   }
 
+  /**
+   * @private
+   */
   _listen() {
     if (this.#ws && this.#ws.readyState <= 1) {
       return;
@@ -48,12 +53,10 @@ export default class API {
       this.#sub.unsubscribe();
     }
 
-    const boundListen = this._listen.bind(this);
-
     try {
       this.#ws = new WebSocket(this.socketURL.toString());
       this.#ws.onerror = () => {
-        setTimeout(boundListen, WEBSOCKET_RETRY_TIMER);
+        setTimeout(this._listen, WEBSOCKET_RETRY_TIMER);
       };
       this.#ws.onopen = () => {
         this.observable = new Observable((observer) => {
@@ -78,11 +81,10 @@ export default class API {
         );
       };
       this.#ws.addEventListener('close', () => {
-        setTimeout(boundListen, WEBSOCKET_RETRY_TIMER);
+        setTimeout(this._listen, WEBSOCKET_RETRY_TIMER);
       });
     } catch (e) {
-      console.error(e.name, e);
-      setTimeout(boundListen, WEBSOCKET_RETRY_TIMER);
+      setTimeout(this._listen, WEBSOCKET_RETRY_TIMER);
     }
   }
 

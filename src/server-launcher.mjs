@@ -1,27 +1,35 @@
-import _debug from 'debug';
+// @ts-check
+import * as path from 'path';
+import * as fs from 'node:fs';
 import waitOn from 'wait-on';
-import path from 'path';
-import fs from 'fs';
 import fetch from 'node-fetch';
 import { spawn } from 'child_process';
 import { PROJECT_ROOT, getVersion } from './constants.mjs';
+import { createDebug } from './diagnostics.js';
 
-const debug = _debug('jambox');
+const debug = createDebug();
 
-const ping = async (port) => {
+/**
+ * @param href {String}
+ */
+const ping = async (href) => {
   try {
-    await waitOn({ resources: [`http://localhost:${port}`], timeout: 500 });
+    await waitOn({ resources: [href], timeout: 500 });
     return true;
   } catch (error) {
     return false;
   }
 };
 
-const spawnServerProcess = async ({ port, config, constants }) => {
+const spawnServerProcess = async ({ config, constants }) => {
   const out = fs.openSync(config.logLocation, 'a');
   const child = spawn(
     'node',
-    [path.join(PROJECT_ROOT, './jam-server.mjs'), '--port', port],
+    [
+      path.join(PROJECT_ROOT, './jam-server.mjs'),
+      '--port',
+      config.serverURL.port,
+    ],
     {
       detached: true,
       // All of the server output is piped into a file
@@ -29,7 +37,7 @@ const spawnServerProcess = async ({ port, config, constants }) => {
       env: {
         ...process.env,
         DEBUG: 'jambox*',
-        DEBUG_COLORS: 0,
+        DEBUG_COLORS: '0',
         NODE_EXTRA_CA_CERTS: path.join(constants.PROJECT_ROOT, 'testCA.pem'),
       },
     }
@@ -39,18 +47,19 @@ const spawnServerProcess = async ({ port, config, constants }) => {
 
   debug('Waiting on the server to become available');
   await waitOn({
-    resources: [`http://localhost:${port}`],
+    resources: [config.serverURL.href],
     timeout: 1000 * 10,
   });
 };
 
 // Returns when a server instance is available
-const launcher = async ({ log, port, constants, config }) => {
+const launcher = async ({ log, constants, config }) => {
   debug('Checking if a server instance is running.');
-  const isServerAvailable = await ping(port);
+  const isServerAvailable = await ping(config.serverURL.href);
+
   if (isServerAvailable) {
     // Would be slightly nicer if waitOn could return the values from the pinged endpoints...
-    const apiVersion = await fetch(`http://localhost:${port}/`).then((res) =>
+    const apiVersion = await fetch(config.serverURL.href).then((res) =>
       res.text()
     );
     const currentVersion = getVersion();
@@ -61,16 +70,16 @@ const launcher = async ({ log, port, constants, config }) => {
         }).`
       );
       log(`Killing old version.`);
-      await fetch(`http://localhost:${port}/shutdown`);
+      await fetch(`${config.serverURL.origin}/shutdown`);
       log(`Starting a new Jambox process.`);
-      await spawnServerProcess({ port, config, constants });
+      await spawnServerProcess({ config, constants });
     }
     return;
   }
 
   log('Jambox server not currently running. Launching an instance');
 
-  await spawnServerProcess({ port, config, constants });
+  await spawnServerProcess({ config, constants });
 };
 
 export default launcher;

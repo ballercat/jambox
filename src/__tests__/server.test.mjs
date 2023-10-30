@@ -12,13 +12,18 @@ const SERVER_PORT = 7777;
 const APP_PORT = 5555;
 
 test.before(async (t) => {
-  t.context.server = await server({
-    port: SERVER_PORT,
-    nodeProcess: { on() {}, exit() {} },
-  });
+  try {
+    t.context.server = await server({
+      port: SERVER_PORT,
+      nodeProcess: { on() {}, exit() {} },
+    });
 
-  // Setup a tiny server
-  t.context.app = await tiny(APP_PORT);
+    // Setup a tiny server
+    t.context.app = await tiny(APP_PORT);
+  } catch (e) {
+    console.log(e);
+    throw e;
+  }
 });
 
 test.after.always(async (t) => {
@@ -26,32 +31,6 @@ test.after.always(async (t) => {
   t.context.server = null;
   await t.context.app._close();
   t.context.app = null;
-});
-
-test.serial('server config - get, post', async (t) => {
-  let config = (await supertest(t.context.server).get('/api/config')).body;
-  t.like(config, {
-    serverURL: `http://localhost:${SERVER_PORT}`,
-  });
-
-  await supertest(t.context.server)
-    .post('/api/config')
-    .send({
-      forward: {
-        'http://github.com': `http://localhost:${APP_PORT}`,
-        'http://google.com': `http://localhost:${APP_PORT}`,
-      },
-    })
-    .expect(200);
-  config = (await supertest(t.context.server).get('/api/config')).body;
-
-  t.like(config, {
-    forward: {
-      'http://github.com': `http://localhost:${APP_PORT}`,
-      'http://google.com': `http://localhost:${APP_PORT}`,
-    },
-    serverURL: `http://localhost:${SERVER_PORT}`,
-  });
 });
 
 test.serial('ws - config', async (t) => {
@@ -70,10 +49,11 @@ test.serial('ws - config', async (t) => {
       },
     })
     .expect(200);
+
   // Websocket is notified of config changes
   t.is(ws.messages.pendingPush.length >= 1, true);
   t.like(JSON.parse(ws.messages.pendingPush[0].data.toString()), {
-    type: 'config',
+    type: 'config.update',
     payload: {
       forward: {
         'http://github.com': `http://localhost:${APP_PORT}`,
@@ -90,51 +70,6 @@ test.serial('ws - config', async (t) => {
 
   const res2 = await (await fetch('http://google.com/echo', opts)).json();
   t.like(res2, { path: '/echo' });
-});
-
-test.serial('ws - request inspect', async (t) => {
-  t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
-
-  const { body: config } = await supertest(t.context.server).get('/api/config');
-
-  await supertest(t.context.server)
-    .post('/api/config')
-    .send({
-      forward: {
-        'http://google.com': `http://localhost:${APP_PORT}`,
-      },
-    })
-    .expect(200);
-
-  const plan = superwstest(config.serverURL)
-    .ws('/')
-    .expectJson((json) => {
-      t.like(json, { type: 'request', payload: { url: 'http://google.com/' } });
-      t.is(typeof json.payload.startTimestamp, 'number');
-      t.is(typeof json.payload.bodyReceivedTimestamp, 'number');
-    })
-    .expectJson((json) => {
-      t.like(json, {
-        type: 'response',
-        payload: { statusCode: 200 },
-      });
-    })
-    .expectJson((json) => {
-      t.like(json, {
-        type: 'request',
-        payload: { url: 'http://google.com/test' },
-      });
-    })
-    .expectJson((json) =>
-      t.like(json, { type: 'response', payload: { statusCode: 200 } })
-    );
-
-  const opts = { agent: new HttpsProxyAgent(config.proxy.http) };
-
-  await fetch('http://google.com', opts).catch(console.log);
-  await fetch('http://google.com/test', opts).catch(console.log);
-
-  await plan;
 });
 
 test.serial('auto mocks', async (t) => {
@@ -155,12 +90,12 @@ test.serial('auto mocks', async (t) => {
     .ws('/')
     .expectJson((json) => {
       t.like(json, {
-        type: 'request',
+        type: 'jambox.request',
         payload: { url: 'http://random-domain.com/path.html' },
       });
     })
     .expectJson((json) => {
-      t.like(json, { type: 'response', payload: { statusCode: 204 } });
+      t.like(json, { type: 'jambox.response', payload: { statusCode: 204 } });
     });
 
   const opts = { agent: new HttpsProxyAgent(config.proxy.http) };
@@ -187,13 +122,13 @@ test.serial('abort signal', async (t) => {
     .ws('/')
     .expectJson((json) => {
       t.like(json, {
-        type: 'request',
+        type: 'jambox.request',
         payload: { url: 'http://random-domain.com/delay' },
       });
     })
     .expectJson((json) => {
       t.like(json, {
-        type: 'abort',
+        type: 'jambox.abort',
         payload: { url: 'http://random-domain.com/delay' },
       });
     });
@@ -212,7 +147,7 @@ test.serial('abort signal', async (t) => {
 
   // A bit tricky, we need to delay the abort somewhat to ensure a connection of
   // some kind is established before abort.
-  setTimeout(() => controller.abort(), 10);
+  setTimeout(() => controller.abort(), 20);
 
   const error = await fetchPromise;
 

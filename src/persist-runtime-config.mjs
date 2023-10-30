@@ -15,14 +15,11 @@ import { EXTENSION_PATH } from './constants.mjs';
  * the server, from there the extension may use the REST API
  * to communicate with the server.
  *
- * @typedef {Object} RuntimeConfig - Runtime configuration
- * @property {string} host - hostname
- * @property {number} port - port number
- * @param {RuntimeConfig} config - Config object
+ * @param {URL} serverURL
  */
-export default function persistRuntimeConfig(config) {
+export default function persistRuntimeConfig(serverURL) {
   fs.writeFileSync(
     path.join(EXTENSION_PATH, 'runtime.json'),
-    JSON.stringify(config, null, 2)
+    JSON.stringify({ host: serverURL.hostname, port: serverURL.port }, null, 2)
   );
 }

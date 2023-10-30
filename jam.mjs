@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 import record from './src/record.mjs';
 import * as constants from './src/constants.mjs';
+import { enable as enableDiagnostics } from './src/diagnostics.js';
+
+enableDiagnostics();
 
 const run = async (argv, cwd) => {
   console.log('📻 Jambox 📻');

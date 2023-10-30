@@ -18,6 +18,8 @@ const getContentType = (url, response) => {
 };
 
 export const initialState = {
+  // these only track initial errors (for now)
+  errors: [],
   complete: false,
   config: {},
   http: {},
@@ -49,9 +51,10 @@ export const reducer = (state, action) => {
         http: {},
       };
     }
-    case 'config': {
+    case 'config.update': {
       return {
         ...state,
+        errors: [],
         config: payload,
       };
     }
@@ -68,7 +71,7 @@ export const reducer = (state, action) => {
         complete: true,
       };
     }
-    case 'abort': {
+    case 'jambox.abort': {
       if (state.complete) return state;
       return {
         ...state,
@@ -81,7 +84,7 @@ export const reducer = (state, action) => {
         },
       };
     }
-    case 'request': {
+    case 'jambox.request': {
       if (state.complete) return state;
       const url = new URL(payload.url);
       return {
@@ -96,7 +99,7 @@ export const reducer = (state, action) => {
         },
       };
     }
-    case 'response': {
+    case 'jambox.response': {
       if (state.complete) return state;
       // Extension refresh in the middle of a request -> response cycle
       if (!state.http[payload.id]) {
@@ -135,6 +138,7 @@ export const reducer = (state, action) => {
       }
       return {
         ...state,
+        errors: [],
         cache: {
           ...state.cache,
           ...payload,
@@ -160,6 +164,9 @@ export const reducer = (state, action) => {
           },
         },
       };
+    }
+    case 'error': {
+      return { ...state, errors: [...state.errors, ...payload] };
     }
     default:
       return state;

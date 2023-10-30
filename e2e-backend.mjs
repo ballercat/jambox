@@ -2,6 +2,9 @@
 import http from 'http';
 import tinyServer from './src/utils/tiny-server.mjs';
 import jamboxServer from './src/server/index.mjs';
+import { enable as enableDiagnostics } from './src/diagnostics.js';
+
+enableDiagnostics();
 
 const launch = async () => {
   await tinyServer(7777);

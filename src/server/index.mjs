@@ -1,22 +1,27 @@
 // @ts-check
-import fs from 'fs';
-import path from 'path';
-import _debug from 'debug';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import express from 'express';
 import expessWS from 'express-ws';
 import bodyParser from 'body-parser';
-import mockttp from 'mockttp';
-import Cache from '../cache.mjs';
-import setupAPI from './api.mjs';
-import setupHandlers from './handlers.mjs';
-import { PROJECT_ROOT } from '../constants.mjs';
+import * as mockttp from 'mockttp';
+import { PROJECT_ROOT, getVersion } from '../constants.mjs';
+import Jambox from '../Jambox.mjs';
+import noop from '../noop.mjs';
+import { enter } from '../store.mjs';
+import Broadcaster from './Broadcaster.mjs';
+import cacheRouter from './routes/cache.route.mjs';
+import resetRouter from './routes/reset.route.mjs';
+import configRouter from './routes/config.route.mjs';
+import { createDebug } from '../diagnostics.js';
 
-const debug = _debug('jambox');
+const debug = createDebug('server');
 
-const getServices = (filesystem) => {
-  const app = express();
-  const ews = expessWS(app);
-  const cache = new Cache();
+async function start({ port, nodeProcess = process, filesystem = fs }) {
+  nodeProcess.on('exit', (code) => {
+    debug(`Shutting down, code: ${code}`);
+  });
+
   const proxy = mockttp.getLocal({
     recordTraffic: false,
     suggestChanges: false,
@@ -29,42 +34,50 @@ const getServices = (filesystem) => {
         .toString(),
     },
   });
+  await proxy.start();
+  const jambox = new Jambox(proxy, port);
+  await jambox.reset();
+
+  const app = express();
+  const ws = expessWS(app);
+
+  const broadcaster = new Broadcaster(() => ws.getWss().clients);
+  broadcaster.broadcast(jambox.cache);
+  broadcaster.broadcast(jambox.config);
+  broadcaster.broadcast(jambox);
 
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
-  return { app, ws: ews, cache, proxy };
-};
+  app.get('/shutdown', async (_req, res) => {
+    await proxy.stop();
 
-const shutdown = (nodeProcess, svc) => async (req, res) => {
-  await svc.proxy.stop();
+    res.send('Shutting down.');
 
-  res.send('Shutting down.');
+    nodeProcess.exit(0);
+  });
+  app.use((_req, _res, next) => enter({ jambox }, next));
+  app.get('/', (_, res) => res.send(getVersion()));
 
-  nodeProcess.exit(0);
-};
+  app.use('/api', configRouter);
+  app.use('/api', cacheRouter);
+  app.use('/api', resetRouter);
+  // enable websocket connects
+  // @ts-ignore
+  app.ws('/', noop);
 
-async function start({ port, nodeProcess = process, filesystem = fs }) {
-  const svc = getServices(filesystem);
-  const config = {
-    value: { serverURL: `http://localhost:${port}` },
-  };
-
-  await svc.proxy.start();
-  await setupHandlers(svc, config);
-
-  setupAPI(svc, config);
-
-  svc.app.get('/shutdown', shutdown(nodeProcess, svc));
-  svc.app.listen(port, () =>
-    debug(`Jambox ${config.value.serverURL}. Proxy ${svc.proxy.url}`)
-  );
-
-  nodeProcess.on('exit', (code) => {
-    debug(`Shutting down, code: ${code}`);
+  // eslint-disable-next-line
+  app.use((err, _req, res, _next) => {
+    const statusCode = err.statusCode || 500;
+    debug(`${err.message} ${err.stack}`);
+    res.status(statusCode).json({ error: err.message, stack: err.stack });
   });
 
-  return svc.app;
+  app.listen(port, () =>
+    debug(`Jambox ${jambox.config.serverURL}. Proxy ${proxy.url}`)
+  );
+
+  return app;
 }
 
 export default start;

@@ -5650,6 +5650,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hyperdyperid@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "hyperdyperid@npm:1.2.0"
+  checksum: 210029d1c86926f09109f6317d143f8b056fc38e8dd11b0c3e3205fc6c6ff8429fb55b4b9c2bce065462719ed9d34366eced387aaa0035d93eb76b306a8547ef
+  languageName: node
+  linkType: hard
+
 "iconv-lite@npm:0.4.24":
   version: 0.4.24
   resolution: "iconv-lite@npm:0.4.24"
@@ -6117,8 +6124,8 @@ __metadata:
     html-webpack-plugin: ^5.5.0
     http-encoding: ^1.5.1
     https-proxy-agent: ^5.0.1
+    memfs: ^4.2.1
     minimatch: ^5.1.0
-    mock-fs: ^5.1.4
     mockttp: ^3.9.4
     nock: ^13.2.9
     node-fetch: 2.6.7
@@ -6246,6 +6253,28 @@ __metadata:
   bin:
     jsesc: bin/jsesc
   checksum: b8b44cbfc92f198ad972fba706ee6a1dfa7485321ee8c0b25f5cedd538dcb20cde3197de16a7265430fce8277a12db066219369e3d51055038946039f6e20e17
+  languageName: node
+  linkType: hard
+
+"json-joy@npm:^9.2.0":
+  version: 9.5.1
+  resolution: "json-joy@npm:9.5.1"
+  dependencies:
+    arg: ^5.0.2
+    hyperdyperid: ^1.2.0
+  peerDependencies:
+    quill-delta: ^5
+    rxjs: 7
+    tslib: 2
+  bin:
+    json-pack: bin/json-pack.js
+    json-pack-test: bin/json-pack-test.js
+    json-patch: bin/json-patch.js
+    json-patch-test: bin/json-patch-test.js
+    json-pointer: bin/json-pointer.js
+    json-pointer-test: bin/json-pointer-test.js
+    json-unpack: bin/json-unpack.js
+  checksum: 01b8a26a5b168a36a041c9aaf2942fa4ea636f06a7b9e76814b921c1fd5f0a4bcbd96a39cdf45cfd8a939766ffdf5f7e93c9c593af2a3a8e33fe7bd5548e7d7e
   languageName: node
   linkType: hard
 
@@ -6747,6 +6776,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"memfs@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "memfs@npm:4.2.1"
+  dependencies:
+    json-joy: ^9.2.0
+    thingies: ^1.11.1
+  peerDependencies:
+    tslib: 2
+  checksum: a6c055a020245f27a4460ebfabd19a002d8c5c2b2270baeed9f35fc8f12e40578edbade63b7a5834ae54238309bcb3e6b223f43fad818c9b8be400ebd71586c9
+  languageName: node
+  linkType: hard
+
 "memoize-one@npm:^6.0.0":
   version: 6.0.0
   resolution: "memoize-one@npm:6.0.0"
@@ -6982,13 +7023,6 @@ __metadata:
   bin:
     mkdirp: bin/cmd.js
   checksum: a96865108c6c3b1b8e1d5e9f11843de1e077e57737602de1b82030815f311be11f96f09cce59bd5b903d0b29834733e5313f9301e3ed6d6f6fba2eae0df4298f
-  languageName: node
-  linkType: hard
-
-"mock-fs@npm:^5.1.4":
-  version: 5.2.0
-  resolution: "mock-fs@npm:5.2.0"
-  checksum: c25835247bd26fa4e0189addd61f98973f61a72741e4d2a5694b143a2069b84978443a7ac0fdb1a71aead99273ec22ff4e9c968de11bbd076db020264c5b8312
   languageName: node
   linkType: hard
 
@@ -9503,6 +9537,15 @@ __metadata:
   version: 0.2.0
   resolution: "text-table@npm:0.2.0"
   checksum: b6937a38c80c7f84d9c11dd75e49d5c44f71d95e810a3250bd1f1797fc7117c57698204adf676b71497acc205d769d65c16ae8fa10afad832ae1322630aef10a
+  languageName: node
+  linkType: hard
+
+"thingies@npm:^1.11.1":
+  version: 1.12.0
+  resolution: "thingies@npm:1.12.0"
+  peerDependencies:
+    tslib: ^2
+  checksum: 04b75d264e1880676fb9f400b2c0e069abdd00de1fa006d9daee527ad6d899828169fd46bb17e7cabf2802b7dbd64053106e29e7a7aa271659f5b41b3a11657f
   languageName: node
   linkType: hard
 
