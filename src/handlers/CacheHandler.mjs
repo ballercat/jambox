@@ -5,14 +5,29 @@ import Cache from '../Cache.mjs';
 export default class CacheHandler extends mockttp.requestHandlers
   .CallbackHandler {
   /**
-   * @param svc {object}
-   * @param svc.cache {Cache}
+   * Empty cache response
    */
-  constructor(svc) {
+  static NO_CACHE_RESULT = {
+    statusCode: 404,
+    statusMessage: 'No cached result found',
+    json: {
+      errors: [
+        'This request was matched, but no previous response found in cache.',
+      ],
+    },
+  };
+
+  /**
+   * @param {import('../Jambox.mjs').default} jambox
+   */
+  constructor(jambox) {
     const callback = async (completedRequest) => {
       try {
         const hash = await Cache.hash(completedRequest);
-        const { response } = svc.cache.get(hash);
+        if (!jambox.cache.has(hash)) {
+          return CacheHandler.NO_CACHE_RESULT;
+        }
+        const { response } = jambox.cache.get(hash);
         return {
           headers: {
             ...response.headers,
@@ -25,7 +40,16 @@ export default class CacheHandler extends mockttp.requestHandlers
           statusMessage: response.statusMessage,
         };
       } catch (e) {
-        throw new Error('Error');
+        return {
+          statusCode: 500,
+          statusMessage: 'Internal jambox error',
+          json: {
+            errors: [
+              'CacheHandler encountered an error',
+              `${e.message} ${e.stack}`,
+            ],
+          },
+        };
       }
     };
 

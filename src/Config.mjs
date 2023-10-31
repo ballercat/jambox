@@ -36,7 +36,10 @@ export default class Config extends Emitter {
   noProxy = ['<-loopback->'];
   trust = new Set();
   forward = null;
-  cache = null;
+  /**
+   * @member {object|null}
+   */
+  cache;
   stub = null;
   blockNetworkRequests = false;
   paused = false;
@@ -70,6 +73,7 @@ export default class Config extends Emitter {
     this.serverURL = new URL('http://localhost');
     this.serverURL.port = port || '9000';
     this.proxy = proxy;
+    this.cache = null;
     this.update(rest);
   }
 

@@ -6,7 +6,7 @@
     "react-dom": "^18.2.0"
   },
   "scripts": {
-    "dev": "../../jam.mjs next",
+    "dev": "../../jam.mjs --reset next",
     "build": "next build",
     "start": "next start",
     "visit": "../../jam.mjs http://jambox-demo-graphql.vercel.app",
