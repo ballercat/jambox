@@ -21,7 +21,16 @@ const ping = async (href) => {
   }
 };
 
-const spawnServerProcess = async ({ config, constants }) => {
+/**
+ * Launches the jambox server in a new process
+ *
+ * @param {object}                         options
+ * @param {(msg: string) => void}          options.log
+ * @param {import('./Config.mjs').default} options.config
+ * @param {object}                         options.constants
+ */
+const spawnServerProcess = async ({ log, config, constants }) => {
+  log('Launching a new Jambox instance.');
   const out = fs.openSync(config.logLocation, 'a');
   const child = spawn(
     'node',
@@ -52,34 +61,54 @@ const spawnServerProcess = async ({ config, constants }) => {
   });
 };
 
-// Returns when a server instance is available
-const launcher = async ({ log, constants, config }) => {
+/**
+ * Kill a running server
+ *
+ * @param {import('./Config.mjs').default}  config
+ * @param {(msg: string) => void}           log
+ */
+const killOldServer = (config, log) => {
+  log(`Sending a shutdown signal to running Jambox server.`);
+  return fetch(new URL('shutdown', config.serverURL));
+};
+
+/**
+ * Returns when a server instance is available
+ *
+ * @param {object}                          options
+ * @param {object}                          options.constants
+ * @param {(msg: string) => void}           options.log
+ * @param {import('./Config.mjs').default}  options.config
+ * @param {object}                          options.flags
+ */
+const launcher = async ({ log, constants, config, flags }) => {
   debug('Checking if a server instance is running.');
   const isServerAvailable = await ping(config.serverURL.href);
-
-  if (isServerAvailable) {
-    // Would be slightly nicer if waitOn could return the values from the pinged endpoints...
-    const apiVersion = await fetch(config.serverURL.href).then((res) =>
-      res.text()
-    );
-    const currentVersion = getVersion();
-    if (currentVersion !== null && apiVersion !== currentVersion) {
-      log(
-        `Installed version (${getVersion()}) is different from running version (${
-          apiVersion || '??'
-        }).`
-      );
-      log(`Killing old version.`);
-      await fetch(`${config.serverURL.origin}/shutdown`);
-      log(`Starting a new Jambox process.`);
-      await spawnServerProcess({ config, constants });
-    }
-    return;
+  if (!isServerAvailable) {
+    return spawnServerProcess({ log, config, constants });
   }
 
-  log('Jambox server not currently running. Launching an instance');
+  if (flags.reset) {
+    log('Resetting.');
+    await killOldServer(config, log);
+    return spawnServerProcess({ log, config, constants });
+  }
 
-  await spawnServerProcess({ config, constants });
+  // Would be slightly nicer if waitOn could return the values from the pinged endpoints...
+  const apiVersion = await fetch(config.serverURL.href).then((res) =>
+    res.text()
+  );
+  const currentVersion = getVersion();
+
+  if (currentVersion !== null && apiVersion !== currentVersion) {
+    log(
+      `Installed version (${getVersion()}) is different from running version (${
+        apiVersion || '??'
+      }).`
+    );
+    await killOldServer(config, log);
+    return spawnServerProcess({ log, config, constants });
+  }
 };
 
 export default launcher;

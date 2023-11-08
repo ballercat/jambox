@@ -1,3 +1,9 @@
+## 0.1.1 - `--reset` cli arg, better messages
+
+- Add custom responses for cache misses while network access is disabled
+- Add custom responses for unmocked requests while network access is disabled
+- Add `--reset`/`-r` reset flag to restart jambox
+
 ## 0.1.0 - Refactor
 
 - Rework internal logic, bump to `0.1.0`

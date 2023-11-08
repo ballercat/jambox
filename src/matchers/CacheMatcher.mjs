@@ -7,24 +7,37 @@ export default class CacheMatcher extends mockttp.matchers.CallbackMatcher {
   #options;
 
   /**
-   * @param svc {object}
-   * @param svc.cache {Cache}
+   * @param {import('../Jambox.mjs').default} jambox
    */
-  constructor(svc, options = {}) {
+  constructor(jambox, options = {}) {
     super(async (request) => {
-      if (svc.cache.bypass()) {
+      if (jambox.cache.bypass()) {
         return false;
       }
 
       const { ignore = [], stage = [] } = options;
       const url = new URL(request.url);
-      const testGlob = (glob) => minimatch(url.hostname + url.pathname, glob);
+      const testGlob = (/** @type {string} */ glob) =>
+        minimatch(url.hostname + url.pathname, glob);
       const ignored = ignore.some(testGlob);
+
+      if (ignored) {
+        return false;
+      }
+
       const matched = stage.some(testGlob);
+
+      if (!matched) {
+        return;
+      }
+
+      if (jambox.config.blockNetworkRequests) {
+        return true;
+      }
 
       const hash = await Cache.hash(request);
 
-      return !ignored && matched && svc.cache.has(hash);
+      return jambox.cache.has(hash);
     });
     this.#options = options;
   }

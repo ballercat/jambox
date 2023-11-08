@@ -15,7 +15,7 @@ test.before(async (t) => {
   try {
     t.context.server = await server({
       port: SERVER_PORT,
-      nodeProcess: { on() {}, exit() {} },
+      nodeProcess: { on() {}, exit() {}, pid: '0' },
     });
 
     // Setup a tiny server
@@ -199,7 +199,7 @@ test.serial('pause', async (t) => {
 });
 
 // NOTE: This does work but needs a better cache mock
-test('server - reset', async (t) => {
+test.serial('server - reset', async (t) => {
   t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
 
   const cacheDir = path.join(PROJECT_ROOT, 'src', '__mocks__', 'cache-dir');

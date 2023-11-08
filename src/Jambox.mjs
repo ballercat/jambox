@@ -45,7 +45,12 @@ export default class Jambox extends Emitter {
     this.cache = new Cache();
     this.proxy = proxy;
 
-    this.config.subscribe(this.reset.bind(this));
+    this.onAbort = this.onAbort.bind(this);
+    this.onRequest = this.onRequest.bind(this);
+    this.onResponse = this.onResponse.bind(this);
+    this.reset = this.reset.bind(this);
+
+    this.config.subscribe(this.reset);
   }
 
   async reset() {
@@ -53,9 +58,9 @@ export default class Jambox extends Emitter {
     await this.proxy.reset();
     await this.cache.reset({ ...this.config.cache });
 
-    this.proxy.on('abort', this.#onAbort.bind(this));
-    this.proxy.on('request', this.#onRequest.bind(this));
-    this.proxy.on('response', this.#onResponse.bind(this));
+    this.proxy.on('abort', this.onAbort);
+    this.proxy.on('request', this.onRequest);
+    this.proxy.on('response', this.onResponse);
 
     if (!this.config.blockNetworkRequests) {
       await this.proxy
@@ -63,8 +68,13 @@ export default class Jambox extends Emitter {
         .asPriority(98)
         .thenPassThrough({
           // Trust any hosts specified.
-          ignoreHostHttpsErrors: [...this.config.trust],
+          ignoreHostHttpsErrors: Array.from(this.config.trust),
         });
+    } else {
+      await this.proxy
+        .forAnyRequest()
+        .asPriority(98)
+        .thenReply(418, 'Network access disabled', '');
     }
 
     if (this.config.paused) {
@@ -72,19 +82,19 @@ export default class Jambox extends Emitter {
     }
 
     if (this.config.cache) {
-      await this.#record(this.config.cache);
+      await this.record(this.config.cache);
     }
 
     if (this.config.forward) {
-      await this.#forward(this.config.forward);
+      await this.forward(this.config.forward);
     }
 
     if (this.config.stub) {
-      await this.#stub(this.config.stub);
+      await this.stub(this.config.stub);
     }
   }
 
-  #record(setting) {
+  record(setting) {
     return this.proxy.addRequestRule({
       priority: 100,
       matchers: [new CacheMatcher(this, setting)],
@@ -92,7 +102,7 @@ export default class Jambox extends Emitter {
     });
   }
 
-  #forward(setting) {
+  forward(setting) {
     return Promise.all(
       Object.entries(setting).map(async ([original, ...rest]) => {
         const options =
@@ -150,7 +160,7 @@ export default class Jambox extends Emitter {
     );
   }
 
-  #stub(setting) {
+  stub(setting) {
     return Promise.all(
       Object.entries(setting).map(([path, value]) => {
         const options = typeof value === 'object' ? value : { status: value };
@@ -158,7 +168,7 @@ export default class Jambox extends Emitter {
           return;
         }
 
-        let response = null;
+        let response = Buffer.from('');
         if (options.file) {
           response = fs.readFileSync(options.file);
         } else if (options.body && typeof options.body === 'object') {
@@ -178,7 +188,7 @@ export default class Jambox extends Emitter {
     );
   }
 
-  #shouldStage(url) {
+  shouldStage(url) {
     if (this.cache.bypass() || this.config.blockNetworkRequests) {
       return false;
     }
@@ -187,19 +197,25 @@ export default class Jambox extends Emitter {
     const stageList = this.config.cache?.stage || [];
 
     const matchValue = url.hostname + url.pathname;
-    if (ignoreList.some((glob) => minimatch(matchValue, glob))) {
+    if (
+      ignoreList.some((/** @type {string} */ glob) =>
+        minimatch(matchValue, glob)
+      )
+    ) {
       return false;
     }
 
-    return stageList.some((glob) => minimatch(matchValue, glob));
+    return stageList.some((/** @type {string} */ glob) =>
+      minimatch(matchValue, glob)
+    );
   }
 
-  async #onRequest(request) {
+  async onRequest(request) {
     try {
       const url = new URL(request.url);
       const hash = await Cache.hash(request);
       const cached = this.cache.has(hash);
-      const staged = cached ? false : this.#shouldStage(url);
+      const staged = cached ? false : this.shouldStage(url);
 
       if (staged) {
         this.cache.add(request);
@@ -218,7 +234,7 @@ export default class Jambox extends Emitter {
     }
   }
 
-  async #onResponse(response) {
+  async onResponse(response) {
     try {
       if (!this.cache.bypass() && this.cache.hasStaged(response)) {
         await this.cache.commit(response);
@@ -231,7 +247,7 @@ export default class Jambox extends Emitter {
     }
   }
 
-  async #onAbort(abortedRequest) {
+  async onAbort(abortedRequest) {
     if (this.cache.hasStaged(abortedRequest)) {
       this.cache.abort(abortedRequest);
     }

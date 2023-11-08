@@ -1,19 +1,21 @@
 // @ts-check
+import * as path from 'node:path';
+import { spawn } from 'node:child_process';
 import fetch from 'node-fetch';
-import path from 'path';
-import { spawn } from 'child_process';
 import persistRuntimeConfig from './persist-runtime-config.mjs';
 import launchProxiedChrome from './browser.mjs';
 import isURI from './is-uri.mjs';
 import launchServer from './server-launcher.mjs';
 import Config from './Config.mjs';
+import { parseArgs, JAMBOX_FLAGS } from './parse-args.mjs';
 import { createDebug } from './diagnostics.js';
 
 const debug = createDebug();
 
-export default async function record(options) {
+export default async function cli(options) {
   const { script, cwd = process.cwd(), log, env, constants } = options;
-  const [entrypoint, ...args] = script;
+  const flags = parseArgs(script, JAMBOX_FLAGS);
+  const [entrypoint, ...args] = flags.target;
 
   debug('Checking if a server instance is running.');
 
@@ -21,7 +23,7 @@ export default async function record(options) {
   config.load(cwd);
 
   try {
-    await launchServer({ log, constants, config });
+    await launchServer({ log, constants, config, flags });
   } catch (error) {
     log(`Failed to launch a server, terminating. ${error}`);
     throw error;

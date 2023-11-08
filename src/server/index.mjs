@@ -52,7 +52,7 @@ async function start({ port, nodeProcess = process, filesystem = fs }) {
   app.get('/shutdown', async (_req, res) => {
     await proxy.stop();
 
-    res.send('Shutting down.');
+    res.send(nodeProcess.pid.toString());
 
     nodeProcess.exit(0);
   });
