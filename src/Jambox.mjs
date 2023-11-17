@@ -73,8 +73,24 @@ export default class Jambox extends Emitter {
     } else {
       await this.proxy
         .forAnyRequest()
+        .matching((req) => {
+          const url = new URL(req.url);
+          return url.hostname !== 'localhost';
+        })
         .asPriority(98)
         .thenReply(418, 'Network access disabled', '');
+
+      // Even if network access is disabled, allow localhost requests (for any port).
+      // Priority set to 1 in-case the user want's to override this behavior
+      // See https://github.com/ballercat/jambox/issues/42
+      await this.proxy
+        .forAnyRequest()
+        .matching((req) => {
+          const url = new URL(req.url);
+          return url.hostname === 'localhost';
+        })
+        .asPriority(1)
+        .thenPassThrough();
     }
 
     if (this.config.paused) {
