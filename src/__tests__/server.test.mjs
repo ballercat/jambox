@@ -198,6 +198,34 @@ test.serial('pause', async (t) => {
   t.is(res.statusText, 'jambox stub');
 });
 
+test.serial('blocked network still allows localhost requests', async (t) => {
+  t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
+
+  const { body: config } = await supertest(t.context.server).get('/api/config');
+
+  const opts = { agent: new HttpsProxyAgent(config.proxy.http) };
+
+  // works prior to blocking network requests
+  let response = await fetch(`http://localhost:${APP_PORT}/foobar`, opts);
+
+  t.is(response.status, 200);
+
+  let json = await response.json();
+  t.like(json, { path: '/foobar' });
+
+  await supertest(t.context.server)
+    .post('/api/config')
+    .send({ blockNetworkRequests: true })
+    .expect(200);
+
+  response = await fetch(`http://localhost:${APP_PORT}/foobar`, opts);
+
+  t.is(response.status, 200);
+
+  json = await response.json();
+  t.like(json, { path: '/foobar' });
+});
+
 // NOTE: This does work but needs a better cache mock
 test.serial('server - reset', async (t) => {
   t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
