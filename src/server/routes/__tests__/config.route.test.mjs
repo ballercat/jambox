@@ -16,7 +16,12 @@ test('get & post api', async (t) => {
 
   const app = express();
   app.use(bodyParser.json());
-  app.use((req, res, next) => enter({ jambox: { config, reset() {} } }, next));
+  app.use((req, res, next) =>
+    enter(
+      { jambox: { config, reset() {}, once: () => Promise.resolve() } },
+      next
+    )
+  );
   app.use('/api', router);
 
   await supertest(app)

@@ -9,6 +9,7 @@ router.get('/config', async (_, res) => res.send(jambox().config.serialize()));
 router.post('/config', async (req, res, next) => {
   try {
     jambox().config.update(req.body);
+    await jambox().once('jambox.reset');
     res.sendStatus(200);
   } catch (error) {
     next(error);
@@ -21,6 +22,7 @@ router.post('/pause', async (req, res, next) => {
   try {
     const { paused } = req.body;
     jambox().config.update({ paused });
+    await jambox().once('jambox.reset');
     res.sendStatus(200);
   } catch (error) {
     next(error);

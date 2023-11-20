@@ -55,6 +55,7 @@ export default class Jambox extends Emitter {
 
   async reset() {
     debug('Reset');
+
     await this.proxy.reset();
     await this.cache.reset({ ...this.config.cache });
 
@@ -93,21 +94,21 @@ export default class Jambox extends Emitter {
         .thenPassThrough();
     }
 
-    if (this.config.paused) {
-      return;
+    if (!this.config.paused) {
+      if (this.config.cache) {
+        await this.record(this.config.cache);
+      }
+
+      if (this.config.forward) {
+        await this.forward(this.config.forward);
+      }
+
+      if (this.config.stub) {
+        await this.stub(this.config.stub);
+      }
     }
 
-    if (this.config.cache) {
-      await this.record(this.config.cache);
-    }
-
-    if (this.config.forward) {
-      await this.forward(this.config.forward);
-    }
-
-    if (this.config.stub) {
-      await this.stub(this.config.stub);
-    }
+    this.dispatch('reset');
   }
 
   record(setting) {
