@@ -1,3 +1,7 @@
+## 0.1.2 - Fix config api route
+
+- fix: wait on `reset` event during config api calls
+
 ## 0.1.1 - `--reset` cli arg, better messages
 
 - feat: custom responses for cache misses while network access is disabled
