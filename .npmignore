@@ -11,6 +11,7 @@ test-report.xml
 # misc folders
 coverage
 dist
+docs
 public
 recipes
 cypress
