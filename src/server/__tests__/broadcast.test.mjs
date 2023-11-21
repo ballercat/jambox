@@ -11,8 +11,8 @@ test('cache broadcast', async (t) => {
       this.data.push(event);
     },
   };
-  const broadcaster = new Broadcaster(() => [client]);
-  const cache = new Cache('test');
+  const broadcaster = new Broadcaster(() => new Set([client]));
+  const cache = new Cache();
 
   broadcaster.broadcast(cache);
 

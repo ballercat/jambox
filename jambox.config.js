@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * This config is used for integration tests
  *
@@ -5,6 +6,10 @@
  * - Used to reset the running jambox instance during tests
  * - Causes .jambox/default.tape.zip to be written
  * - Leave .jambox/default.tape.zip empty after integration tests
+ */
+
+/**
+ * @implements import('./index.d.ts').JamboxConfig
  */
 module.exports = {
   blockNetworkRequests: false,

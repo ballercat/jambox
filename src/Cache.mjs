@@ -53,9 +53,13 @@ export const events = {
 };
 
 class Cache extends Emitter {
-  #staged = {};
-  #cache = {};
-  #bypass = false;
+  /** @private */
+  staged = {};
+  /** @private */
+  cache = {};
+  /** @private */
+  _bypass = false;
+
   /**
    * @member {PortablePath}
    */
@@ -66,7 +70,7 @@ class Cache extends Emitter {
   }
 
   /**
-   * @type request {Request}
+   * @param request {import('mockttp').CompletedRequest}
    */
   static async hash(request) {
     const body = await request.body.getText();
@@ -78,15 +82,15 @@ class Cache extends Emitter {
 
   bypass(value) {
     if (typeof value !== 'undefined') {
-      debug(`set bypass from ${this.#bypass} to ${value}`);
-      this.#bypass = value;
+      debug(`set bypass from ${this._bypass} to ${value}`);
+      this._bypass = value;
     }
 
-    return this.#bypass;
+    return this._bypass;
   }
 
   all() {
-    return { ...this.#cache };
+    return { ...this.cache };
   }
 
   /**
@@ -97,7 +101,7 @@ class Cache extends Emitter {
       return;
     }
 
-    if (this.#staged[request.id]) {
+    if (this.staged[request.id]) {
       debug(
         `avoiding overwritting an existing staged request to ${request.url}`
       );
@@ -106,7 +110,7 @@ class Cache extends Emitter {
 
     debug(`add()[stage] ${request.url}`);
     this.dispatch(events.stage, { request: { ...request } });
-    this.#staged[request.id] = request;
+    this.staged[request.id] = request;
   }
 
   /**
@@ -118,7 +122,7 @@ class Cache extends Emitter {
     }
 
     this.dispatch(events.abort, { request: { ...request } });
-    delete this.#staged[request.id];
+    delete this.staged[request.id];
   }
 
   hasStaged(request) {
@@ -126,7 +130,7 @@ class Cache extends Emitter {
       return false;
     }
 
-    return Boolean(this.#staged[request.id]);
+    return Boolean(this.staged[request.id]);
   }
 
   /**
@@ -137,18 +141,18 @@ class Cache extends Emitter {
       return;
     }
 
-    const request = this.#staged[response.id];
+    const request = this.staged[response.id];
     const hash = await Cache.hash(request);
 
     debug(`commit() url ${request.url} -- hash ${hash}`);
-    this.#cache[hash] = {
+    this.cache[hash] = {
       id: hash,
       request,
       response,
     };
-    this.dispatch(events.commit, { ...this.#cache[hash] });
+    this.dispatch(events.commit, { ...this.cache[hash] });
 
-    delete this.#staged[request.id];
+    delete this.staged[request.id];
 
     return hash;
   }
@@ -162,26 +166,26 @@ class Cache extends Emitter {
     }
 
     const hash = await Cache.hash(request);
-    if (!this.#cache[hash]) {
+    if (!this.cache[hash]) {
       return;
     }
 
     debug(`Revert ${hash}`);
-    this.dispatch(events.revert, { ...this.#cache[hash] });
-    delete this.#cache[hash];
+    this.dispatch(events.revert, { ...this.cache[hash] });
+    delete this.cache[hash];
   }
 
   has(hash) {
-    return Boolean(this.#cache[hash]);
+    return Boolean(this.cache[hash]);
   }
 
   get(hash) {
     debug(`get() ${hash}`);
-    return this.#cache[hash];
+    return this.cache[hash];
   }
 
   findById(id) {
-    return Object.values(this.#cache).find((pair) => pair.request.id === id);
+    return Object.values(this.cache).find((pair) => pair.request.id === id);
   }
 
   /**
@@ -197,7 +201,7 @@ class Cache extends Emitter {
     const zipfs = new ZipFS(this.tape, { create });
 
     for (const hash of ids) {
-      const record = this.#cache[hash];
+      const record = this.cache[hash];
       if (!record) {
         debug(`Attempted to record ${hash} but it's not found`);
         return;
@@ -207,8 +211,8 @@ class Cache extends Emitter {
       // 'pretty-print' json since it'll be compressed anyway
       await zipfs.writeFilePromise(filename, JSON.stringify(record, null, 2));
 
-      this.#cache[hash] = {
-        ...this.#cache[hash],
+      this.cache[hash] = {
+        ...this.cache[hash],
         tape: this.tape,
         filename,
       };
@@ -262,7 +266,7 @@ class Cache extends Emitter {
           const json = JSON.parse(content);
           const obj = deserialize(json);
 
-          this.#cache[name] = {
+          this.cache[name] = {
             id: name,
             request: obj.request,
             response: obj.response,
@@ -304,7 +308,7 @@ class Cache extends Emitter {
 
     for (const hash of ids) {
       try {
-        const record = this.#cache[hash];
+        const record = this.cache[hash];
 
         if (!record) {
           const errorMessage = `Attempted to delete a record that does not exist ${hash}`;
@@ -335,23 +339,20 @@ class Cache extends Emitter {
   }
 
   async update({ id, response }) {
-    const newResponse = await updateResponse(
-      this.#cache[id].response,
-      response
-    );
+    const newResponse = await updateResponse(this.cache[id].response, response);
 
-    this.#cache[id].response = newResponse;
+    this.cache[id].response = newResponse;
     debug(`Update record ${id}`);
-    this.dispatch(events.update, this.#cache[id]);
+    this.dispatch(events.update, this.cache[id]);
 
-    if (this.#cache[id].tape) {
+    if (this.cache[id].tape) {
       await this.persist([id]);
     }
   }
 
   clear() {
-    this.#staged = {};
-    this.#cache = {};
+    this.staged = {};
+    this.cache = {};
     this.dispatch(events.clear);
   }
 }

@@ -1,4 +1,3 @@
-// @ts-check
 import * as NodeFS from 'node:fs';
 import * as path from 'node:path';
 import { createDebug } from './diagnostics.js';
@@ -14,7 +13,7 @@ import debounce from './utils/debounce.mjs';
 const debug = createDebug('config');
 
 /**
- * @typedef  {object} ConfigUpdate
+ * @typedef  {object}         ConfigUpdate
  * @property {object=}        forward
  * @property {object=}        stub
  * @property {Array<string>=} trust
@@ -32,7 +31,11 @@ export default class Config extends Emitter {
   dir = '';
   filepath = '';
   logLocation = '';
-  proxy = {};
+
+  /**
+   * @member {ProxyConfig}
+   */
+  proxy;
   noProxy = ['<-loopback->'];
   trust = new Set();
   forward = null;
@@ -54,8 +57,8 @@ export default class Config extends Emitter {
 
   /**
    * @param {object}                init
-   * @param {string=}               init.port
-   * @param {object=}               init.proxy
+   * @param {string|number=}        init.port
+   * @param {ProxyConfig=}          init.proxy
    * @param {object}                options
    * @param {import('node:fs')}     options.fs
    * @param {(f: string) => object} options.loadConfigModule
@@ -71,7 +74,7 @@ export default class Config extends Emitter {
     this.loadConfigModule = loadConfigModule;
     this.fs = fs;
     this.serverURL = new URL('http://localhost');
-    this.serverURL.port = port || '9000';
+    this.serverURL.port = String(port) || '9000';
     this.proxy = proxy;
     this.cache = null;
     this.update(rest);
@@ -182,6 +185,9 @@ export default class Config extends Emitter {
     );
   }
 
+  /**
+   * @returns {SerializedConfig}
+   */
   serialize() {
     return {
       serverURL: this.serverURL.origin,

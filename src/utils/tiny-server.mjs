@@ -1,10 +1,14 @@
 import http from 'http';
 import express from 'express';
 
-// Promisify doesn't work right with http callbacks
-const promise = (cb, ...args) => {
+/**
+ * Promisify doesn't work right with http callbacks
+ *
+ * @param cb {Function}
+ */
+const promise = (cb, /** @type {any[]} */ ...args) => {
   return new Promise((res, rej) => {
-    args.push((err) => {
+    args.push((/** @type {Error?} */ err) => {
       if (err == null) {
         res();
         return;
@@ -15,7 +19,11 @@ const promise = (cb, ...args) => {
   });
 };
 
-// This thing just echoes the paths
+/**
+ * This thing just echoes the paths
+ *
+ * @param port {number} port number
+ */
 export default async function tiny(port) {
   const app = express();
   let connections = [];
@@ -23,7 +31,7 @@ export default async function tiny(port) {
   app.get('/*', (req, res) => {
     res.status(200).json({ path: req.path });
   });
-  app.post('/delay', (req, res) => {
+  app.post('/delay', (_, res) => {
     setTimeout(() => {
       res.status(200).json({ delayed: 50 });
     }, 50);
@@ -39,6 +47,7 @@ export default async function tiny(port) {
     );
   });
 
+  // @ts-ignore
   server._close = () => {
     return new Promise((res, rej) => {
       connections.forEach((connection) => connection.end());

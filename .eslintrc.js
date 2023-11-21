@@ -1,5 +1,6 @@
 module.exports = {
-  plugins: ['svelte3', 'typescript'],
+  plugins: ['svelte3', '@typescript-eslint'],
+  parser: '@typescript-eslint/parser',
   rules: {
     'no-console': 0,
     'no-undefined': 1,

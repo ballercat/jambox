@@ -69,7 +69,7 @@ const spawnServerProcess = async ({ log, config, constants }) => {
  */
 const killOldServer = (config, log) => {
   log(`Sending a shutdown signal to running Jambox server.`);
-  return fetch(new URL('shutdown', config.serverURL));
+  return fetch(String(new URL('shutdown', config.serverURL)));
 };
 
 /**

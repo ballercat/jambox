@@ -15,17 +15,22 @@ const createDebug = (n) => {
   return (message) => debugChannel.publish({ namespace, message });
 };
 
+/**
+ * @type {Record<string, any>}
+ */
 const debuggers = {};
 let enabled = false;
-debugChannel.subscribe((event) => {
-  if (!enabled) {
-    return;
+debugChannel.subscribe(
+  (/** @type {{namespace: string; message: string; }} */ event) => {
+    if (!enabled) {
+      return;
+    }
+    if (!debuggers[event.namespace]) {
+      debuggers[event.namespace] = _debug(event.namespace);
+    }
+    debuggers[event.namespace](event.message);
   }
-  if (!debuggers[event.namespace]) {
-    debuggers[event.namespace] = _debug(event.namespace);
-  }
-  debuggers[event.namespace](event.message);
-});
+);
 
 const enable = () => {
   enabled = true;

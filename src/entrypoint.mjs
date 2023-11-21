@@ -39,15 +39,17 @@ export default async function cli(options) {
    * - 'info' is kind of a poor name here
    * - We are looking for the proxy settings from the running instance
    */
-  const info = await (
-    await fetch(`${config.serverURL.href}api/reset`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ cwd }),
-    })
-  ).json();
+  const info = /** @type {SerializedConfig} */ (
+    await (
+      await fetch(`${config.serverURL.href}api/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cwd }),
+      })
+    ).json()
+  );
 
   debug(`Check if entrypoint ${entrypoint} is a URI`);
 
