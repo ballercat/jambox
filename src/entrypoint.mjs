@@ -12,7 +12,7 @@ import { createDebug } from './diagnostics.js';
 
 const debug = createDebug();
 
-export default async function cli(options) {
+async function cli(options) {
   const { script, cwd = process.cwd(), log, env, constants } = options;
   const flags = parseArgs(script, JAMBOX_FLAGS);
   const [entrypoint, ...args] = flags.target;
@@ -39,7 +39,7 @@ export default async function cli(options) {
    * - 'info' is kind of a poor name here
    * - We are looking for the proxy settings from the running instance
    */
-  const info = /** @type {SerializedConfig} */ (
+  const info = /** @type {import('./index.js').SerializedConfig} */ (
     await (
       await fetch(`${config.serverURL.href}api/reset`, {
         method: 'POST',
@@ -78,3 +78,5 @@ export default async function cli(options) {
 
   return { process: true };
 }
+
+export default cli;

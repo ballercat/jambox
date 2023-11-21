@@ -1,7 +1,7 @@
 import * as NodeFS from 'node:fs';
 import * as path from 'node:path';
 import { createDebug } from './diagnostics.js';
-import getUserConfigFile from './read-user-config.js';
+import { getUserConfigFile } from './read-user-config.js';
 import {
   CONFIG_FILE_NAME,
   CACHE_DIR_NAME,
@@ -58,7 +58,7 @@ export default class Config extends Emitter {
   /**
    * @param {object}                init
    * @param {string|number=}        init.port
-   * @param {ProxyConfig=}          init.proxy
+   * @param {import('./index.js').ProxyInfo=}   init.proxy
    * @param {object}                options
    * @param {import('node:fs')}     options.fs
    * @param {(f: string) => object} options.loadConfigModule
@@ -186,7 +186,7 @@ export default class Config extends Emitter {
   }
 
   /**
-   * @returns {SerializedConfig}
+   * @returns {import('./index.js').SerializedConfig}
    */
   serialize() {
     return {

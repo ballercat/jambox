@@ -9,6 +9,7 @@ cypress/videos
 dist
 build
 public
+docs
 .idea
 test-report.xml
 
