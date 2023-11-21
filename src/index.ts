@@ -1,4 +1,5 @@
-// Typedoc entrypoint
+// Typedoc entrypoint and where types are improted from into js
+
 export type ProxyInfo = {
   http: string;
   https: string;
@@ -76,7 +77,7 @@ export type StubRule =
  * Any changes to the config will be reflected on the already running proxy process.
  * Anytime a config is changed the proxy resets and reloads values from cache.
  */
-export interface JamboxFileConfig {
+export interface FileConfig {
   /**
    * Should the proxy allow for any network access.
    *
