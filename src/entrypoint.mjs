@@ -8,7 +8,7 @@ import isURI from './is-uri.mjs';
 import launchServer from './server-launcher.mjs';
 import Config from './Config.mjs';
 import { parseArgs, JAMBOX_FLAGS } from './parse-args.mjs';
-import { createDebug } from './diagnostics.js';
+import { createDebug } from './diagnostics.cjs';
 
 const debug = createDebug();
 

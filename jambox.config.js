@@ -9,9 +9,9 @@
  */
 
 /**
- * @implements import('./index.d.ts').JamboxConfig
+ * @type {import('./src/index.js').FileConfig}
  */
-module.exports = {
+const config = {
   blockNetworkRequests: false,
   forward: {
     'http://jambox-test.com': {
@@ -30,3 +30,5 @@ module.exports = {
     stage: ['jambox-test.com/**'],
   },
 };
+
+module.exports = config;

@@ -18,24 +18,26 @@ export type SerializedConfig = {
   noProxy: Array<string>;
 };
 
-export type ForwardRule = {
-  /**
-   * Target host to send traffic to. Must be a valid URL.
-   */
-  target: string;
-  /**
-   * What paths should requests be matched aggainst. Accepts globs.
-   *
-   * Use `**` to match all paths
-   */
-  paths: Array<string>;
-  /**
-   * Should websocket requests also be matched?
-   *
-   * Default value: false
-   */
-  websocket?: boolean;
-};
+export type ForwardRule =
+  | {
+      /**
+       * Target host to send traffic to. Must be a valid URL.
+       */
+      target: string;
+      /**
+       * What paths should requests be matched aggainst. Accepts globs.
+       *
+       * Use `**` to match all paths
+       */
+      paths: Array<string>;
+      /**
+       * Should websocket requests also be matched?
+       *
+       * Default value: false
+       */
+      websocket?: boolean;
+    }
+  | string;
 
 type StatusCode = number;
 /**
@@ -71,6 +73,14 @@ export type StubRule =
     };
 
 /**
+ * Cache options
+ */
+export type CacheRules = {
+  stage?: Array<string>;
+  ignore?: Array<string>;
+};
+
+/**
  * Jambox File Configuration
  *
  * The file which exports these values will be watched as the proxy is running.
@@ -100,4 +110,10 @@ export interface FileConfig {
    * Key-value pairs of globs of request paths with a matching StubRule.
    */
   stub?: Record<string, StubRule>;
+  /**
+   * Cache rules
+   *
+   * When falsy, caching is disabled.
+   */
+  cache?: CacheRules;
 }

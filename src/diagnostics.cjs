@@ -14,6 +14,7 @@ const createDebug = (n) => {
    */
   return (message) => debugChannel.publish({ namespace, message });
 };
+exports.createDebug = createDebug;
 
 /**
  * @type {Record<string, any>}
@@ -31,13 +32,9 @@ debugChannel.subscribe(
     debuggers[event.namespace](event.message);
   }
 );
+exports.debugChannel = debugChannel;
 
 const enable = () => {
   enabled = true;
 };
-
-module.exports = {
-  debugChannel,
-  createDebug,
-  enable,
-};
+exports.enable = enable;

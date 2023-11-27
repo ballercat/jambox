@@ -1,7 +1,6 @@
 import * as NodeFS from 'node:fs';
 import * as path from 'node:path';
-import { createDebug } from './diagnostics.js';
-import { getUserConfigFile } from './read-user-config.js';
+import { getUserConfigFile } from './read-user-config.cjs';
 import {
   CONFIG_FILE_NAME,
   CACHE_DIR_NAME,
@@ -9,6 +8,7 @@ import {
 } from './constants.mjs';
 import Emitter from './Emitter.mjs';
 import debounce from './utils/debounce.mjs';
+import { createDebug } from './diagnostics.cjs';
 
 const debug = createDebug('config');
 

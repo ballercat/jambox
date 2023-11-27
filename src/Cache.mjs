@@ -7,9 +7,9 @@ import deserialize from './utils/deserialize.mjs';
 import { updateResponse } from './utils/serialize.mjs';
 import { PortablePath, npath, ppath } from '@yarnpkg/fslib';
 import { ZipFS } from '@yarnpkg/libzip';
-import { createDebug } from './diagnostics.js';
+import { createDebug } from './diagnostics.cjs';
 
-const debug = createDebug('cache');
+const debug = createDebug('server');
 
 export const serializeRequest = async (request) => {
   return {

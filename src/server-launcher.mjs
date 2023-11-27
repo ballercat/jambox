@@ -5,7 +5,7 @@ import waitOn from 'wait-on';
 import fetch from 'node-fetch';
 import { spawn } from 'child_process';
 import { PROJECT_ROOT, getVersion } from './constants.mjs';
-import { createDebug } from './diagnostics.js';
+import { createDebug } from './diagnostics.cjs';
 
 const debug = createDebug();
 

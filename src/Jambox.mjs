@@ -9,11 +9,14 @@ import CacheMatcher from './matchers/CacheMatcher.mjs';
 import GlobMatcher from './matchers/GlobMatcher.mjs';
 import CacheHandler from './handlers/CacheHandler.mjs';
 import ProxyHandler from './handlers/ProxyHandler.mjs';
-import { createDebug } from './diagnostics.js';
+import { createDebug } from './diagnostics.cjs';
 
 const debug = createDebug('core');
 
 export default class Jambox extends Emitter {
+  /**
+   * @typedef {import('mockttp')} mockttp
+   */
   /**
    * @member {Cache}
    */
@@ -74,7 +77,7 @@ export default class Jambox extends Emitter {
     } else {
       await this.proxy
         .forAnyRequest()
-        .matching((req) => {
+        .matching((/** @type {mockttp.CompletedRequest} */ req) => {
           const url = new URL(req.url);
           return url.hostname !== 'localhost';
         })
@@ -86,7 +89,7 @@ export default class Jambox extends Emitter {
       // See https://github.com/ballercat/jambox/issues/42
       await this.proxy
         .forAnyRequest()
-        .matching((req) => {
+        .matching((/** @type {mockttp.CompletedRequest} */ req) => {
           const url = new URL(req.url);
           return url.hostname === 'localhost';
         })
@@ -111,6 +114,9 @@ export default class Jambox extends Emitter {
     this.dispatch('reset');
   }
 
+  /**
+   * @param {import('./index.js').CacheRules} setting
+   */
   record(setting) {
     return this.proxy.addRequestRule({
       priority: 100,
@@ -119,15 +125,19 @@ export default class Jambox extends Emitter {
     });
   }
 
-  forward(setting) {
+  /**
+   * @param {Record<string, import('./index.js').ForwardRule>} forwardRules
+   */
+  forward(forwardRules) {
     return Promise.all(
-      Object.entries(setting).map(async ([original, ...rest]) => {
-        const options =
-          typeof rest[0] === 'object'
-            ? rest[0]
-            : {
-                target: rest[0],
-              };
+      Object.entries(forwardRules).map(async ([original, target]) => {
+        let options;
+        if (typeof target === 'string') {
+          options = { target, paths: ['**'] };
+        }
+        if (typeof target === 'object') {
+          options = target;
+        }
 
         const originalURL = new URL(original);
         const targetURL = new URL(
@@ -205,6 +215,9 @@ export default class Jambox extends Emitter {
     );
   }
 
+  /**
+   * @param {URL} url
+   */
   shouldStage(url) {
     if (this.cache.bypass() || this.config.blockNetworkRequests) {
       return false;
@@ -227,6 +240,9 @@ export default class Jambox extends Emitter {
     );
   }
 
+  /**
+   * @param {mockttp.CompletedRequest} request
+   */
   async onRequest(request) {
     try {
       const url = new URL(request.url);
@@ -251,6 +267,9 @@ export default class Jambox extends Emitter {
     }
   }
 
+  /**
+   * @param {mockttp.CompletedResponse} response
+   */
   async onResponse(response) {
     try {
       if (!this.cache.bypass() && this.cache.hasStaged(response)) {
@@ -264,6 +283,9 @@ export default class Jambox extends Emitter {
     }
   }
 
+  /**
+   * @param {mockttp.AbortedRequest} abortedRequest
+   */
   async onAbort(abortedRequest) {
     if (this.cache.hasStaged(abortedRequest)) {
       this.cache.abort(abortedRequest);
