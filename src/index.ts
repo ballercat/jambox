@@ -18,7 +18,7 @@ export type SerializedConfig = {
   noProxy: Array<string>;
 };
 
-export type ForwardRule =
+export type ForwardOption =
   | {
       /**
        * Target host to send traffic to. Must be a valid URL.
@@ -45,7 +45,7 @@ type StatusCode = number;
  *
  * Either a status code or a config object
  */
-export type StubRule =
+export type StubOption =
   | StatusCode
   | {
       status: StatusCode;
@@ -75,7 +75,7 @@ export type StubRule =
 /**
  * Cache options
  */
-export type CacheRules = {
+export type CacheOption = {
   stage?: Array<string>;
   ignore?: Array<string>;
 };
@@ -103,17 +103,17 @@ export interface FileConfig {
    * The host of the provided URL will be matched across all requests inspected
    * by the Jambox proxy.
    */
-  forward?: Record<string, ForwardRule>;
+  forward?: Record<string, ForwardOption>;
   /**
    * Stub rules
    *
    * Key-value pairs of globs of request paths with a matching StubRule.
    */
-  stub?: Record<string, StubRule>;
+  stub?: Record<string, StubOption>;
   /**
    * Cache rules
    *
    * When falsy, caching is disabled.
    */
-  cache?: CacheRules;
+  cache?: CacheOption;
 }

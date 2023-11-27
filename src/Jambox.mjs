@@ -115,22 +115,22 @@ export default class Jambox extends Emitter {
   }
 
   /**
-   * @param {import('./index.js').CacheRules} setting
+   * @param {import('./index.js').CacheOption} cache
    */
-  record(setting) {
+  record(cache) {
     return this.proxy.addRequestRule({
       priority: 100,
-      matchers: [new CacheMatcher(this, setting)],
+      matchers: [new CacheMatcher(this, cache)],
       handler: new CacheHandler(this),
     });
   }
 
   /**
-   * @param {Record<string, import('./index.js').ForwardRule>} forwardRules
+   * @param {Record<string, import('./index.js').ForwardOption>} forwards
    */
-  forward(forwardRules) {
+  forward(forwards) {
     return Promise.all(
-      Object.entries(forwardRules).map(async ([original, target]) => {
+      Object.entries(forwards).map(async ([original, target]) => {
         let options;
         if (typeof target === 'string') {
           options = { target, paths: ['**'] };
@@ -187,9 +187,12 @@ export default class Jambox extends Emitter {
     );
   }
 
-  stub(setting) {
+  /**
+   * @param {import('./index.js').StubOption} stubs
+   */
+  stub(stubs) {
     return Promise.all(
-      Object.entries(setting).map(([path, value]) => {
+      Object.entries(stubs).map(([path, value]) => {
         const options = typeof value === 'object' ? value : { status: value };
         if (options.preferNetwork && !this.config.blockNetworkRequests) {
           return;

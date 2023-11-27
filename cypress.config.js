@@ -1,8 +1,12 @@
-const fetch = require('node-fetch');
-const { defineConfig } = require('cypress');
-const webpackConfig = require('./webpack.config.js');
+// const fetch = require('node-fetch');
+// const { defineConfig } = require('cypress');
+// const webpackConfig = require('./webpack.config.js');
 
-module.exports = defineConfig({
+import fetch from 'node-fetch';
+import { defineConfig } from 'cypress';
+import webpackConfig from './webpack.config.js';
+
+const config = defineConfig({
   viewportHeight: 720,
   viewportWidth: 1280,
   chromeWebSecurity: false,
@@ -26,3 +30,5 @@ module.exports = defineConfig({
     },
   },
 });
+
+export default config;
