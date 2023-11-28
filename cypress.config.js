@@ -1,9 +1,6 @@
-// const fetch = require('node-fetch');
-// const { defineConfig } = require('cypress');
-// const webpackConfig = require('./webpack.config.js');
 import fetch from 'node-fetch';
 import { defineConfig } from 'cypress';
-import webpackConfig from './webpack.config.mjs';
+import webpackConfig from './webpack.config.js';
 import nodeEvents from './cypress-node-events.js';
 
 const config = defineConfig({
