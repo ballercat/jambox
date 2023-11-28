@@ -1,4 +1,3 @@
-// @ts-check
 /**
  * This config is used for integration tests
  *
@@ -11,7 +10,7 @@
 /**
  * @type {import('./src/index.js').FileConfig}
  */
-const config = {
+export default {
   blockNetworkRequests: false,
   forward: {
     'http://jambox-test.com': {
@@ -30,5 +29,3 @@ const config = {
     stage: ['jambox-test.com/**'],
   },
 };
-
-module.exports = config;

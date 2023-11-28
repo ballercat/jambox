@@ -1,8 +1,9 @@
 {
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "cypress.config.ts", "jambox.config.js"],
   "exclude": ["src/**/__tests__/*", "src/**/__mocks__/*"],
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
+    "module": "ES2022",
     "allowJs": true,
     "checkJs": true,
     "esModuleInterop": true,
@@ -15,6 +16,12 @@
   },
   "typeAcquisition": {
     "enable": true,
-    "include": ["src/types.ts"]
+    "include": ["src/index.ts"]
+  },
+  "ts-node": {
+    "transpileOnly": true,
+    "compilerOptions": {
+      "module": "ES2022"
+    }
   }
 }

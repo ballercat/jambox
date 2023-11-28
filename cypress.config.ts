@@ -1,10 +1,10 @@
 // const fetch = require('node-fetch');
 // const { defineConfig } = require('cypress');
 // const webpackConfig = require('./webpack.config.js');
-
 import fetch from 'node-fetch';
 import { defineConfig } from 'cypress';
-import webpackConfig from './webpack.config.js';
+import webpackConfig from './webpack.config.mjs';
+import nodeEvents from './cypress-node-events.js';
 
 const config = defineConfig({
   viewportHeight: 720,
@@ -19,7 +19,7 @@ const config = defineConfig({
       webpackConfig,
     },
     setupNodeEvents(on, config) {
-      require('./cypress-node-events')(on);
+      nodeEvents(on);
 
       // Shutdown the server after `yarn cypress run --component completes
       // This ensures that c8 outputs the lcov.info file properly

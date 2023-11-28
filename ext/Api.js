@@ -1,6 +1,6 @@
 // @ts-check
 import Observable from 'zen-observable';
-import { debounce } from './nodash';
+import { debounce } from './nodash.js';
 
 /**
  * @typedef {import('./types').Subscribtion} Subscribtion

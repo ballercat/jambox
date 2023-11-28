@@ -16,6 +16,7 @@ export type SerializedConfig = {
   stub: object;
   proxy: ProxyInfo;
   noProxy: Array<string>;
+  errors: Array<unknown>;
 };
 
 export type ForwardOption =

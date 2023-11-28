@@ -1,7 +1,7 @@
-const fetch = require('node-fetch');
-const waitOn = require('wait-on');
+import fetch from 'node-fetch';
+import waitOn from 'wait-on';
 
-function nodeEvents(on) {
+export default function nodeEvents(on) {
   on('task', {
     jambox: {
       // Configure Jambox with a dynamic config during a test
@@ -31,5 +31,3 @@ function nodeEvents(on) {
     },
   });
 }
-
-module.exports = nodeEvents;
