@@ -1,3 +1,4 @@
+// @ts-check
 import fetch from 'node-fetch';
 import { defineConfig } from 'cypress';
 import webpackConfig from './webpack.config.js';

@@ -188,7 +188,7 @@ export default class Jambox extends Emitter {
   }
 
   /**
-   * @param {import('./index.js').StubOption} stubs
+   * @param {Record<string, import('./index.js').StubOption>} stubs
    */
   stub(stubs) {
     return Promise.all(

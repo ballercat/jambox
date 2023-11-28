@@ -33,17 +33,23 @@ export default class Config extends Emitter {
   logLocation = '';
   errors = [];
   /**
-   * @member {ProxyConfig}
+   * @type {import('./index.js').ProxyInfo}
    */
   proxy;
   noProxy = ['<-loopback->'];
   trust = new Set();
+  /**
+   * @type {Record<string, import('./index.js').ForwardOption>}
+   */
   forward = null;
   /**
-   * @member {object|null}
+   * @type {import('./index.js').CacheOption}
    */
   cache;
-  stub = null;
+  /**
+   * @type {Record<string, import('./index.js').StubOption>}
+   */
+  stub;
   blockNetworkRequests = false;
   paused = false;
   /**

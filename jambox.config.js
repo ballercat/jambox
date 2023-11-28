@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * This config is used for integration tests
  *

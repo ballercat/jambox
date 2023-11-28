@@ -21,6 +21,7 @@
     "build": "webpack",
     "dev": "nodemon --watch ext --watch src --exec ./jam-server.mjs",
     "test": "c8 -r=text -r=lcov ava",
+    "typecheck": "tsc",
     "e2e": "c8 -o ./coverage-cypress -r=text -r=lcov node ./e2e-backend.mjs",
     "e2e-dev": "nodemon --watch ext --watch src --exec ./e2e-backend.mjs",
     "cy": "HTTP_PROXY=http://localhost:8000 cypress open --component",

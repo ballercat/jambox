@@ -1,5 +1,5 @@
 {
-  "include": ["src/**/*", "cypress.config.js", "jambox.config.js"],
+  "include": ["src/**/*"],
   "exclude": ["src/**/__tests__/*", "src/**/__mocks__/*"],
   "compilerOptions": {
     "target": "ES2022",
@@ -12,7 +12,8 @@
     "outDir": "dist",
     "declarationMap": true,
     "moduleResolution": "NodeNext",
-    "sourceMap": false
+    "sourceMap": false,
+    "skipLibCheck": true
   },
   "typeAcquisition": {
     "enable": true,
