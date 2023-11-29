@@ -1,3 +1,10 @@
+## 0.2.0 - JSDoc type coverage, docs site
+
+- chore: cover codebase with JSDoc types
+- chore: add typecheck CI step
+- feat: support ESM/CommonJS `jambox.config.js` in config files
+- feat: build & publish TS types
+
 ## 0.1.2 - Fix config api route
 
 - fix: wait on `reset` event during config api calls

@@ -60,17 +60,14 @@ export default {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js)$/,
         resolve: {
           fullySpecified: false,
         },
       },
       {
-        test: /.(js)$/,
+        test: /\.(js)$/,
         loader: 'babel-loader',
-        resolve: {
-          fullySpecified: false,
-        },
       },
       {
         test: /\.(svelte)$/,
