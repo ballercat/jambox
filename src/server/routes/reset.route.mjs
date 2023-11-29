@@ -9,6 +9,7 @@ router.post('/reset', async (req, res, next) => {
     if (req.body.cwd !== jambox().config.cwd) {
       // changing a config should reset jambox
       await jambox().config.load(req.body.cwd);
+      await jambox().once('jambox.reset');
     } else {
       // Read a config from cwd
       await jambox().reset();
