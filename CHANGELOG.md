@@ -1,3 +1,8 @@
+## 0.1.3 - Match paths containing dots, serialize browser config values
+
+- fix: match pathnames with dot('.') literals in them
+- fix: serialize and accept a `browser` option in config
+
 ## 0.1.2 - Fix config api route
 
 - fix: wait on `reset` event during config api calls
