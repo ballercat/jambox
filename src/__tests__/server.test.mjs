@@ -43,6 +43,7 @@ test.serial('ws - config', async (t) => {
   await supertest(t.context.server)
     .post('/api/config')
     .send({
+      browser: 'chrome-canary',
       forward: {
         'http://github.com': `http://localhost:${APP_PORT}`,
         'http://google.com': `http://localhost:${APP_PORT}`,
@@ -55,6 +56,7 @@ test.serial('ws - config', async (t) => {
   t.like(JSON.parse(ws.messages.pendingPush[0].data.toString()), {
     type: 'config.update',
     payload: {
+      browser: 'chrome-canary',
       forward: {
         'http://github.com': `http://localhost:${APP_PORT}`,
         'http://google.com': `http://localhost:${APP_PORT}`,
@@ -68,8 +70,10 @@ test.serial('ws - config', async (t) => {
   const res = await (await fetch('http://github.com', opts)).json();
   t.like(res, { path: '/' });
 
-  const res2 = await (await fetch('http://google.com/echo', opts)).json();
-  t.like(res2, { path: '/echo' });
+  // the dot '.' in the path below is intentional
+  // see https://github.com/ballercat/jambox/pull/47
+  const res2 = await (await fetch('http://google.com/.echo', opts)).json();
+  t.like(res2, { path: '/.echo' });
 });
 
 test.serial('auto mocks', async (t) => {
