@@ -4,6 +4,7 @@
 - chore: add typecheck CI step
 - feat: support ESM/CommonJS `jambox.config.js` in config files
 - feat: build & publish TS types
+- fix: wait for full reset when cwd is changed via api
 
 ## 0.1.2 - Fix config api route
 
