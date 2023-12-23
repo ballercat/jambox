@@ -21,12 +21,14 @@ const debug = createDebug('config');
  * @property {boolean=}       blockNetworkRequests
  * @property {boolean=}       paused
  * @property {string=}        port
+ * @property {string=}        browser
  */
 export default class Config extends Emitter {
   /**
    * @member {URL}
    */
   serverURL;
+  browser = 'chrome';
   cwd = '';
   dir = '';
   filepath = '';
@@ -140,6 +142,10 @@ export default class Config extends Emitter {
       this.serverURL.port = options.port;
     }
 
+    if (typeof options.browser === 'string') {
+      this.browser = options.browser;
+    }
+
     this.dispatch('update', this.serialize());
   }
 
@@ -204,6 +210,7 @@ export default class Config extends Emitter {
    */
   serialize() {
     return {
+      browser: this.browser,
       serverURL: this.serverURL.origin,
       paused: this.paused,
       blockNetworkRequests: this.blockNetworkRequests,

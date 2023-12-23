@@ -4,7 +4,7 @@ import mockttp from 'mockttp';
 
 const checkGlobs = (url, globs) => {
   for (const glob of globs) {
-    if (!minimatch(url.pathname, glob)) {
+    if (!minimatch(url.pathname, glob, { dot: true })) {
       return false;
     }
   }
