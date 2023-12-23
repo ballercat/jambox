@@ -1,5 +1,5 @@
 import App from './App.svelte';
-import API from './Api';
+import API from './Api.js';
 
 const boot = async () => {
   const api = await API.create();

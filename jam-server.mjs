@@ -5,7 +5,7 @@ import server from './src/server/index.mjs';
 import fs from 'fs';
 import fetch from 'node-fetch';
 import Tail from 'tail-file';
-import { enable as enableDiagnostics } from './src/diagnostics.js';
+import { enable as enableDiagnostics } from './src/diagnostics.cjs';
 
 enableDiagnostics();
 

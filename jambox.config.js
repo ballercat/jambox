@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * This config is used for integration tests
  *
@@ -6,7 +7,11 @@
  * - Causes .jambox/default.tape.zip to be written
  * - Leave .jambox/default.tape.zip empty after integration tests
  */
-module.exports = {
+
+/**
+ * @type {import('./src/index.js').FileConfig}
+ */
+export default {
   blockNetworkRequests: false,
   forward: {
     'http://jambox-test.com': {

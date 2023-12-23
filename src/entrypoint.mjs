@@ -8,11 +8,11 @@ import isURI from './is-uri.mjs';
 import launchServer from './server-launcher.mjs';
 import Config from './Config.mjs';
 import { parseArgs, JAMBOX_FLAGS } from './parse-args.mjs';
-import { createDebug } from './diagnostics.js';
+import { createDebug } from './diagnostics.cjs';
 
 const debug = createDebug();
 
-export default async function cli(options) {
+async function cli(options) {
   const { script, cwd = process.cwd(), log, env, constants } = options;
   const flags = parseArgs(script, JAMBOX_FLAGS);
   const [entrypoint, ...args] = flags.target;
@@ -39,15 +39,17 @@ export default async function cli(options) {
    * - 'info' is kind of a poor name here
    * - We are looking for the proxy settings from the running instance
    */
-  const info = await (
-    await fetch(`${config.serverURL.href}api/reset`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ cwd }),
-    })
-  ).json();
+  const info = /** @type {import('./index.js').SerializedConfig} */ (
+    await (
+      await fetch(`${config.serverURL.href}api/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cwd }),
+      })
+    ).json()
+  );
 
   debug(`Check if entrypoint ${entrypoint} is a URI`);
 
@@ -76,3 +78,5 @@ export default async function cli(options) {
 
   return { process: true };
 }
+
+export default cli;

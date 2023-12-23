@@ -72,6 +72,7 @@ async function launchProxiedChrome(uri, info) {
   const browserName = info.browser || 'chrome';
   const browsers = await detect();
   const chrome = browsers.find(({ name }) => name === browserName);
+  // @ts-ignore
   const launch = await getLauncher();
 
   if (os.platform() === 'darwin') {
@@ -100,7 +101,7 @@ async function launchProxiedChrome(uri, info) {
           `--load-extension=${EXTENSION_PATH}`,
         ],
       },
-      (err, instance) => {
+      (err, /** @type {any} */ instance) => {
         if (err !== null) {
           console.log(err);
           reject(err);

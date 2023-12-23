@@ -1,3 +1,11 @@
+## 0.2.0 - JSDoc type coverage, docs site
+
+- chore: cover codebase with JSDoc types
+- chore: add typecheck CI step
+- feat: support ESM/CommonJS `jambox.config.js` in config files
+- feat: build & publish TS types
+- fix: wait for full reset when cwd is changed via api
+
 ## 0.1.3 - Match paths containing dots, serialize browser config values
 
 - fix: match pathnames with dot('.') literals in them

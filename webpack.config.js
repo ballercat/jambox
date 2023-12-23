@@ -1,10 +1,16 @@
-const path = require('path');
-const HTMLWebpackPlugin = require('html-webpack-plugin');
-const ManifestPlugin = require('./manifest-plugin.js');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { EnvironmentPlugin } = require('webpack');
+import * as url from 'node:url';
+import path from 'node:path';
+import { createRequire } from 'node:module';
+import HTMLWebpackPlugin from 'html-webpack-plugin';
+import ManifestPlugin from './manifest-plugin.js';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import webpack from 'webpack';
 
-module.exports = {
+const { EnvironmentPlugin } = webpack;
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+const require = createRequire(import.meta.url);
+
+export default {
   mode: process.env.CI ? 'production' : 'development',
   devtool: 'source-map',
   entry: {
@@ -54,7 +60,13 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /.(js)$/,
+        test: /\.(js)$/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
+      {
+        test: /\.(js)$/,
         loader: 'babel-loader',
       },
       {

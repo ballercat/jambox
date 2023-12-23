@@ -5,7 +5,7 @@ import waitOn from 'wait-on';
 import fetch from 'node-fetch';
 import { spawn } from 'child_process';
 import { PROJECT_ROOT, getVersion } from './constants.mjs';
-import { createDebug } from './diagnostics.js';
+import { createDebug } from './diagnostics.cjs';
 
 const debug = createDebug();
 
@@ -69,7 +69,7 @@ const spawnServerProcess = async ({ log, config, constants }) => {
  */
 const killOldServer = (config, log) => {
   log(`Sending a shutdown signal to running Jambox server.`);
-  return fetch(new URL('shutdown', config.serverURL));
+  return fetch(String(new URL('shutdown', config.serverURL)));
 };
 
 /**

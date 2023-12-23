@@ -2,6 +2,7 @@ import * as url from 'url';
 import path from 'path';
 import fs from 'fs';
 
+// @ts-ignore
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export const PROJECT_ROOT = path.join(__dirname, '..');

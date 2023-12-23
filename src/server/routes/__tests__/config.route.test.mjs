@@ -16,7 +16,7 @@ test('get & post api', async (t) => {
 
   const app = express();
   app.use(bodyParser.json());
-  app.use((req, res, next) =>
+  app.use((_req, _res, next) =>
     enter(
       { jambox: { config, reset() {}, once: () => Promise.resolve() } },
       next

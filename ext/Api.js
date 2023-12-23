@@ -1,16 +1,12 @@
 // @ts-check
 import Observable from 'zen-observable';
-import { debounce } from './nodash';
-
-/**
- * @typedef {import('./types').Subscribtion} Subscribtion
- */
+import { debounce } from './nodash.js';
 
 const WEBSOCKET_RETRY_TIMER = 3000;
 
 export default class API {
   /**
-   * @type {?Subscribtion}
+   * @type {?ZenObservable.Subscription}
    * */
   #sub;
   /**

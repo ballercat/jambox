@@ -13,7 +13,7 @@ import Broadcaster from './Broadcaster.mjs';
 import cacheRouter from './routes/cache.route.mjs';
 import resetRouter from './routes/reset.route.mjs';
 import configRouter from './routes/config.route.mjs';
-import { createDebug } from '../diagnostics.js';
+import { createDebug } from '../diagnostics.cjs';
 
 const debug = createDebug('server');
 

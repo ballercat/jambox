@@ -1,7 +1,7 @@
-const prettier = require('prettier');
-const manifest = require('./ext/manifest');
+import prettier from 'prettier';
+import manifest from './ext/manifest.js';
 
-class ManifestPlugin {
+export default class ManifestPlugin {
   apply(compiler) {
     compiler.hooks.make.tap('ManifestPlugin', (compilation) => {
       const fileName = 'manifest.json';
@@ -20,5 +20,3 @@ class ManifestPlugin {
     });
   }
 }
-
-module.exports = ManifestPlugin;

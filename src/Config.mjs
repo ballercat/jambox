@@ -1,8 +1,6 @@
-// @ts-check
 import * as NodeFS from 'node:fs';
 import * as path from 'node:path';
-import { createDebug } from './diagnostics.js';
-import getUserConfigFile from './read-user-config.js';
+import { getLoader } from './read-user-config.js';
 import {
   CONFIG_FILE_NAME,
   CACHE_DIR_NAME,
@@ -10,11 +8,12 @@ import {
 } from './constants.mjs';
 import Emitter from './Emitter.mjs';
 import debounce from './utils/debounce.mjs';
+import { createDebug } from './diagnostics.cjs';
 
 const debug = createDebug('config');
 
 /**
- * @typedef  {object} ConfigUpdate
+ * @typedef  {object}         ConfigUpdate
  * @property {object=}        forward
  * @property {object=}        stub
  * @property {Array<string>=} trust
@@ -34,15 +33,25 @@ export default class Config extends Emitter {
   dir = '';
   filepath = '';
   logLocation = '';
-  proxy = {};
+  errors = [];
+  /**
+   * @type {import('./index.js').ProxyInfo}
+   */
+  proxy;
   noProxy = ['<-loopback->'];
   trust = new Set();
+  /**
+   * @type {Record<string, import('./index.js').ForwardOption>}
+   */
   forward = null;
   /**
-   * @member {object|null}
+   * @type {import('./index.js').CacheOption}
    */
   cache;
-  stub = null;
+  /**
+   * @type {Record<string, import('./index.js').StubOption>}
+   */
+  stub;
   blockNetworkRequests = false;
   paused = false;
   /**
@@ -56,24 +65,31 @@ export default class Config extends Emitter {
 
   /**
    * @param {object}                init
-   * @param {string=}               init.port
-   * @param {object=}               init.proxy
+   * @param {string|number=}        init.port
+   * @param {import('./index.js').ProxyInfo=}   init.proxy
    * @param {object}                options
    * @param {import('node:fs')}     options.fs
-   * @param {(f: string) => object} options.loadConfigModule
    */
   constructor(
     { port, proxy, ...rest } = {},
-    { fs, loadConfigModule } = {
+    { fs } = {
       fs: NodeFS,
-      loadConfigModule: getUserConfigFile,
     }
   ) {
     super('config');
-    this.loadConfigModule = loadConfigModule;
+    const loader = getLoader(fs.promises);
+    this.loadConfigModule = async (/** @type {string} */ filepath) => {
+      try {
+        return await loader(filepath);
+      } catch (e) {
+        debug(`Caught error during config load ${e.message}`);
+        this.errors.push(e);
+        return {};
+      }
+    };
     this.fs = fs;
     this.serverURL = new URL('http://localhost');
-    this.serverURL.port = port || '9000';
+    this.serverURL.port = String(port) || '9000';
     this.proxy = proxy;
     this.cache = null;
     this.update(rest);
@@ -140,17 +156,18 @@ export default class Config extends Emitter {
     this.cache = null;
     this.blockNetworkRequests = false;
     this.paused = false;
+    this.errors = [];
   }
 
   /**
    * @param {string=} cwd
    */
-  load(cwd) {
+  async load(cwd) {
     this.clear();
 
     if (!cwd) {
       debug(`Update existing config ${this.filepath}`);
-      this.update(this.loadConfigModule(this.filepath));
+      this.update(await this.loadConfigModule(this.filepath));
       return;
     }
 
@@ -167,7 +184,7 @@ export default class Config extends Emitter {
     this.prepCacheDir();
 
     // Works with .json & .js
-    this.update(this.loadConfigModule(this.filepath));
+    this.update(await this.loadConfigModule(this.filepath));
 
     this.watch();
   }
@@ -188,6 +205,9 @@ export default class Config extends Emitter {
     );
   }
 
+  /**
+   * @returns {import('./index.js').SerializedConfig}
+   */
   serialize() {
     return {
       browser: this.browser,
@@ -201,6 +221,7 @@ export default class Config extends Emitter {
       stub: this.stub,
       proxy: this.proxy,
       noProxy: this.noProxy,
+      errors: this.errors,
     };
   }
 }
