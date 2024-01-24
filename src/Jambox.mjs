@@ -163,6 +163,7 @@ export default class Jambox extends Emitter {
           const wsOptions = {
             forwarding: {
               targetHost: `ws://${targetURL.host}`,
+              updateHostHeader: true,
             },
           };
 

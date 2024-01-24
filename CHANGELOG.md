@@ -1,3 +1,7 @@
+## 0.1.4 - Update WS host headers
+
+- fix: update the host header for websocket connections
+
 ## 0.1.3 - Match paths containing dots, serialize browser config values
 
 - fix: match pathnames with dot('.') literals in them
