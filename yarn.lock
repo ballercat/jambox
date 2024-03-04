@@ -1421,6 +1421,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/busboy@npm:^2.0.0":
+  version: 2.1.1
+  resolution: "@fastify/busboy@npm:2.1.1"
+  checksum: 42c32ef75e906c9a4809c1e1930a5ca6d4ddc8d138e1a8c8ba5ea07f997db32210617d23b2e4a85fe376316a41a1a0439fc6ff2dedf5126d96f45a9d80754fb2
+  languageName: node
+  linkType: hard
+
 "@floating-ui/core@npm:^1.1.0, @floating-ui/core@npm:^1.3.1":
   version: 1.3.1
   resolution: "@floating-ui/core@npm:1.3.1"
@@ -6145,6 +6152,7 @@ __metadata:
     svelte-watch-resize: ^1.0.3
     tail-file: ^1.4.15
     typescript: ^5.1.3
+    undici: 6.7.0
     wait-on: ^6.0.1
     webextension-polyfill: ^0.10.0
     webpack: ^5.74.0
@@ -9742,6 +9750,15 @@ __metadata:
   version: 2.0.5
   resolution: "undefsafe@npm:2.0.5"
   checksum: f42ab3b5770fedd4ada175fc1b2eb775b78f609156f7c389106aafd231bfc210813ee49f54483d7191d7b76e483bc7f537b5d92d19ded27156baf57592eb02cc
+  languageName: node
+  linkType: hard
+
+"undici@npm:6.7.0":
+  version: 6.7.0
+  resolution: "undici@npm:6.7.0"
+  dependencies:
+    "@fastify/busboy": ^2.0.0
+  checksum: bc03abd66d2a5db49e46e80453cf32793933db4a56aea5cd5957614e15762a83ef8a00fc54058c8c5fa9c4f4777060b67f37cc98860f49f95f191075cf076d0b
   languageName: node
   linkType: hard
 
