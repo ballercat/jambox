@@ -9,7 +9,6 @@ import launchServer from './server-launcher.mjs';
 import Config from './Config.mjs';
 import { parseArgs, JAMBOX_FLAGS } from './parse-args.mjs';
 import { createDebug } from './diagnostics.js';
-import * as Undici from 'undici';
 
 const debug = createDebug();
 
@@ -62,14 +61,6 @@ export default async function cli(options) {
       browser,
     };
   }
-
-  // Configure "native" `fetch` (e.g. `globalThis.fetch` in Node.js)
-  // to work with the `global-agent` proxy
-  // @see: https://github.com/gajus/global-agent/issues/52#issuecomment-1134525621
-  const ProxyAgent = Undici.ProxyAgent;
-  const setGlobalDispatcher = Undici.setGlobalDispatcher;
-
-  setGlobalDispatcher(new ProxyAgent(info.proxy.http));
 
   // Launch a (node) script
   spawn(entrypoint, args, {

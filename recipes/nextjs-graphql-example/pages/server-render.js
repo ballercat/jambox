@@ -48,7 +48,10 @@ export default function ServerRenderPage({data: initialData}) {
       </div>
       <div>
         {data ? (
-          <img src={data.pokemon.image} alt={data.pokemon.name} />
+          <>
+            <h2>{data.pokemon.name}</h2>
+            <img src={data.pokemon.image} alt={data.pokemon.name} />
+          </>
         ) : loading ? (
           <p>Loading…</p>
         ) : (
