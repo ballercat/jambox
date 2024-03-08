@@ -1,3 +1,7 @@
+## 0.2.0 - Add support for native `fetch` proxying
+
+- feat: Support `globalThis.fetch` proxying, allowing native fetch requests to be cached/stubbed/etc
+
 ## 0.1.3 - Match paths containing dots, serialize browser config values
 
 - fix: match pathnames with dot('.') literals in them
