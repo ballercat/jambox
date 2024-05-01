@@ -1,7 +1,11 @@
-## 0.1.4 - Remove disable web security flags
+## 0.2.1 - Remove disable web security flags
 
 - fix: `--disable-web-security` removed. This causes Chrome to omit the Origin
         header when enabled.
+
+## 0.2.0 - Add support for native `fetch` proxying
+
+- feat: Support `globalThis.fetch` proxying, allowing native fetch requests to be cached/stubbed/etc
 
 ## 0.1.3 - Match paths containing dots, serialize browser config values
 
