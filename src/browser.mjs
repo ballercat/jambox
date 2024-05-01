@@ -30,14 +30,13 @@ const mac = ({ chrome, uri, info }) => {
       '--args',
       uri,
       '--args',
-      '--disable-web-security',
       '--disable-features=ChromeWhatsNewUI',
       '--disable-background-networking',
       '--disable-component-update',
       '--check-for-update-interval=31536000',
       // Proxy
       `--proxy-server=${info.proxy.http}`,
-      `--proxy-bypass-list=${info.noProxy.join(',')}`,
+      `--proxy-bypass-list="${info.noProxy.join(';')}"`,
       // FIXME: Don't depend on browser-launchers profile
       `--user-data-dir=${
         osenv.home() +
@@ -88,7 +87,6 @@ async function launchProxiedChrome(uri, info) {
         detached: true,
         profile: null,
         options: [
-          '--disable-web-security',
           `--ignore-certificate-errors-spki-list=${SPKI_FINGERPRINT}`,
           '--disable-features=ChromeWhatsNewUI',
           '--disable-background-networking',
