@@ -1,3 +1,8 @@
+## 0.1.4 - Remove disable web security flags
+
+- fix: `--disable-web-security` removed. This causes Chrome to omit the Origin
+        header when enabled.
+
 ## 0.1.3 - Match paths containing dots, serialize browser config values
 
 - fix: match pathnames with dot('.') literals in them
