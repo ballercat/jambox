@@ -1,3 +1,7 @@
+## 0.3.0 - Add auto CORS support in forwarded requests
+
+- feat: add cors support in forwarded requests
+
 ## 0.2.1 - Remove disable web security flags
 
 - fix: `--disable-web-security` removed. This causes Chrome to omit the Origin
