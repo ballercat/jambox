@@ -36,6 +36,7 @@ const mac = ({ chrome, uri, info }) => {
       '--check-for-update-interval=31536000',
       // Proxy
       `--proxy-server=${info.proxy.http}`,
+      // https://www.chromium.org/developers/design-documents/network-settings/
       `--proxy-bypass-list="${info.noProxy.join(';')}"`,
       // FIXME: Don't depend on browser-launchers profile
       `--user-data-dir=${
