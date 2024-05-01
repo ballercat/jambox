@@ -149,6 +149,41 @@ export default class Jambox extends Emitter {
           },
         };
 
+        if (options.cors) {
+          httpOptions.beforeResponse = (res) => {
+            return {
+              ...res,
+              headers: {
+                'access-control-allow-origin': '*',
+                ...res.headers,
+              },
+            };
+          };
+
+          const optionsHeaders =
+            typeof options.cors === 'object'
+              ? options.cors
+              : {
+                  'access-control-allow-origin': '*',
+                  'access-control-allow-methods':
+                    'GET, POST, PUT, DELETE, OPTIONS',
+                  'access-control-allow-headers': '*',
+                  'access-control-max-age': 600,
+                };
+          await this.proxy
+            .forAnyRequest()
+            .forHost(originalURL.host)
+            .matching((request) => {
+              if (request.method !== 'OPTIONS') {
+                return false;
+              }
+
+              return true;
+            })
+            .asPriority(101)
+            .thenJson(204, {}, optionsHeaders);
+        }
+
         const matchers = [
           new GlobMatcher(originalURL, { paths: options.paths || ['**'] }),
         ];

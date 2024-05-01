@@ -110,6 +110,11 @@ module.exports = {
       ],
       // Match websockets (support for NextJS local dev)
       websocket: true,
+      // Enable automatic cors support
+      // Useful for local servers which do not implement OPTIONS handlers
+      // An object of custom OPTIONS respond Headers could be provided as well
+      // default: false
+      cors: true,
     },
   },
   stub: {
