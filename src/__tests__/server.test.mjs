@@ -101,6 +101,16 @@ test.serial('cors support', async (t) => {
   // OPTIONS should 204 automatically
   let response = await fetch(`http://jambox.test.com/foobar`, opts);
   t.like(response, { status: 204, statusText: 'No Content' });
+
+  response = await fetch(`http://jambox.test.com/foobar`, {
+    ...opts,
+    method: 'GET',
+  });
+
+  t.like(Object.fromEntries(response.headers.entries()), {
+    // This is set by jambox automatically when cors is enabled
+    'access-control-allow-origin': '*',
+  });
 });
 
 test.serial('auto mocks', async (t) => {
