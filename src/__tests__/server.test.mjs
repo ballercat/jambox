@@ -113,6 +113,48 @@ test.serial('cors support', async (t) => {
   });
 });
 
+test.serial('forward array', async (t) => {
+  t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
+
+  const { body: config } = await supertest(t.context.server).get('/api/config');
+
+  await supertest(t.context.server)
+    .post('/api/config')
+    .send({
+      forward: [
+        {
+          match: 'http://jambox.test.com',
+          target: `http://localhost:${APP_PORT}`,
+          paths: ['**', '!**/foobar'],
+        },
+        {
+          match: 'http://jambox.test.com',
+          target: `http://localhost:${APP_PORT}`,
+          paths: ['**/foobar'],
+          cors: true,
+        },
+      ],
+    });
+
+  const opts = {
+    agent: new HttpsProxyAgent(config.proxy.http),
+    method: 'OPTIONS',
+  };
+
+  // OPTIONS should 204 automatically
+  let response = await fetch(`http://jambox.test.com/foobar`, opts);
+  t.like(response, { status: 204, statusText: 'No Content' });
+
+  response = await fetch(`http://jambox.test.com/foobar`, {
+    ...opts,
+    method: 'GET',
+  });
+
+  t.like(Object.fromEntries(response.headers.entries()), {
+    // This is set by jambox automatically when cors is enabled
+    'access-control-allow-origin': '*',
+  });
+});
 test.serial('auto mocks', async (t) => {
   t.assert(t.context.server, `Server init error: ${t.context.error?.stack}`);
   const { body: config } = await supertest(t.context.server).get('/api/config');

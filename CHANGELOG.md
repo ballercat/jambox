@@ -1,3 +1,7 @@
+## 0.4.0 - Support a forward array in configuration
+
+- feat: support an array in the `forward` setting
+
 ## 0.3.0 - Add auto CORS support in forwarded requests
 
 - feat: add cors support in forwarded requests

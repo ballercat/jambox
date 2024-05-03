@@ -120,16 +120,26 @@ export default class Jambox extends Emitter {
   }
 
   forward(setting) {
-    return Promise.all(
-      Object.entries(setting).map(async ([original, ...rest]) => {
+    let entries;
+    if (Array.isArray(setting)) {
+      entries = setting;
+    } else {
+      entries = Object.entries(setting).map(([match, ...rest]) => {
         const options =
           typeof rest[0] === 'object'
             ? rest[0]
             : {
                 target: rest[0],
               };
-
-        const originalURL = new URL(original);
+        return {
+          match,
+          ...options,
+        };
+      });
+    }
+    return Promise.all(
+      entries.map(async (options) => {
+        const originalURL = new URL(options.match);
         const targetURL = new URL(
           options.target,
           // If the first argument of new URL() is a path the second argument is
