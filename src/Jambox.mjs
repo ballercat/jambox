@@ -124,7 +124,7 @@ export default class Jambox extends Emitter {
     if (Array.isArray(setting)) {
       entries = setting;
     } else {
-      entries = Object.entries(setting).map(([original, ...rest]) => {
+      entries = Object.entries(setting).map(([match, ...rest]) => {
         const options =
           typeof rest[0] === 'object'
             ? rest[0]
@@ -132,14 +132,14 @@ export default class Jambox extends Emitter {
                 target: rest[0],
               };
         return {
-          original,
+          match,
           ...options,
         };
       });
     }
     return Promise.all(
       entries.map(async (options) => {
-        const originalURL = new URL(options.original);
+        const originalURL = new URL(options.match);
         const targetURL = new URL(
           options.target,
           // If the first argument of new URL() is a path the second argument is
