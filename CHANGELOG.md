@@ -1,3 +1,7 @@
+## 0.4.1 - Automatically update host header
+
+- fix: auto update host header during forwarding
+
 ## 0.4.0 - Support a forward array in configuration
 
 - feat: support an array in the `forward` setting

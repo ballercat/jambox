@@ -149,13 +149,12 @@ export default class Jambox extends Emitter {
         );
         const useSSL =
           targetURL.port === '443' || targetURL.protocol === 'https:';
-        const changeHosts = originalURL.host !== targetURL.host;
 
         const httpOptions = {
           ignoreHostHttpsErrors: true,
           forwarding: {
             targetHost: `http${useSSL ? 's' : ''}://${targetURL.host}`,
-            updateHostHeader: changeHosts ? originalURL.host : false,
+            updateHostHeader: true,
           },
         };
 
@@ -193,9 +192,17 @@ export default class Jambox extends Emitter {
             .asPriority(101)
             .thenJson(204, {}, optionsHeaders);
         }
+        if (options.debug) {
+          httpOptions.beforeRequest = (req) => {
+            debug(`[${originalURL.host}] ${req.path} match`);
+            return req;
+          };
+        }
 
         const matchers = [
-          new GlobMatcher(originalURL, { paths: options.paths || ['**'] }),
+          new GlobMatcher(originalURL, {
+            paths: options.paths || ['**'],
+          }),
         ];
 
         await this.proxy.addRequestRule({
