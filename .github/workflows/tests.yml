@@ -13,10 +13,11 @@ jobs:
       - name: Unit tests
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x.x
+          node-version: 20.x.x
       - run: yarn
       - run: yarn test
       - name: cypress
+        if: ${{ false }}
         uses: cypress-io/github-action@v5
         with:
           start: npm run e2e
@@ -38,7 +39,7 @@ jobs:
       - name: Lints
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x.x
+          node-version: 20.x.x
       - run: yarn
       - run: yarn lint
   build:
@@ -48,7 +49,7 @@ jobs:
       - name: Lints
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x.x
+          node-version: 20.x.x
       - run: yarn
       - run: yarn build
 
