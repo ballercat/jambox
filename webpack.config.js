@@ -25,6 +25,9 @@ module.exports = {
     mainFields: ['svelte', 'browser', 'module', 'main'],
     conditionNames: ['svelte', 'import'],
   },
+  devServer: {
+    host: 'localhost',
+  },
   plugins: [
     new ManifestPlugin(),
     new HTMLWebpackPlugin({
