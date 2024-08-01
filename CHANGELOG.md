@@ -1,3 +1,8 @@
+## 0.4.2 - Upgrade svelte
+
+- chore: upgrade svelte to 4.x
+- chore: disabled cypress in CI due to bug
+
 ## 0.4.1 - Automatically update host header
 
 - fix: auto update host header during forwarding
