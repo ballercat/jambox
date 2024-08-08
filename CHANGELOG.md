@@ -1,3 +1,7 @@
+## 0.4.3 - Move svelte deps to dev
+
+- chore: move svelte related dependencies to devDependencies
+
 ## 0.4.2 - Upgrade svelte
 
 - chore: upgrade svelte to 4.x
