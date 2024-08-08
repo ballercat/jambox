@@ -5,10 +5,10 @@
     createMemorySource,
   } from 'svelte-routing/src/history';
   import { store, reducer } from './store.js';
-  import Cache from './Cache';
+  import Cache from './Cache/index.svelte';
   import Checkbox from './Checkbox.svelte';
   import Waterfall from './Waterfall.svelte';
-  import RequestInfo from './RequestInfo';
+  import RequestInfo from './RequestInfo/index.svelte';
   import CacheEntry from './CacheEntry.svelte';
 
   export let api;

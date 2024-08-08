@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@httptoolkit/browser-launcher": "^2.0.2",
+    "@sveltejs/vite-plugin-svelte": "^3.1.1",
     "@yarnpkg/fslib": "^3.0.0-rc.48",
     "@yarnpkg/libzip": "^3.0.0-rc.48",
     "arg": "^5.0.2",
@@ -45,6 +46,7 @@
     "osenv": "^0.1.5",
     "tail-file": "^1.4.15",
     "undici": "6.7.0",
+    "vite": "^5.4.0",
     "wait-on": "^6.0.1",
     "zen-observable": "^0.9.0"
   },

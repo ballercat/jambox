@@ -1,6 +1,5 @@
 const fetch = require('node-fetch');
 const { defineConfig } = require('cypress');
-const webpackConfig = require('./webpack.config.js');
 
 module.exports = defineConfig({
   viewportHeight: 720,
@@ -11,8 +10,7 @@ module.exports = defineConfig({
     specPattern: 'ext/**/*.cy.js',
     devServer: {
       framework: 'svelte',
-      bundler: 'webpack',
-      webpackConfig,
+      bundler: 'vite',
     },
     setupNodeEvents(on, config) {
       require('./cypress-node-events')(on);
