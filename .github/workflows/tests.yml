@@ -17,7 +17,6 @@ jobs:
       - run: yarn
       - run: yarn test
       - name: cypress
-        if: ${{ false }}
         uses: cypress-io/github-action@v5
         with:
           start: npm run e2e
