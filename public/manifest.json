@@ -10,11 +10,11 @@
     "notifications",
     "webNavigation"
   ],
-  "devtools_page": "index.html",
+  "devtools_page": "devtool.html",
   "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     {
-      "resources": ["index.js", "runtime.json"],
+      "resources": ["index.js", "devtool.js", "runtime.json"],
       "matches": ["<all_urls>"]
     }
   ]
