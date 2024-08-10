@@ -14,7 +14,7 @@
     "url": "git+github.com:ballercat/jambox.git"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "vite build",
     "dev": "nodemon --watch ext --watch src --exec ./jam-server.mjs",
     "test": "c8 -r=text -r=lcov ava",
     "e2e": "NODE_OPTIONS=--dns-result-order=ipv4first c8 -o ./coverage-cypress -r=text -r=lcov node ./e2e-backend.mjs",
@@ -59,14 +59,12 @@
     "babel-loader": "^9.1.0",
     "babel-plugin-module-resolver": "^4.1.0",
     "c8": "^7.12.0",
-    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
     "cypress": "^13.13.2",
     "eslint": "^8.31.0",
     "eslint-plugin-svelte3": "^4.0.0",
     "eslint-plugin-typescript": "^0.14.0",
     "find-open-port": "^2.0.3",
-    "html-webpack-plugin": "^5.5.0",
     "https-proxy-agent": "^5.0.1",
     "memfs": "^4.2.1",
     "nodemon": "^2.0.20",
@@ -83,9 +81,7 @@
     "svelte-table": "^0.6.1",
     "svelte-watch-resize": "^1.0.3",
     "typescript": "^5.1.3",
-    "webextension-polyfill": "^0.10.0",
-    "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "webextension-polyfill": "^0.10.0"
   },
   "nodemonConfig": {
     "env": {
