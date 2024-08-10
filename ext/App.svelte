@@ -12,7 +12,6 @@
   import CacheEntry from './CacheEntry.svelte';
 
   export let api;
-
   let search = $store.search;
   const history = createHistory(createMemorySource());
   const chrome = window.chrome;
@@ -144,7 +143,7 @@
           <input
             type="search"
             bind:value={search}
-            autocomplete
+            autocomplete="on"
             placeholder="search"
           />
         </div>
