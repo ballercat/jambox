@@ -13,7 +13,7 @@ jobs:
       - name: Unit tests
         uses: actions/setup-node@v3
         with:
-          node-version: 20.x.x
+          node-version: 18.x.x
       - run: yarn
       - run: yarn test
       - name: cypress
@@ -38,7 +38,7 @@ jobs:
       - name: Lints
         uses: actions/setup-node@v3
         with:
-          node-version: 20.x.x
+          node-version: 18.x.x
       - run: yarn
       - run: yarn lint
   build:
@@ -48,7 +48,7 @@ jobs:
       - name: Lints
         uses: actions/setup-node@v3
         with:
-          node-version: 20.x.x
+          node-version: 18.x.x
       - run: yarn
       - run: yarn build
 
