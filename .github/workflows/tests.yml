@@ -40,7 +40,7 @@ jobs:
         with:
           node-version: 18.x.x
       - run: yarn
-      - run: Map hosts
+      - name: Map hosts
         run: |
           sudo echo "127.0.0.1 localhost" | sudo tee -a /etc/hosts
       - name: cypress
