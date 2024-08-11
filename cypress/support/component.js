@@ -20,8 +20,8 @@
 // require('./commands')
 
 // import { mount } from 'cypress/svelte/dist/cypress-svelte.esm-bundler.js';
-require('./commands');
-const { mount } = require('cypress/svelte');
+import './commands';
+import { mount } from 'cypress/svelte';
 Cypress.Commands.add('mount', mount);
 
 // Example use:

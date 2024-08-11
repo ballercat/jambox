@@ -1,6 +1,5 @@
 const fetch = require('node-fetch');
 const { defineConfig } = require('cypress');
-const webpackConfig = require('./webpack.config.js');
 
 module.exports = defineConfig({
   viewportHeight: 720,
@@ -11,9 +10,22 @@ module.exports = defineConfig({
     specPattern: 'ext/**/*.cy.js',
     devServer: {
       framework: 'svelte',
-      bundler: 'webpack',
-      webpackConfig,
+      bundler: 'vite',
     },
+    setupNodeEvents(on, config) {
+      require('./cypress-node-events')(on);
+
+      // Shutdown the server after `yarn cypress run --component completes
+      // This ensures that c8 outputs the lcov.info file properly
+      on('after:run', () => {
+        return fetch('http://localhost:9000/shutdown');
+      });
+      return config;
+    },
+  },
+  e2e: {
+    video: true,
+    baseUrl: 'http://localhost:8080',
     setupNodeEvents(on, config) {
       require('./cypress-node-events')(on);
 
