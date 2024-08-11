@@ -26,7 +26,7 @@ module.exports = defineConfig({
   e2e: {
     video: true,
     videoCompression: true,
-    baseUrl: 'http://127.0.0.1:8080',
+    baseUrl: 'http://localhost:8080',
     setupNodeEvents(on, config) {
       require('./cypress-node-events')(on);
 
