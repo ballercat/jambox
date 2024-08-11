@@ -40,8 +40,8 @@ jobs:
         with:
           node-version: 18.x.x
       - run: yarn
-      - name: Map hosts
-        run: yarn build
+        # - name: Map hosts
+        #   run: yarn build
       - name: cypress
         uses: cypress-io/github-action@v5
         with:
