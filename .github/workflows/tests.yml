@@ -45,9 +45,8 @@ jobs:
       - name: cypress
         uses: cypress-io/github-action@v5
         with:
-          start: npm run e2e, npm run preview
+          start: npm run e2e
           command: npm run cy-ci
-          wait-on: http://localhost:8080
             # - name: SonarCloud Scan
             #   uses: SonarSource/sonarcloud-github-action@master
             #   env:

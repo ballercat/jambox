@@ -15,6 +15,9 @@ export default defineConfig({
       },
     },
   },
+  devServer: {
+    host: true,
+  },
   preview: {
     port: '8080',
   },
