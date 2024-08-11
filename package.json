@@ -25,7 +25,7 @@
     "format": "prettier --write ./src",
     "shutdown": "curl localhost:9000/shutdown",
     "health": "curl localhost:9000/info",
-    "preview": "yarn vite preview"
+    "preview": "yarn vite preview --host"
   },
   "dependencies": {
     "@httptoolkit/browser-launcher": "^2.0.2",
