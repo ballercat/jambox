@@ -24,7 +24,8 @@
     "lint": "eslint src/**/*.mjs",
     "format": "prettier --write ./src",
     "shutdown": "curl localhost:9000/shutdown",
-    "health": "curl localhost:9000/info"
+    "health": "curl localhost:9000/info",
+    "preview": "yarn vite preview"
   },
   "dependencies": {
     "@httptoolkit/browser-launcher": "^2.0.2",

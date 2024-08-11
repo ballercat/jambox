@@ -41,12 +41,11 @@ jobs:
           node-version: 18.x.x
       - run: yarn
       - name: Map hosts
-        run: |
-          sudo echo "127.0.0.1 localhost" | sudo tee -a /etc/hosts
+        run: yarn build
       - name: cypress
         uses: cypress-io/github-action@v5
         with:
-          start: npm run e2e
+          start: npm run e2e, npm run preview
           command: npm run cy-ci
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
