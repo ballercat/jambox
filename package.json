@@ -20,7 +20,7 @@
     "e2e": "NODE_OPTIONS=--dns-result-order=ipv4first c8 -o ./coverage-cypress -r=text -r=lcov node ./e2e-backend.mjs",
     "e2e-dev": "nodemon --watch ext --watch src --exec ./e2e-backend.mjs",
     "cy": "HTTP_PROXY=http://localhost:8000 cypress open --component",
-    "cy-ci": "NODE_OPTIONS=--dns-result-order=ipv4first HTTP_PROXY=http://127.0.0.1:8000 NO_PROXY=http://localhost:8080 cypress run --e2e",
+    "cy-ci": "NODE_OPTIONS=--dns-result-order=ipv4first HTTP_PROXY=http://127.0.0.1:8000 NO_PROXY=http://127.0.0.1:8080 cypress run --e2e",
     "lint": "eslint src/**/*.mjs",
     "format": "prettier --write ./src",
     "shutdown": "curl localhost:9000/shutdown",
