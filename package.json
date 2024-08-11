@@ -17,7 +17,7 @@
     "build": "vite build",
     "dev": "nodemon --watch ext --watch src --exec ./jam-server.mjs",
     "test": "c8 -r=text -r=lcov ava",
-    "e2e": "NODE_OPTIONS=--dns-result-order=ipv4first c8 -o ./coverage-cypress -r=text -r=lcov node ./e2e-backend.mjs",
+    "e2e": "c8 -o ./coverage-cypress -r=text -r=lcov node ./e2e-backend.mjs",
     "e2e-dev": "nodemon --watch ext --watch src --exec ./e2e-backend.mjs",
     "cy": "HTTP_PROXY=http://localhost:8000 cypress open --component",
     "cy-ci": "HTTP_PROXY=http://localhost:8000 NO_PROXY=127.0.0.1,localhost cypress run --component",

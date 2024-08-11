@@ -38,7 +38,7 @@ jobs:
       - name: Unit tests
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x.x
+          node-version: 20.x.x
       - run: yarn
         # - name: Map hosts
         #   run: yarn build
