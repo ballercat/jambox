@@ -1,3 +1,7 @@
+## 0.4.4 - Use a static profile dir
+
+- fix: use a static chrome profile dir to avoid losing settings between sessions
+
 ## 0.4.3 - Move svelte deps to dev
 
 - chore: move svelte related dependencies to devDependencies
