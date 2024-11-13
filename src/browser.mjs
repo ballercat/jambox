@@ -39,12 +39,7 @@ const mac = ({ chrome, uri, info }) => {
       // https://www.chromium.org/developers/design-documents/network-settings/
       `--proxy-bypass-list="${info.noProxy.join(';')}"`,
       // FIXME: Don't depend on browser-launchers profile
-      `--user-data-dir=${
-        osenv.home() +
-        '/.config/' +
-        'browser-launcher' +
-        `${chrome.name}-${chrome.version}`
-      }`,
+      `--user-data-dir=${osenv.home() + '/.config/jambox-' + chrome.name}`,
       '--disable-restore-session-state',
       '--no-default-browser-check',
       '--disable-popup-blocking',
