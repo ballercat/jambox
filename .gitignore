@@ -8,7 +8,6 @@ cypress/videos
 *.log
 dist
 build
-public
 .idea
 test-report.xml
 
