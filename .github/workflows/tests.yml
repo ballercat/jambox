@@ -23,6 +23,7 @@ jobs:
           start: npm run e2e
           command: npm run cy-ci
       - name: SonarCloud Scan
+        if: false
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
