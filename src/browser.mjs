@@ -63,15 +63,75 @@ const mac = ({ chrome, uri, info }) => {
   return browser;
 };
 
-async function launchProxiedChrome(uri, info) {
-  const browserName = info.browser || 'chrome';
+/**
+ * Resolve the browser to use. When info.browser is an object ({ name, command })
+ * it is used directly, skipping detection. When it's a string (or missing),
+ * we detect installed browsers and find by name.
+ *
+ * @param {string|object} browserConfig - value from config.browser
+ * @returns {Promise<{ name: string, command: string }>}
+ */
+async function resolveBrowser(browserConfig) {
+  if (typeof browserConfig === 'object' && browserConfig !== null) {
+    return browserConfig;
+  }
+
+  const browserName = browserConfig || 'chrome';
   const browsers = await detect();
-  const chrome = browsers.find(({ name }) => name === browserName);
-  const launch = await getLauncher();
+  const match = browsers.find(({ name }) => name === browserName);
+  if (!match) {
+    throw new Error(
+      `Browser "${browserName}" not found. Detected browsers: ${browsers.map((b) => b.name).join(', ')}. ` +
+        `You can provide a custom browser object in jambox.config.js: browser: { name: "...", command: "/path/to/binary" }`
+    );
+  }
+  return match;
+}
+
+async function launchProxiedChrome(uri, info) {
+  const chrome = await resolveBrowser(info.browser);
 
   if (os.platform() === 'darwin') {
     return mac({ chrome, uri, info });
   }
+
+  // When a custom browser object is provided, spawn directly instead of
+  // delegating to browser-launcher (which would do its own lookup).
+  if (typeof info.browser === 'object' && info.browser !== null) {
+    return spawn(
+      chrome.command,
+      [
+        uri,
+        '--disable-features=ChromeWhatsNewUI',
+        '--disable-background-networking',
+        '--disable-component-update',
+        '--check-for-update-interval=31536000',
+        `--proxy-server=${info.proxy.http}`,
+        `--proxy-bypass-list="${info.noProxy.join(';')}"`,
+        `--user-data-dir=${osenv.home() + '/.config/jambox-' + chrome.name}`,
+        '--disable-restore-session-state',
+        '--no-default-browser-check',
+        '--disable-popup-blocking',
+        '--disable-translate',
+        '--start-maximized',
+        '--disable-default-apps',
+        '--disable-sync',
+        '--enable-fixed-layout',
+        '--no-first-run',
+        '--noerrdialogs',
+        `--ignore-certificate-errors-spki-list=${SPKI_FINGERPRINT}`,
+        '--test-type',
+        '--enable-automation',
+        '--auto-open-devtools-for-tabs',
+        `--load-extension=${EXTENSION_PATH}`,
+        '--enable-features=AllowWasmInMV3',
+      ],
+      { detached: true, stdio: 'ignore' }
+    );
+  }
+
+  const browserName = chrome.name;
+  const launch = await getLauncher();
 
   return new Promise((resolve, reject) => {
     launch(

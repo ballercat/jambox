@@ -14,15 +14,55 @@ import debounce from './utils/debounce.mjs';
 const debug = createDebug('config');
 
 /**
+ * @typedef  {object} BrowserConfig
+ * @property {string} name    - Browser name (e.g. 'chromium')
+ * @property {string} command - Absolute path to the browser executable
+ */
+
+/**
+ * Validate and return a browser config value.
+ * Accepts a string (browser name) or an object with { name, command }.
+ * Throws on invalid input.
+ *
+ * @param {string|BrowserConfig} value
+ * @returns {string|BrowserConfig}
+ */
+export function validateBrowserConfig(value) {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    const errors = [];
+    if (typeof value.name !== 'string' || value.name.length === 0) {
+      errors.push('"name" must be a non-empty string');
+    }
+    if (typeof value.command !== 'string' || value.command.length === 0) {
+      errors.push('"command" must be a non-empty string');
+    }
+    if (errors.length > 0) {
+      throw new Error(
+        `Invalid browser config object: ${errors.join(', ')}. Expected { name: string, command: string }.`
+      );
+    }
+    return value;
+  }
+
+  throw new Error(
+    `Invalid browser config: expected a string or an object with { name: string, command: string }, got ${typeof value}.`
+  );
+}
+
+/**
  * @typedef  {object} ConfigUpdate
- * @property {object=}        forward
- * @property {object=}        stub
- * @property {Array<string>=} trust
- * @property {object=}        cache
- * @property {boolean=}       blockNetworkRequests
- * @property {boolean=}       paused
- * @property {string=}        port
- * @property {string=}        browser
+ * @property {object=}                  forward
+ * @property {object=}                  stub
+ * @property {Array<string>=}           trust
+ * @property {object=}                  cache
+ * @property {boolean=}                 blockNetworkRequests
+ * @property {boolean=}                 paused
+ * @property {string=}                  port
+ * @property {(string|BrowserConfig)=}  browser
  */
 export default class Config extends Emitter {
   /**
@@ -126,8 +166,8 @@ export default class Config extends Emitter {
       this.serverURL.port = options.port;
     }
 
-    if (typeof options.browser === 'string') {
-      this.browser = options.browser;
+    if (options.browser != null) {
+      this.browser = validateBrowserConfig(options.browser);
     }
 
     this.dispatch('update', this.serialize());
