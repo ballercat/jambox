@@ -1,8 +1,9 @@
 // @ts-check
 import mockttp from 'mockttp';
 
-export default class ProxyHandler extends mockttp.requestHandlers
-  .PassThroughHandler {
+export default class ProxyHandler
+  extends mockttp.requestHandlers.PassThroughHandler
+{
   #options;
   constructor(options) {
     super(options);

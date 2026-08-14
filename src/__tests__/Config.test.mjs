@@ -117,9 +117,7 @@ test('validateBrowserConfig: rejects object missing command', (t) => {
 });
 
 test('validateBrowserConfig: rejects object with empty strings', (t) => {
-  const err = t.throws(() =>
-    validateBrowserConfig({ name: '', command: '' })
-  );
+  const err = t.throws(() => validateBrowserConfig({ name: '', command: '' }));
   t.true(err.message.includes('"name" must be a non-empty string'));
   t.true(err.message.includes('"command" must be a non-empty string'));
 });

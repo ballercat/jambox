@@ -13,8 +13,8 @@ example kitched sink example in the README.md for a good config starting point.
 
 ## Manual testing
 
-`yarn dev` to watch and rebuild server
-`yarn webpack --watch` to rebuild the extension UI
+`npm run dev` to watch and rebuild server
+`npm run webpack -- --watch` to rebuild the extension UI
 
 Once Chrome is launched with via jambox, for example `jam record <url>` you
 no longer need to re-launch chrome to connect to the jambox. Just restart the
@@ -29,10 +29,10 @@ and the server.
 Start the end-to-end backend, this will stand up a simple HTTP server to test against and
 a jambox server to act as a proxy.
 
-`yarn e2e-dev`
+`npm run e2e-dev`
 
 Launch cypress
 
-`yarn cy`
+`npm run cy`
 
 Note that if yuu did not launch the server first, the tests will fail.

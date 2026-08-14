@@ -1,5 +1,5 @@
 module.exports = {
-  plugins: ['svelte3', 'typescript'],
+  plugins: ['svelte', 'typescript'],
   rules: {
     'no-console': 0,
     'no-undefined': 1,
@@ -19,7 +19,7 @@ module.exports = {
   overrides: [
     {
       files: ['*.svelte'],
-      processor: 'svelte3/svelte3',
+      processor: 'svelte/svelte',
     },
   ],
 };

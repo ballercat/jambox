@@ -14,8 +14,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.x.x
-      - run: yarn
-      - run: yarn test
+          cache: 'npm'
+      - run: npm install
+      - run: npm test
       - name: cypress
         if: ${{ false }}
         uses: cypress-io/github-action@v5
@@ -41,16 +42,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.x.x
-      - run: yarn
-      - run: yarn lint
+          cache: 'npm'
+      - run: npm install
+      - run: npm run lint
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Lints
+      - name: Build
         uses: actions/setup-node@v4
         with:
           node-version: 24.x.x
-      - run: yarn
-      - run: yarn build
+          cache: 'npm'
+      - run: npm install
+      - run: npm run build
 

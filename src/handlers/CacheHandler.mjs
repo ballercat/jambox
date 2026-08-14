@@ -2,8 +2,9 @@
 import mockttp from 'mockttp';
 import Cache from '../Cache.mjs';
 
-export default class CacheHandler extends mockttp.requestHandlers
-  .CallbackHandler {
+export default class CacheHandler
+  extends mockttp.requestHandlers.CallbackHandler
+{
   /**
    * Empty cache response
    */

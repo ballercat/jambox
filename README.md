@@ -7,7 +7,7 @@ Record & Playback requests.
 ## Install
 
 ```
-yarn add -D jambox
+npm install -D jambox
 ```
 
 ## Usage
@@ -27,7 +27,7 @@ Prepend `jam` to whatever command you are using to run `next` for example
 Or without changing an existing command
 
 ```
-$(yarn bin jam) yarn dev
+npx jam npm run dev
 ```
 
 #### Browser
@@ -37,7 +37,7 @@ Each command auto starts a proxy server.
 For example
 
 ```
-yarn jam http://my-site-url.com
+npx jam http://my-site-url.com
 ```
 
 or create a re-usable script if you don't want to type this out every time
@@ -59,19 +59,19 @@ See sub-commands below.
 
 #### `ping`
 
-`yarn jam-server ping`
+`npx jam-server ping`
 
 Attempt to ping a currently running jambox server
 
 #### `shutdown`
 
-`yarn jam-server shutdown`
+`npx jam-server shutdown`
 
 Attempt to shutdown a currently running jambox server
 
 #### `tail`
 
-`yarn jam-server tail`
+`npx jam-server tail`
 
 Tail the current logfile
 

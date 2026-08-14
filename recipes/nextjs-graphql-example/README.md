@@ -2,10 +2,10 @@
 
 ## Install
 
-Make sure to run `yarn` and `yarn build` at the root of this repo.
+Make sure to run `npm install` and `npm run build` at the root of this repo.
 
 ```
-yarn
+npm install
 ```
 
 Set a `browser` option in `jambox.config.js` to either `chrome` or `chromium` based on
@@ -14,8 +14,8 @@ what you have installed on your system. The default is `chromium`.
 ## Run
 
 ```
-❯ yarn dev
-yarn dev
+❯ npm run dev
+npm run dev
 📻 Jambox 📻
 Process launched
 ready - started server on 0.0.0.0:3000, url: http://localhost:3000
@@ -29,7 +29,7 @@ warn  - Fast Refresh had to perform a full reload. Read more: https://nextjs.org
 ## Visit the page
 
 ```
-❯ yarn visit
+❯ npm run visit
 📻 Jambox 📻
 http://jambox-demo-graphql.vercel.app parsed as a URI. Launching a browser instance
 chromium launched with 17172
@@ -85,6 +85,6 @@ difference.
 ## Notes
 
 - You may clear the `.jambox` folder to start fresh.
-- Check if jambox is running with `yarn jam-server ping`
-- Shutdown the server with `yarn jam-server shutdown`
-- Tail the logs with `yarn jam-server tail`
+- Check if jambox is running with `npx jam-server ping`
+- Shutdown the server with `npx jam-server shutdown`
+- Tail the logs with `npx jam-server tail`
