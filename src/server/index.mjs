@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-nocheck
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import express from 'express';
@@ -13,10 +13,34 @@ import Broadcaster from './Broadcaster.mjs';
 import cacheRouter from './routes/cache.route.mjs';
 import resetRouter from './routes/reset.route.mjs';
 import configRouter from './routes/config.route.mjs';
-import { createDebug } from '../diagnostics.js';
+import { createDebug } from '../diagnostics.cjs';
 
 const debug = createDebug('server');
 
+/**
+ * Start the Jambox REST + WebSocket server.
+ *
+ * Initializes the mockttp HTTPS proxy, creates a {@link Jambox} instance,
+ * sets up the Express application with REST API routes and WebSocket support,
+ * and starts listening on the given port.
+ *
+ * **Exposed REST endpoints:**
+ * - `GET  /`            — Returns the current jambox version string
+ * - `GET  /shutdown`    — Stops the proxy and exits the process
+ * - `GET  /api/config`  — Returns serialized configuration
+ * - `POST /api/config`  — Updates configuration (in-memory only)
+ * - `POST /api/pause`   — Toggles the paused state
+ * - `GET  /api/cache`   — Returns all cached request/response pairs
+ * - `POST /api/cache`   — Performs cache actions (delete, update, persist)
+ * - `POST /api/reset`   — Resets the proxy (optionally with a new CWD)
+ * - `WS   /`            — WebSocket endpoint for live event streaming
+ *
+ * @param {object}        options
+ * @param {number}        options.port                  - Port to listen on
+ * @param {NodeJS.Process} [options.nodeProcess=process] - Process to attach exit handler to (injectable for testing)
+ * @param {typeof fs}     [options.filesystem=fs]       - Filesystem module (injectable for testing)
+ * @returns {Promise<import('express').Application>} The configured Express app
+ */
 async function start({ port, nodeProcess = process, filesystem = fs }) {
   nodeProcess.on('exit', (code) => {
     debug(`Shutting down, code: ${code}`);

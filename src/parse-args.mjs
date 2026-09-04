@@ -1,3 +1,6 @@
+/**
+ * @type {Record<string, [string, number, Function]>}
+ */
 export const JAMBOX_FLAGS = {
   '-r': ['reset', 0, Boolean],
   '--reset': ['reset', 0, Boolean],
@@ -20,8 +23,8 @@ export const JAMBOX_FLAGS = {
  *    target: ["yarn dev"] // etc
  * }
  *
- * @param {Array<string>}                args
- * @param {{[string]: [string, number]}} supported
+ * @param {Array<string>}                              args
+ * @param {Record<string, [string, number, Function]>} supported
  *
  * @return {Object}
  */

@@ -1,0 +1,22 @@
+{
+  "include": ["src/**/*"],
+  "exclude": ["src/**/__tests__/*", "src/**/__mocks__/*"],
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "allowJs": true,
+    "checkJs": false,
+    "esModuleInterop": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "declarationMap": true,
+    "moduleResolution": "NodeNext",
+    "sourceMap": false,
+    "skipLibCheck": true
+  },
+  "typeAcquisition": {
+    "enable": true,
+    "include": ["src/index.ts"]
+  }
+}

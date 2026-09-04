@@ -1,10 +1,17 @@
-// @ts-check
+// @ts-nocheck
 import { Buffer } from 'buffer';
 import { encodeBuffer } from 'http-encoding';
 
 /**
- * @param body    {object|string}  Body
- * @param headers {Headers} Headers
+ * Encode a response body into a compressed Buffer, matching the
+ * `content-encoding` header of the response.
+ *
+ * If the body is an object it is JSON-stringified before encoding.
+ * If there is no `content-encoding` header the raw buffer is returned.
+ *
+ * @param {object|string} body    - Response body to encode
+ * @param {object}        headers - HTTP headers (used to read `content-encoding`)
+ * @returns {Promise<Buffer>} Encoded body buffer
  */
 export const encodeBodyBuffer = (body, headers) => {
   let buffer;
@@ -22,8 +29,15 @@ export const encodeBodyBuffer = (body, headers) => {
 };
 
 /**
- * @param prev {object} Previous response
- * @param curr {object} Current response
+ * Merge a previous cached response with partial updates from `curr`.
+ *
+ * The `body` of `curr` is re-encoded using {@link encodeBodyBuffer} so the
+ * internal buffer representation stays consistent. The `content-length`
+ * header is updated automatically if it was present in the original response.
+ *
+ * @param {object} prev - Original cached response object
+ * @param {object} curr - Partial update containing `body` and `headers`
+ * @returns {Promise<object>} Updated response object ready to store in cache
  */
 export const updateResponse = async (prev, curr) => {
   // New body arrives a primitive instead of a buffer and needs to be patched

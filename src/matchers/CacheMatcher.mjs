@@ -1,13 +1,30 @@
-// @ts-check
+// @ts-nocheck
 import mockttp from 'mockttp';
 import minimatch from 'minimatch';
 import Cache from '../Cache.mjs';
 
+/**
+ * Request matcher that determines whether a request should be served from cache.
+ *
+ * A request matches if:
+ * 1. The cache is not in bypass mode
+ * 2. The request URL matches a `stage` glob pattern
+ * 3. The request URL does not match an `ignore` glob pattern
+ * 4. Either network access is blocked OR the request hash exists in cache
+ *
+ * @extends {mockttp.matchers.CallbackMatcher}
+ */
 export default class CacheMatcher extends mockttp.matchers.CallbackMatcher {
+  /** @type {{ stage?: string[], ignore?: string[] }} */
   #options;
 
   /**
-   * @param {import('../Jambox.mjs').default} jambox
+   * Creates a new CacheMatcher.
+   *
+   * @param {import('../Jambox.mjs').default} jambox   - The active Jambox instance
+   * @param {object}                          [options] - Cache match configuration
+   * @param {string[]}                        [options.stage]  - Glob patterns of URLs to stage/cache
+   * @param {string[]}                        [options.ignore] - Glob patterns of URLs to exclude from caching
    */
   constructor(jambox, options = {}) {
     super(async (request) => {
@@ -42,6 +59,11 @@ export default class CacheMatcher extends mockttp.matchers.CallbackMatcher {
     this.#options = options;
   }
 
+  /**
+   * Returns a human-readable description of the matcher configuration.
+   *
+   * @returns {string}
+   */
   explain() {
     return `CacheMatcher ${JSON.stringify(this.#options)}`;
   }

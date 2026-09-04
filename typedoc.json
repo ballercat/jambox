@@ -1,0 +1,14 @@
+{
+  "entryPoints": ["src/index.ts"],
+  "out": "docs",
+  "name": "jambox",
+  "includeVersion": true,
+  "readme": "README.md",
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "searchInComments": true,
+  "navigationLinks": {
+    "GitHub": "https://github.com/ballercat/jambox"
+  }
+}

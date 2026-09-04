@@ -8,6 +8,11 @@ import launcher from '@httptoolkit/browser-launcher';
 // that's right
 const SPKI_FINGERPRINT = 'ImPkfKy0ZYTFQr8oFYoEGm6FJOgHyRUkeMBTfHujwSQ=';
 
+/**
+ * Detect installed browsers via browser-launcher.
+ *
+ * @returns {Promise<Array<{ name: string, command: string }>>}
+ */
 const detect = () => {
   return new Promise((resolve) => {
     launcher.detect(resolve);
@@ -19,6 +24,18 @@ const getLauncher = util.promisify(launcher);
 // NOTE: The launcher from browser-launcher is umm, bad. It does not launch
 // a new instance of chrome and claims it's not possible, but it totally is.
 // The spawn() logic is borrowed from portions of Cypress.
+
+/**
+ * Launch Chrome on macOS via `open -n` so a fresh instance is started
+ * (browser-launcher refuses to do this) with jambox proxy settings,
+ * the jambox extension, and jambox's CA cert pinned as trusted.
+ *
+ * @param {object} param0
+ * @param {{ name: string, command: string }} param0.chrome  - Resolved browser
+ * @param {string} param0.uri                                - URL to open
+ * @param {import('./index.ts').SerializedConfig} param0.info - Serialized config (proxy, noProxy)
+ * @returns {import('child_process').ChildProcess} The spawned `open` process
+ */
 const mac = ({ chrome, uri, info }) => {
   // Borrowed from cypress
   // https://github.com/cypress-io/cypress/blob/4e667e5383a4df482756f3b1b3d572c3a97ac7df/packages/launcher/lib/browsers.ts#L188
@@ -88,6 +105,19 @@ async function resolveBrowser(browserConfig) {
   return match;
 }
 
+/**
+ * Launch a (Chromium-based) browser with jambox's proxy, CA cert and
+ * browser extension configured.
+ *
+ * Platform behavior:
+ * - **macOS**: spawns via `open -n` (see {@link mac})
+ * - **Other**: with a custom browser object, spawns the binary directly;
+ *   otherwise delegates to `browser-launcher`
+ *
+ * @param {string} uri  - URL to open in the browser
+ * @param {import('./index.ts').SerializedConfig} info - Serialized config (browser, proxy, noProxy)
+ * @returns {Promise<import('child_process').ChildProcess|object>} The launched browser instance
+ */
 async function launchProxiedChrome(uri, info) {
   const chrome = await resolveBrowser(info.browser);
 

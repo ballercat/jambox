@@ -1,4 +1,4 @@
-import API from './Api';
+import API from './Api.js';
 import App from './App.svelte';
 
 let api;

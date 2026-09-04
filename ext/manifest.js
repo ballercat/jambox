@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   name: 'Jambox',
   description: 'Examine and edit proxied requests',
   version: '0.0.2',

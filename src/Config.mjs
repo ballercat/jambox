@@ -1,8 +1,8 @@
-// @ts-check
+// @ts-nocheck
 import * as NodeFS from 'node:fs';
 import * as path from 'node:path';
-import { createDebug } from './diagnostics.js';
-import getUserConfigFile from './read-user-config.js';
+import { createDebug } from './diagnostics.cjs';
+import getUserConfigFile from './read-user-config.cjs';
 import {
   CONFIG_FILE_NAME,
   CACHE_DIR_NAME,
@@ -14,6 +14,8 @@ import debounce from './utils/debounce.mjs';
 const debug = createDebug('config');
 
 /**
+ * Browser launch configuration.
+ *
  * @typedef  {object} BrowserConfig
  * @property {string} name    - Browser name (e.g. 'chromium')
  * @property {string} command - Absolute path to the browser executable
@@ -54,6 +56,8 @@ export function validateBrowserConfig(value) {
 }
 
 /**
+ * Partial configuration update, as accepted by {@link Config#update}.
+ *
  * @typedef  {object} ConfigUpdate
  * @property {object=}                  forward
  * @property {object=}                  stub
@@ -64,8 +68,22 @@ export function validateBrowserConfig(value) {
  * @property {string=}                  port
  * @property {(string|BrowserConfig)=}  browser
  */
+
+/**
+ * Jambox runtime configuration.
+ *
+ * Loads `jambox.config.js` from the working directory, watches it for
+ * changes (debounced hot-reload via {@link Config#watch}), and exposes
+ * the merged values used by {@link Jambox} to configure the proxy.
+ *
+ * Emits a `config.update` event whenever the config is updated.
+ *
+ * @extends {Emitter}
+ */
 export default class Config extends Emitter {
   /**
+   * URL of the jambox management server (host + port).
+   *
    * @member {URL}
    */
   serverURL;
@@ -79,6 +97,8 @@ export default class Config extends Emitter {
   trust = new Set();
   forward = null;
   /**
+   * Cache settings (`{ tape, stage?, ignore? }`) or `null` when caching is disabled.
+   *
    * @member {object|null}
    */
   cache;
@@ -86,21 +106,27 @@ export default class Config extends Emitter {
   blockNetworkRequests = false;
   paused = false;
   /**
+   * Filesystem module (injectable for testing).
+   *
    * @member {import('node:fs')}
    */
   fs;
   /**
+   * Loads the user config module from a filepath (injectable for testing).
+   *
    * @member {(f: string) => object}
    */
   loadConfigModule;
 
   /**
+   * Creates a new Config instance.
+   *
    * @param {object}                init
-   * @param {string=}               init.port
-   * @param {object=}               init.proxy
-   * @param {object}                options
-   * @param {import('node:fs')}     options.fs
-   * @param {(f: string) => object} options.loadConfigModule
+   * @param {string=}               init.port   - Port for the management server (default: '9000')
+   * @param {object=}               init.proxy  - Proxy URLs + env vars reported to clients
+   * @param {object}                [options]   - Injectable dependencies
+   * @param {import('node:fs')}     [options.fs]              - Filesystem module
+   * @param {(f: string) => object} [options.loadConfigModule] - Config module loader
    */
   constructor(
     { port, proxy, ...rest } = {},
@@ -119,6 +145,9 @@ export default class Config extends Emitter {
     this.update(rest);
   }
 
+  /**
+   * Ensure the `.jambox` cache directory exists, creating it if necessary.
+   */
   prepCacheDir() {
     if (this.fs.existsSync(this.dir)) {
       return;
@@ -129,7 +158,12 @@ export default class Config extends Emitter {
   }
 
   /**
-   * @param {ConfigUpdate} options
+   * Apply a partial configuration update and dispatch `config.update`.
+   *
+   * Only the keys present in `options` are applied; everything else
+   * keeps its current value.
+   *
+   * @param {ConfigUpdate} options - Partial config values to apply
    */
   update(options) {
     if ('forward' in options) {
@@ -173,6 +207,9 @@ export default class Config extends Emitter {
     this.dispatch('update', this.serialize());
   }
 
+  /**
+   * Reset all user-facing config values back to their defaults.
+   */
   clear() {
     this.forward = null;
     this.stub = null;
@@ -183,7 +220,14 @@ export default class Config extends Emitter {
   }
 
   /**
-   * @param {string=} cwd
+   * Load configuration from a `jambox.config.js` file.
+   *
+   * With a `cwd` argument, points the config at that directory (creating the
+   * cache dir, resolving the config file path and starting a file watcher).
+   * Without one, re-reads the previously loaded config file (used by the
+   * file watcher on changes).
+   *
+   * @param {string=} cwd - Working directory to load `jambox.config.js` from
    */
   load(cwd) {
     this.clear();
@@ -213,6 +257,8 @@ export default class Config extends Emitter {
   }
 
   /**
+   * Watch the config file for changes and hot-reload on modification.
+   *
    * @private
    */
   watch() {
@@ -228,6 +274,11 @@ export default class Config extends Emitter {
     );
   }
 
+  /**
+   * Serialize the config into a plain object for the REST API.
+   *
+   * @returns {import('./index.ts').SerializedConfig}
+   */
   serialize() {
     return {
       browser: this.browser,

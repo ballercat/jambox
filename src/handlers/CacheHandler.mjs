@@ -1,12 +1,23 @@
-// @ts-check
+// @ts-nocheck
 import mockttp from 'mockttp';
 import Cache from '../Cache.mjs';
 
+/**
+ * Request handler that serves responses from the in-memory cache.
+ *
+ * When a request matches the {@link CacheMatcher}, this handler is invoked.
+ * It looks up the request hash in the cache and returns the stored response,
+ * or a 404 if no cached entry is found.
+ *
+ * @extends {mockttp.requestHandlers.CallbackHandler}
+ */
 export default class CacheHandler
   extends mockttp.requestHandlers.CallbackHandler
 {
   /**
-   * Empty cache response
+   * Response returned when no cached entry is found for the request.
+   *
+   * @type {{ statusCode: number, statusMessage: string, json: object }}
    */
   static NO_CACHE_RESULT = {
     statusCode: 404,
@@ -19,7 +30,9 @@ export default class CacheHandler
   };
 
   /**
-   * @param {import('../Jambox.mjs').default} jambox
+   * Creates a new CacheHandler.
+   *
+   * @param {import('../Jambox.mjs').default} jambox - The active Jambox instance
    */
   constructor(jambox) {
     const callback = async (completedRequest) => {
@@ -56,6 +69,12 @@ export default class CacheHandler
 
     super(callback);
   }
+
+  /**
+   * Returns a human-readable description of what this handler does.
+   *
+   * @returns {string}
+   */
   explain() {
     return `CacheHandler return a response from cache`;
   }

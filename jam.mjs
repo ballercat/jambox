@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import entrypoint from './src/entrypoint.mjs';
 import * as constants from './src/constants.mjs';
-import { enable as enableDiagnostics } from './src/diagnostics.js';
+import { enable as enableDiagnostics } from './src/diagnostics.cjs';
 
 enableDiagnostics();
 

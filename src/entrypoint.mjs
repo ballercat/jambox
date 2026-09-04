@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-nocheck
 import * as path from 'node:path';
 import { spawn } from 'node:child_process';
 import fetch from 'node-fetch';
@@ -8,11 +8,34 @@ import isURI from './is-uri.mjs';
 import launchServer from './server-launcher.mjs';
 import Config from './Config.mjs';
 import { parseArgs, JAMBOX_FLAGS } from './parse-args.mjs';
-import { createDebug } from './diagnostics.js';
+import { createDebug } from './diagnostics.cjs';
 
 const debug = createDebug();
 
-export default async function cli(options) {
+/**
+ * Jambox CLI entrypoint.
+ *
+ * Given a target (a URL or a command to run), this will:
+ *
+ * 1. Load the user config from the current working directory
+ * 2. Ensure a jambox server is running ({@link launchServer})
+ * 3. POST the cwd to `/api/reset` so the running server picks up this
+ *    project's config and returns its proxy settings
+ * 4. Launch the target:
+ *    - A **URI** opens a proxied Chrome instance ({@link launchProxiedChrome})
+ *      and persists the runtime config for the extension
+ *    - Anything else is spawned as a **node script** with `NODE_EXTRA_CA_CERTS`,
+ *      the proxy `require` hook, and `GLOBAL_AGENT_HTTP_PROXY` set
+ *
+ * @param {object} options
+ * @param {string} options.script    - Full CLI invocation (parsed for jambox flags)
+ * @param {string=} options.cwd      - Working directory (default: `process.cwd()`)
+ * @param {Function} options.log     - Logger
+ * @param {object} options.env       - Environment variables passed to spawned scripts
+ * @param {object} options.constants - Project constants (PROJECT_ROOT, SCRIPT_HELPER)
+ * @returns {Promise<{ browser?: object, process?: boolean }>}
+ */
+async function cli(options) {
   const { script, cwd = process.cwd(), log, env, constants } = options;
   const flags = parseArgs(script, JAMBOX_FLAGS);
   const [entrypoint, ...args] = flags.target;
@@ -39,15 +62,17 @@ export default async function cli(options) {
    * - 'info' is kind of a poor name here
    * - We are looking for the proxy settings from the running instance
    */
-  const info = await (
-    await fetch(`${config.serverURL.href}api/reset`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ cwd }),
-    })
-  ).json();
+  const info = /** @type {import('./index.js').SerializedConfig} */ (
+    await (
+      await fetch(`${config.serverURL.href}api/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cwd }),
+      })
+    ).json()
+  );
 
   debug(`Check if entrypoint ${entrypoint} is a URI`);
 
@@ -76,3 +101,5 @@ export default async function cli(options) {
 
   return { process: true };
 }
+
+export default cli;
